@@ -8,10 +8,7 @@
    supabaseUrl / supabaseAnonKey: progetto Supabase dove gira supabase/schema.sql.
      La chiave publishable è pensata per stare nel browser: la tabella è chiusa
      e si legge/scrive solo tramite le funzioni che richiedono il codice del viaggio.
-   supabaseSchema: schema Postgres (va aggiunto agli "Exposed schemas" della Data API).
-
-   I valori si possono anche inserire dalla pagina (scheda "Prima di partire" → Salvataggio):
-   in quel caso restano solo sul dispositivo. */
+   supabaseSchema: schema Postgres (va aggiunto agli "Exposed schemas" della Data API). */
 window.JP26_CONFIG = {
   googleMapsKey: "AIzaSyDEcVce0Rb3nVQb58T1KGEwnqmYdgwHuvQ",
   supabaseUrl: "https://exchjppslwhbnbzuhfqs.supabase.co",

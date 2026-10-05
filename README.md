@@ -23,7 +23,7 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
 4. Apri il sito, vai su *Prima di partire → Salvataggio e Google Maps*, premi *Genera un codice* e *Salva e sincronizza*.
    Inserisci lo stesso codice sul telefono di Michela.
 
-Le chiavi si possono anche incollare direttamente nella pagina (sezione *Chiavi tecniche*): restano solo su quel dispositivo.
+Le chiavi stanno solo in `config.js`: per cambiarle si modifica quel file.
 
 ## Google Maps nel cruscotto
 
