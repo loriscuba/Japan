@@ -431,7 +431,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
 <section class="view" id="v-checklist" role="tabpanel">
   <h2>Prima di partire</h2>
-  <p class="muted">Spunta quello che hai fatto. Con il salvataggio cloud attivo (in fondo alla pagina) i segni si vedono su tutti i vostri telefoni.</p>
+  <p class="muted">Spunta quello che hai fatto: i segni si salvano e si vedono su tutti i vostri telefoni.</p>
   <div class="prog"><i id="progbar" style="width:0%"></i></div>
   <p class="muted" id="progtxt"></p>
   <div id="chklist"></div>
@@ -444,7 +444,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
     </div>
   </div>
   <div class="sec" id="settings">
-    <h3>Salvataggio e Google Maps</h3>
+    <h3>Salvataggio</h3>
     <div class="setbox" id="setbox"></div>
   </div>
 </section>
@@ -1587,7 +1587,7 @@ function setMsg(t){ const m=$("#setmsg"); if(m) m.textContent=t; }
 
 /* ---------- salvataggio cloud (Supabase) ---------- */
 const Sync={
-  code: store.get("code",""), timer:null, state:"local", busy:false,
+  code: CFG.tripCode||store.get("code",""), timer:null, state:"local", busy:false,
   on(){ return !!(SB.url&&SB.key&&this.code); },
   rpc(fn,body){
     return fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:Object.assign({"Content-Type":"application/json","Content-Profile":SB.schema,apikey:SB.key},SB.key.indexOf("sb_")===0?{}:{Authorization:"Bearer "+SB.key}),body:JSON.stringify(body)})
@@ -1624,20 +1624,10 @@ const Sync={
   }
 };
 function renderSettings(){
-  $("#setbox").innerHTML=`<p class="muted" style="margin-top:0">Piano, spunte, impostazioni e note restano sempre su questo dispositivo. Con il salvataggio cloud si condividono tra tutti i telefoni che usano lo <b>stesso codice viaggio</b>: inseriscilo uguale sul telefono di Michela.</p>
-   <label>Codice viaggio <input type="text" id="s-code" autocomplete="off" spellcheck="false" value="${esc(Sync.code)}" placeholder="almeno 8 caratteri, es. generato qui sotto"></label>
-   <div class="acts" style="margin-top:0"><button class="btn small" data-act="newcode">Genera un codice</button></div>
-   <div class="acts"><button class="btn small primary" data-act="savecfg">Salva e sincronizza</button><button class="btn small" data-act="syncnow"${Sync.on()?"":" disabled"}>Sincronizza ora</button></div>
-   <p class="muted" style="margin:10px 0 0">Google Maps nelle schede: <b>${GM_KEY?"attivo":"non configurato"}</b>. Cloud: <b>${SB.url&&SB.key?"configurato":"non configurato"}</b>.</p>
-   <div class="acts"><button class="btn small" data-act="export">Scarica backup</button><button class="btn small" data-act="import">Carica backup</button><input type="file" id="importfile" accept="application/json,.json" data-act="importfile" hidden></div>
+  $("#setbox").innerHTML=`<p class="muted" style="margin-top:0">Piano, spunte, programmi, luoghi aggiunti e note si salvano da soli nel database del viaggio e si vedono su tutti i vostri telefoni. Una copia resta anche sul dispositivo, così il cruscotto funziona pure senza rete.</p>
+   <div class="acts"><button class="btn small primary" data-act="syncnow"${Sync.on()?"":" disabled"}>Sincronizza ora</button><button class="btn small" data-act="export">Scarica backup</button><button class="btn small" data-act="import">Carica backup</button><input type="file" id="importfile" accept="application/json,.json" data-act="importfile" hidden></div>
+   <p class="muted" style="margin:10px 0 0">Google Maps: <b>${GM_KEY?"attivo":"non configurato"}</b>. Database: <b>${Sync.on()?"attivo":"non configurato"}</b>.</p>
    <p class="muted" id="setmsg" aria-live="polite" style="margin:8px 0 0"></p>`;
-}
-function saveCfg(){
-  const code=$("#s-code").value.trim();
-  if(code&&code.length<8){ setMsg("Il codice deve avere almeno 8 caratteri."); return; }
-  Sync.code=code; store.set("code",code);
-  renderSettings();
-  if(Sync.on()) Sync.pull(true); else { Sync.badge(); setMsg(code?"Codice salvato. Manca la configurazione Supabase.":"Salvataggio cloud disattivato."); }
 }
 
 /* ---------- eventi ---------- */
@@ -1676,8 +1666,6 @@ document.addEventListener("click",function(e){
   else if(act==="csv") downloadCSV(id==="sel");
   else if(act==="export") exportJSON();
   else if(act==="import") $("#importfile").click();
-  else if(act==="newcode"){ $("#s-code").value=randCode(); }
-  else if(act==="savecfg") saveCfg();
   else if(act==="syncnow") Sync.pull(true);
   else if(act==="copy"){
     const t=planText(), out=$("#copied");

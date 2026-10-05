@@ -6,7 +6,7 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
 ## Cosa si salva
 
 - **Sempre, sul dispositivo:** piano delle attrazioni, spunte della checklist, ritmo, età di Umberto, cambio, note giornaliere.
-- **Sul cloud (Supabase), se configurato:** gli stessi dati, condivisi fra tutti i telefoni che usano lo stesso *codice viaggio*.
+- **Nel database (Supabase):** gli stessi dati, condivisi da tutti senza codice da inserire (il codice del viaggio è fisso in `config.js`).
   Sincronizza da solo a ogni modifica, quando riapri la pagina e ogni minuto.
 - **Backup:** scheda *Prima di partire → Salvataggio* → *Scarica backup* / *Carica backup* (file JSON).
 
@@ -20,8 +20,7 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
 3. **Google Maps (dati live nelle schede: orari, valutazioni, foto, mappa):** in Google Cloud Console abilita
    *Maps JavaScript API*, *Places API (New)* e *Routes API*, crea una chiave API con restrizione *Referrer HTTP*
    sul dominio del sito (es. `https://loriscuba.github.io/*`) e mettila in `config.js`.
-4. Apri il sito, vai su *Prima di partire → Salvataggio e Google Maps*, premi *Genera un codice* e *Salva e sincronizza*.
-   Inserisci lo stesso codice sul telefono di Michela.
+4. Apri il sito: il salvataggio nel database è automatico.
 
 Le chiavi stanno solo in `config.js`: per cambiarle si modifica quel file.
 
