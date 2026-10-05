@@ -306,12 +306,29 @@ select.mini{min-width:0;width:auto;padding:4px 6px;font-size:.82rem;border-width
 .addform input[type=text]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--card);color:var(--ink)}
 .addform select{min-width:0}
 .daypick{display:inline-flex;gap:6px;align-items:center;font-size:.84rem;color:var(--muted)}
+body.locked>header,body.locked>nav,body.locked>main{display:none}
+.gate{display:none;min-height:100vh;place-items:center;padding:24px 16px}
+body.locked .gate{display:grid}
+.gatebox{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:center}
+.gatebox h1{font-size:1.6rem;margin-bottom:6px}
+.gatebox input{width:100%;font:inherit;font-size:1.05rem;padding:10px 12px;margin:14px 0 10px;border:1.5px solid var(--ink);border-radius:8px;background:var(--paper);color:var(--ink);text-align:center}
+.gatebox .btn{width:100%;justify-content:center;padding:10px}
+.gatemsg{min-height:1.4em;margin:10px 0 0;font-size:.9rem;color:var(--risk)}
 textarea.note{font:inherit;font-size:.93rem;width:100%;min-height:58px;padding:7px 9px;border:1px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--ink);resize:vertical;margin-top:8px}
 textarea.note:focus{border-style:solid;border-color:var(--ink)}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
-<body>
+<body class="locked">
+<section class="gate" id="gate" aria-label="Accesso">
+  <form class="gatebox" id="gateform" autocomplete="on">
+    <h1>Giappone 2026</h1>
+    <p class="muted" style="margin:0">Il cruscotto del viaggio di Loris, Michela e Umberto. Inserisci la password: la chiede una volta sola su questo dispositivo.</p>
+    <input type="password" id="gatepw" name="password" autocomplete="current-password" placeholder="Password" aria-label="Password" required>
+    <button class="btn primary" type="submit">Entra</button>
+    <p class="gatemsg" id="gatemsg" aria-live="polite"></p>
+  </form>
+</section>
 <header class="hero"><div class="wrap">
   <div class="herotop">
     <div>
@@ -1587,7 +1604,7 @@ function setMsg(t){ const m=$("#setmsg"); if(m) m.textContent=t; }
 
 /* ---------- salvataggio cloud (Supabase) ---------- */
 const Sync={
-  code: CFG.tripCode||store.get("code",""), timer:null, state:"local", busy:false,
+  code: store.get("pw",""), timer:null, state:"local", busy:false,
   on(){ return !!(SB.url&&SB.key&&this.code); },
   rpc(fn,body){
     return fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:Object.assign({"Content-Type":"application/json","Content-Profile":SB.schema,apikey:SB.key},SB.key.indexOf("sb_")===0?{}:{Authorization:"Bearer "+SB.key}),body:JSON.stringify(body)})
@@ -1625,7 +1642,7 @@ const Sync={
 };
 function renderSettings(){
   $("#setbox").innerHTML=`<p class="muted" style="margin-top:0">Piano, spunte, programmi, luoghi aggiunti e note si salvano da soli nel database del viaggio e si vedono su tutti i vostri telefoni. Una copia resta anche sul dispositivo, così il cruscotto funziona pure senza rete.</p>
-   <div class="acts"><button class="btn small primary" data-act="syncnow"${Sync.on()?"":" disabled"}>Sincronizza ora</button><button class="btn small" data-act="export">Scarica backup</button><button class="btn small" data-act="import">Carica backup</button><input type="file" id="importfile" accept="application/json,.json" data-act="importfile" hidden></div>
+   <div class="acts"><button class="btn small primary" data-act="syncnow"${Sync.on()?"":" disabled"}>Sincronizza ora</button><button class="btn small" data-act="export">Scarica backup</button><button class="btn small" data-act="import">Carica backup</button><button class="btn small" data-act="logout">Esci da questo dispositivo</button><input type="file" id="importfile" accept="application/json,.json" data-act="importfile" hidden></div>
    <p class="muted" style="margin:10px 0 0">Google Maps: <b>${GM_KEY?"attivo":"non configurato"}</b>. Database: <b>${Sync.on()?"attivo":"non configurato"}</b>.</p>
    <p class="muted" id="setmsg" aria-live="polite" style="margin:8px 0 0"></p>`;
 }
@@ -1650,6 +1667,7 @@ document.addEventListener("click",function(e){
   else if(act==="addback"){ addSearch(); }
   else if(act==="addconfirm") addConfirm();
   else if(act==="dayopt") dayOptimize(id);
+  else if(act==="logout"){ if(confirm("Esci dal cruscotto su questo dispositivo? Per rientrare servirà di nuovo la password.")){ try{ Object.keys(localStorage).filter(k=>k.indexOf("jp26")===0).forEach(k=>localStorage.removeItem(k)); }catch(x){} location.reload(); } }
   else if(act==="dayroutes"){ S.dayMsg[id]={txt:"Calcolo i tempi reali di spostamento con Google…"}; renderDays();
     dayRoutes(id).then(r=>{ const sim=simulate(id,allLists()[id]); S.dayMsg[id]={txt:routesOff?`Google Routes non risponde: ${routesOff}. Per attivarlo: Google Cloud → abilita "Routes API" e aggiungila alle API consentite della chiave.`:r.err&&!r.n?`Errore da Google Routes: ${r.err}`:`Tempi reali aggiornati${r.n?` (${r.n} percorsi)`:" (erano già calcolati)"}: ${durTxt(Math.round(sim.travelTot))} di spostamenti, rientro verso le ${fmtT(sim.fin)}.`,ok:!routesOff&&!r.err}; renderDays(); }); }
   else if(act==="dayreset"){ delete S.sched[id]; delete S.dayMsg[id]; saveSched(); }
@@ -1706,7 +1724,22 @@ setInterval(function(){ if(document.visibilityState==="visible") Sync.pull(); },
 renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect();
 renderDays(); renderLegs(); renderAtt(); renderChk();
 $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
-renderSettings(); Sync.badge(); Sync.pull(); renderMapMode();
+renderSettings(); Sync.badge();
+function unlock(){ document.body.classList.remove("locked"); renderMapMode(); applyBox(); Sync.pull(); }
+if(Sync.code){ unlock(); }
+else {
+  try{ localStorage.removeItem("jp26_code"); }catch(e){}
+  const f=$("#gateform"), msg=$("#gatemsg"); setTimeout(()=>{ const i=$("#gatepw"); if(i) i.focus(); },50);
+  f.addEventListener("submit",function(ev){
+    ev.preventDefault(); const pw=$("#gatepw").value.trim(); if(!pw) return;
+    if(!(SB.url&&SB.key)){ msg.textContent="Database non configurato."; return; }
+    msg.textContent="Controllo…"; Sync.code=pw;
+    Sync.rpc("get_trip_state",{p_code:pw}).then(d=>{
+      if(!d){ Sync.code=""; msg.textContent="Password errata."; $("#gatepw").select(); return; }
+      store.set("pw",pw); store.set("upd",0); applySnap(d); unlock();
+    },e=>{ Sync.code=""; msg.textContent=e&&e.code==="net"?"Serve la connessione per il primo accesso: riprova quando sei online.":"Errore dal database: "+(e&&e.message||"riprova"); });
+  });
+}
 })();
 </script>
 </body>
