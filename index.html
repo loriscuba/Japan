@@ -272,6 +272,39 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .ginfo{--ink:#1B2A46;--paper:#F3F5F8;--card:#fff;--muted:#58647E;--line:#D5DCE7;--ok:#0C7A55;--okbg:#DCF2E8;--req:#8F5A00;--reqbg:#FFEDC2;--todo:#2054B8;--todobg:#E1EAFB;--risk:#B73030;--riskbg:#FBE0E0;color:#1B2A46;max-width:280px;font-family:var(--fb);font-size:.88rem;line-height:1.45}
 .ginfo .heart{color:#C2366B}
 .ginfo .btn[aria-pressed="true"]{color:#fff}
+.tl{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
+.tlhead{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.tlbtns{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.tlrow{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:6px 10px;align-items:start;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
+.tlrow.fixed{background:transparent;border-style:dashed}
+.tlrow.bad{border-color:var(--risk)}
+.tlrow input.tin{font:inherit;font-size:.95rem;padding:4px 6px;border:1.5px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);width:88px}
+.tlrow input.locked{border-color:var(--ink);font-weight:700}
+.tltime{font-weight:700;padding:5px 2px}
+.tlsub{font-size:.84rem}
+.tlmove{color:var(--muted);font-size:.84rem;margin:2px 0 2px 44px;padding:5px 0 5px 14px;border-left:2px dotted var(--line)}
+.tlfree{color:var(--ok);font-weight:700}
+.tlend{font-size:.88rem;font-weight:700;color:var(--muted);padding:4px 10px}
+.tlwarn{font-size:.84rem;color:var(--risk);margin-top:3px}
+.tlsoft{font-size:.84rem;color:var(--req);margin-top:3px}
+.tlmsg{font-size:.9rem;border-left:4px solid var(--lk-req);background:var(--paper);padding:6px 10px;border-radius:0 6px 6px 0;margin:0 0 8px}
+.tlmsg.ok{border-left-color:var(--lk-ok)}
+.ib{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:6px;min-width:30px;height:30px;cursor:pointer;font-weight:700}
+.ib:disabled{opacity:.35;cursor:default}
+select.mini{min-width:0;width:auto;padding:4px 6px;font-size:.82rem;border-width:1px;border-color:var(--line)}
+.linkbtn{background:none;border:0;padding:0;color:var(--todo);text-decoration:underline;cursor:pointer;font:inherit}
+@media (max-width:620px){.tlrow{grid-template-columns:64px minmax(0,1fr);padding:8px}.tlrow input.tin{width:60px;padding:4px}.tlrow .tlbtns{grid-column:1 / -1;flex-wrap:nowrap}.tlrow .tlbtns select.mini{flex:1 1 0;min-width:0;max-width:none}.tlmove{margin-left:22px;padding-left:10px}.tlhead .tlbtns .btn{flex:1 1 auto}}
+@media (max-width:560px){.day{grid-template-columns:minmax(0,1fr)}.stub{display:flex;gap:8px;align-items:baseline;justify-content:flex-start;border-right:0;border-bottom:2px dashed var(--line);padding:8px 14px}.stub .nn{font-size:1.5rem}.daybody{padding:12px}}
+.addbar{display:flex;gap:8px;margin:6px 0 10px}
+.addbar input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:1.5px solid var(--ink);border-radius:8px;background:var(--paper);color:var(--ink)}
+.addlist{display:grid;gap:6px}
+.addres{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);cursor:pointer;font:inherit;font-size:.9rem}
+.addres:hover{border-color:var(--ink)}
+.addgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px 12px;margin-top:6px}
+.addform label{display:flex;flex-direction:column;gap:3px;font-size:.86rem;font-weight:700}
+.addform input[type=text]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--card);color:var(--ink)}
+.addform select{min-width:0}
+.daypick{display:inline-flex;gap:6px;align-items:center;font-size:.84rem;color:var(--muted)}
 textarea.note{font:inherit;font-size:.93rem;width:100%;min-height:58px;padding:7px 9px;border:1px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--ink);resize:vertical;margin-top:8px}
 textarea.note:focus{border-style:solid;border-color:var(--ink)}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
@@ -350,7 +383,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
 <section class="view" id="v-giorni" role="tabpanel">
   <h2>Giorno per giorno</h2>
-  <p class="muted">I riquadri con l'orario sono dati del preventivo. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Il tramonto è verso le 17 in tutte le tappe, quindi alle 18 è già buio.</p>
+  <p class="muted">I riquadri con l'orario sono dati del preventivo. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Sotto ogni giorno c'è il programma con orari e spostamenti: cambia un orario per fissarlo, sposta le tappe, aggiungi luoghi da Google Maps e premi «Riorganizza giorno» per l'ordine migliore. Il tramonto è verso le 17, alle 18 è già buio.</p>
   <div id="days" style="margin-top:14px"></div>
 </section>
 
@@ -463,13 +496,13 @@ const store = {
   get(k,d){ try{ const v=localStorage.getItem("jp26_"+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
   set(k,v){ try{ localStorage.setItem("jp26_"+k,JSON.stringify(v)); }catch(e){} if(SYNCED.indexOf(k)>=0) Sync.touch(); }
 };
-const SYNCED=["sel","chk","pace","child","fx","town","notes"];
+const SYNCED=["sel","chk","pace","child","fx","town","notes","custom","sched"];
 const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fmt = n => Math.round(n).toLocaleString("it-IT");
 const ST = {ok:"Disponibile", req:"Su richiesta", todo:"Da organizzare", risk:"Da verificare"};
 const chip = (s,t)=> `<span class="chip ${s}">${t||ST[s]}</span>`;
 const gsearch = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
-const placeUrl = a => a.cid ? "https://maps.google.com/?cid="+a.cid : gsearch(a.q);
+const placeUrl = a => a.cid ? "https://maps.google.com/?cid="+a.cid : a.gurl ? a.gurl : gsearch(a.q);
 const verdictChip = v => v==="si"?chip("ok","Consigliato"):v==="forse"?chip("req","Forse"):chip("todo","Salterei");
 const gdir = (o,d,m)=> "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+"&travelmode="+(m||"transit");
 const MESI=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
@@ -644,6 +677,7 @@ const S = {
   node:null, leg:null, region:"all"
 };
 const ATTM = {}; ATT.forEach(a=>ATTM[a.id]=a);
+S.custom=store.get("custom",[]); S.custom.forEach(c=>{ ATT.push(c); ATTM[c.id]=c; });
 S.sel=new Set(Array.from(S.sel).filter(id=>ATTM[id]));
 S.ffav=false;
 S.mapmode=GM_KEY?store.get("mapmode","google"):"schema";
@@ -849,19 +883,20 @@ function renderExpect(){ $("#expect").innerHTML=EXPECT.map(e=>`<div><b>${e.t}</b
 /* ---------- giorni ---------- */
 function renderDays(){
   const ti=todayIdx();
+  const lists=allLists();
   $("#days").innerHTML=DAYS.map((D,i)=>{
     const dt=parseD(D.d);
     const fx=D.fx.map(f=>`<div class="fx"><span class="t">${f.t}</span><span>${f.x}</span>${chip(f.s)}</div>`).join("");
     const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}">${a.fav?"♥ ":""}${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
     const w=D.w.map(x=>`<div class="warn">${x}</div>`).join("");
-    const rp=[].concat.apply([],D.pl.map(b=>b.ids)).filter((id,k,arr)=>arr.indexOf(id)===k&&S.sel.has(id)&&ATTM[id]&&ATTM[id].cat!=="Dormire").map(id=>ATTM[id]);
+    const rp=(lists[D.d]||[]).filter(it=>ATTM[it.id]).map(it=>ATTM[it.id]);
     const pt=a=>a.ll?a.ll.join(","):a.q;
     const route=rp.length>=2?`<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pt(rp[0]))}&destination=${encodeURIComponent(pt(rp[rp.length-1]))}${rp.length>2?"&waypoints="+encodeURIComponent(rp.slice(1,-1).map(pt).join("|")):""}">Giro del giorno su Google Maps (${rp.length} tappe)</a>`
       :rp.length===1?`<a class="btn small" target="_blank" rel="noopener" href="${placeUrl(rp[0])}">${esc(rp[0].name)} su Google Maps</a>`:"";
     return `<article class="day${ti===i?" today":""}">
       <div class="stub"><div class="gg">${GG[dt.getDay()]}</div><div class="nn">${dt.getDate()}</div><div class="mm">${MESI[dt.getMonth()]}</div></div>
       <div class="daybody"><div class="dayhead"><h3>${D.title}</h3><span class="chip todo" style="background:var(--paper);color:var(--muted)">${D.c}</span>${ti===i?'<span class="seal">Oggi</span>':""}</div>
-      ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}${route?`<div class="acts" style="margin-top:6px">${route}</div>`:""}
+      ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}${renderTL(D,lists)}${route?`<div class="acts" style="margin-top:8px">${route}</div>`:""}
       <textarea class="note" data-act="note" data-id="${D.d}" aria-label="Note del ${dt.getDate()} ${MESI[dt.getMonth()]}" placeholder="Note vostre: ristoranti, orari, prenotazioni…">${esc(S.notes[D.d]||"")}</textarea></div></article>`;
   }).join("");
 }
@@ -911,33 +946,35 @@ function renderBudget(){
 function renderFilters(){
   const cats=["Templi e storia","Natura e panorami","Quartieri","Cibo","Esperienze","Shopping","Dormire"];
   const cities=Object.keys(CITY);
-  $("#filters").innerHTML=`<button class="fbtn" data-act="fcity" data-id="all" aria-pressed="${S.fcity==="all"}">Tutte le città</button>`+
+  $("#filters").innerHTML=`<button class="btn small primary" data-act="addplace" data-id="">+ Aggiungi un luogo</button><span style="flex-basis:100%"></span><button class="fbtn" data-act="fcity" data-id="all" aria-pressed="${S.fcity==="all"}">Tutte le città</button>`+
    cities.map(c=>`<button class="fbtn" data-act="fcity" data-id="${c}" aria-pressed="${S.fcity===c}">${CITY[c].n} (${ATT.filter(a=>a.city===c&&S.sel.has(a.id)).length})</button>`).join("")+
    `<span style="flex-basis:100%"></span><label class="muted" for="fcat">Tipo</label><select id="fcat" data-act="fcat"><option value="all">Tutti</option>${cats.map(c=>`<option ${S.fcat===c?"selected":""}>${c}</option>`).join("")}</select>
     <button class="fbtn" data-act="ffav" aria-pressed="${S.ffav}">♥ Preferiti di Michela</button>
     <button class="fbtn" data-act="fkid" aria-pressed="${S.fkid}">Adatte a un bambino</button>
     <button class="fbtn" data-act="fpri" aria-pressed="${S.fpri}">Solo imperdibili e consigliate</button>`;
 }
-function attCard(a){
+function attCard(a,dmap){
   const on=S.sel.has(a.id);
   const pri=a.pri===3?'<span class="seal" title="Imperdibile">必見</span>':a.pri===2?'<span class="tag">Consigliata</span>':'<span class="tag dim">Se hai tempo</span>';
   const org=a.zone==="Okuhida"?HOT.okuhida.q:CITY[a.city].origin;
   const hrs=a.cat==="Dormire"?"alternativa per la notte":a.meal?"pasto, non pesa sul tempo":a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
   return `<article class="att${on?" is-sel":""}${a.fav?" is-fav":""}">
-   <div class="row1">${a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
+   <div class="row1">${a.custom?'<span class="tag">Aggiunto da te</span>':a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
    <h3>${a.name}</h3><div class="jp" lang="ja">${a.jp}</div>
    <div class="meta"><span>${a.cat}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}${a.inc?'<span class="chip ok">Già nel preventivo</span>':""}</div>
    <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}
    <div class="acts"><button class="btn small" data-act="toggle" data-id="${a.id}" aria-pressed="${on}">${on?"Nel piano":"Aggiungi al piano"}</button>
    <button class="btn small primary" data-act="detail" data-kind="att" data-id="${a.id}">Dettagli</button>
    <a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Mappa</a>
-   <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Dall'hotel</a></div></article>`;
+   <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Dall'hotel</a>${a.custom?`<button class="btn small" data-act="delcustom" data-id="${a.id}">Elimina</button>`:""}</div>
+   ${on&&a.cat!=="Dormire"&&dmap?`<label class="daypick">Giorno <select class="mini" data-act="setday" data-id="${a.id}"><option value="">${dmap[a.id]?"—":"non ancora in un giorno"}</option>${dayOpts(dmap[a.id]||"")}</select></label>`:""}</article>`;
 }
 function renderGrid(){
   let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2)&&(!S.ffav||a.fav));
   const order=Object.keys(CITY);
   list.sort((a,b)=>order.indexOf(a.city)-order.indexOf(b.city)||b.pri-a.pri);
-  $("#grid").innerHTML=list.length?list.map(attCard).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
+  const dmap=dayOfMap();
+  $("#grid").innerHTML=list.length?list.map(a=>attCard(a,dmap)).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
 }
 function renderAtt(){ renderFavBox(); renderBudget(); renderFilters(); renderGrid(); }
 function renderFavBox(){
@@ -950,7 +987,8 @@ function renderFavBox(){
    <div class="acts"><button class="btn small" data-act="favday">Mostra solo i suoi preferiti</button></div>`;
 }
 function toggle(id){
-  if(S.sel.has(id)) S.sel.delete(id); else S.sel.add(id);
+  if(S.sel.has(id)){ S.sel.delete(id); unschedule(id); store.set("sched",S.sched); }
+  else { S.sel.add(id); const D=DAYS.find(D=>S.sched[D.d]&&D.pl.some(b=>b.ids.indexOf(id)>=0)); if(D){ insertBest(D.d,{id:id}); store.set("sched",S.sched); } }
   store.set("sel",Array.from(S.sel));
   renderHead(); renderAtt(); renderDays(); renderPanel(); gmapMarkers();
 }
@@ -1134,6 +1172,316 @@ function gmapOpen(it,m){
   GM.info.setContent(d); GM.info.open({map:GM.map,anchor:m,shouldFocus:false});
 }
 
+/* ---------- programma della giornata: orari, spostamenti, riorganizzazione ---------- */
+const CITYLL={tokyo:[35.68,139.76],takayama:[36.14,137.26],shirakawago:[36.257,136.906],kanazawa:[36.565,136.656],kyoto:[35.005,135.768],osaka:[34.69,135.50]};
+const TRANSIT={tokyo:"metro o JR",takayama:"bus",shirakawago:"bus",kanazawa:"bus (Kanazawa Loop Bus)",kyoto:"bus o metro",osaka:"metro"};
+const PT={takayamaSt:[36.1408,137.2510],nohiBus:[36.1416153,137.2515461],shirakawaBus:[36.2569,136.9061],kanazawaSt:[36.5781,136.6480],kyotoSt:[34.9858,135.7588]};
+const DAYCFG={
+ "2026-10-21":{city:"tokyo",start:"08:30",end:"21:30",from:"hot:tokyo",to:"hot:tokyo"},
+ "2026-10-22":{city:"tokyo",start:"08:00",end:"21:30",from:"hot:tokyo",to:"hot:tokyo"},
+ "2026-10-23":{city:"tokyo",start:"08:00",end:"21:00",from:"hot:tokyo",to:"hot:tokyo"},
+ "2026-10-24":{city:"takayama",start:"14:00",end:"21:00",from:"pt:takayamaSt",startLabel:"arrivo a Takayama in treno",to:"hot:okuhida",fixed:[{t:"16:30",min:95,label:"Bus Nohi Takayama → Okuhida",at:"pt:nohiBus",to:"hot:okuhida"}]},
+ "2026-10-25":{city:"kanazawa",start:"12:57",end:"21:30",from:"pt:shirakawaBus",startLabel:"arrivo a Shirakawa-go con il bus delle 11:50",to:"hot:kanazawa",fixed:[{t:"15:10",min:85,label:"Bus Nohi Shirakawa-go → Kanazawa",at:"pt:shirakawaBus",to:"pt:kanazawaSt"}]},
+ "2026-10-26":{city:"kanazawa",start:"08:00",end:"21:30",from:"hot:kanazawa",to:"hot:kyoto",fixed:[{t:"12:45",min:150,label:"Treno Kanazawa → Kyoto (cambio a Tsuruga)",at:"pt:kanazawaSt",to:"pt:kyotoSt"}]},
+ "2026-10-27":{city:"kyoto",start:"07:00",end:"21:30",from:"hot:kyoto",to:"hot:kyoto"},
+ "2026-10-28":{city:"kyoto",start:"07:00",end:"21:30",from:"hot:kyoto",to:"hot:kyoto"},
+ "2026-10-29":{city:"kyoto",start:"06:00",end:"21:30",from:"hot:kyoto",to:"hot:osaka",fixed:[{t:"11:00",min:75,label:"Check-out, bagagli e treno Keihan per Osaka",at:"hot:kyoto",to:"hot:osaka"}]}
+};
+const HRS=store.get("hrs",{});
+S.sched=store.get("sched",{}); S.dayMsg={};
+const toMin=s=>{ const p=String(s).split(":"); return (+p[0])*60+(+p[1]||0); };
+const fmtT=m=>{ m=Math.round(m); const h=Math.floor(m/60)%24, mm=m%60; return (h<10?"0":"")+h+":"+(mm<10?"0":"")+mm; };
+const parseHM=v=>{ const m=String(v||"").trim().match(/^(\d{1,2})(?:[:.,h ]?(\d{2}))?$/); if(!m) return null; const h=+m[1], mi=m[2]?+m[2]:0; return h<24&&mi<60?fmtT(h*60+mi):null; };
+const durTxt=m=>m>=60?`${Math.floor(m/60)} h${m%60?" "+(m%60)+" min":""}`:`${m} min`;
+function hav(a,b){ const R=6371, r=Math.PI/180, dLa=(b[0]-a[0])*r, dLo=(b[1]-a[1])*r; const x=Math.sin(dLa/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(x)); }
+function hotLL(k){ const h=HOT[k]; return (h&&h.ll)||geoCache["hot:"+k]||(k==="okuhida"?[NODES.okuhida.lat,NODES.okuhida.lon]:null); }
+function locOf(ref){
+  if(!ref) return null;
+  if(ref.indexOf("hot:")===0) return hotLL(ref.slice(4));
+  if(ref.indexOf("pt:")===0) return PT[ref.slice(3)];
+  const a=ATTM[ref]; if(!a) return null;
+  return a.ll||geoCache[ref]||(a.zone==="Okuhida"&&a.id==="ta_onsen"?hotLL("okuhida"):null);
+}
+function nearestCity(ll){ let best="tokyo",bd=1e9; Object.keys(CITYLL).forEach(k=>{ const d=hav(ll,CITYLL[k]); if(d<bd){bd=d;best=k;} }); return {city:best,km:bd}; }
+function travel(a,b,city){
+  if(!a||!b) return {min:20,icon:"❔",txt:"spostamento da verificare (manca la posizione)",mode:"transit"};
+  const d=hav(a,b); if(d<0.08) return {min:0,none:true};
+  const dd=d*1.35;
+  if(dd<=1.3){ const m=Math.round(dd/4.3*60)+2; return {min:m,icon:"🚶",txt:`a piedi, circa ${m} min`,mode:"walking",a:a,b:b}; }
+  if(d<=30){
+    const m=Math.round(10+dd/22*60); let t=`${TRANSIT[city]||"mezzi pubblici"}, circa ${m} min`;
+    if(dd<=7){ const tm=Math.round(6+dd/20*60), y=Math.round((500+Math.max(0,dd-1.1)*420)/100)*100; t+=` · oppure taxi, circa ${tm} min e ${fmt(y)} ¥`; }
+    if(dd<=2.2) t+=` · a piedi sarebbero ${Math.round(dd/4.3*60)} min`;
+    return {min:m,icon:"🚇",txt:t,mode:"transit",a:a,b:b};
+  }
+  const m=Math.round(20+dd/70*60); return {min:m,icon:"🚆",txt:`treno o bus, circa ${durTxt(m)}`,mode:"transit",a:a,b:b};
+}
+function trLink(tr){ return tr.a&&tr.b?`https://www.google.com/maps/dir/?api=1&origin=${tr.a.join(",")}&destination=${tr.b.join(",")}&travelmode=${tr.mode}`:""; }
+/* fascia preferita, ricavata dal testo "Quando" e dal tipo di luogo */
+function prefWin(a){
+  const t=((a.best||"")+" "+(a.name||"")).toLowerCase(), ty=(a.types||[]).join(" ");
+  let m=t.match(/dalle (\d{1,2})[:.](\d{2}) alle (\d{1,2})[:.](\d{2})/);
+  if(m) return {s:+m[1]*60+ +m[2],e:+m[3]*60+ +m[4],lbl:`tra le ${m[1]}:${m[2]} e le ${m[3]}:${m[4]}`,strong:1};
+  m=t.match(/(?:alle|verso le) (\d{1,2})[:.](\d{2})/);
+  if(m){ const x=+m[1]*60+ +m[2]; return {s:x-15,e:x+45,lbl:`verso le ${m[1]}:${m[2]}`,strong:1}; }
+  if(/colazione|entro le 10/.test(t)) return {s:420,e:600,lbl:"entro le 10"};
+  if(/prima di cena/.test(t)) return {s:960,e:1110,lbl:"prima di cena"};
+  if(/cena/.test(t)||(/sera|notte|dopo il tramonto/.test(t)&&a.cat==="Cibo")) return {s:1110,e:1230,lbl:"a cena, dalle 18:30",strong:1};
+  if(/pranzo/.test(t)) return {s:690,e:810,lbl:"a pranzo",strong:1};
+  if(/merenda/.test(t)) return {s:900,e:1050,lbl:"a merenda"};
+  if(/tramonto|imbrunire/.test(t)) return {s:960,e:1080,lbl:"al tramonto, verso le 17",strong:1};
+  if(/sera|notte|neon/.test(t)) return {s:1080,e:1290,lbl:"di sera",strong:1};
+  if(/alba|presto|apertura|prima dei gruppi/.test(t)) return {s:420,e:600,lbl:"presto la mattina"};
+  if(/mattina/.test(t)) return {s:480,e:720,lbl:"la mattina"};
+  if(/pomeriggio/.test(t)) return {s:780,e:1050,lbl:"il pomeriggio"};
+  if(a.cat==="Cibo") return /cafe|bakery|dessert|coffee|ice_cream|confection/.test(ty)?{s:600,e:1050,lbl:"di giorno"}:{s:690,e:1260,lbl:"a pranzo o a cena"};
+  if(a.cat==="Templi e storia"||a.cat==="Natura e panorami") return {s:480,e:1020,lbl:"prima delle 17, quando chiudono molti templi e giardini"};
+  return {s:540,e:1200,lbl:"di giorno"};
+}
+function hoursOf(a){ return a.hrs||HRS[a.id]||undefined; }
+function simpleHours(oh){
+  if(!oh||!oh.periods||!oh.periods.length) return undefined;
+  if(oh.periods.length===1&&!oh.periods[0].close) return "always";
+  return oh.periods.filter(p=>p.open&&p.close).map(p=>[p.open.day,p.open.hour*60+p.open.minute,p.close.day,p.close.hour*60+p.close.minute]);
+}
+function openCheck(h,wd,st,en){
+  if(!h) return null; if(h==="always") return {st:st};
+  const ps=h.filter(p=>p[0]===wd).map(p=>[p[1],p[2]===wd?p[3]:p[3]+1440]).sort((x,y)=>x[0]-y[0]);
+  if(!ps.length) return {closed:true,st:st};
+  const p=ps.find(q=>st<q[1]-10); if(!p) return {after:true,st:st,closeAt:ps[ps.length-1][1]};
+  const s2=Math.max(st,p[0]); return {st:s2,over:Math.max(0,s2+(en-st)-p[1]),closeAt:p[1],openAt:p[0]};
+}
+function itemInfo(date,it){
+  const cfg=DAYCFG[date];
+  if(it.id.indexOf("fx:")===0){ const f=(cfg.fixed||[])[+it.id.slice(3)]; if(!f) return null;
+    return {fx:true,name:f.label,dur:f.min,loc:locOf(f.at),to:locOf(f.to),anchor:true,t:toMin(f.t),city:cfg.city}; }
+  const a=ATTM[it.id]; if(!a) return null;
+  const dur=it.min!=null?it.min:(a.cat==="Dormire"?0:(a.min||60));
+  return {a:a,name:a.name,dur:dur,loc:locOf(a.id),anchor:!!it.t,t:it.t?toMin(it.t):null,city:a.city,win:prefWin(a),hrs:hoursOf(a)};
+}
+/* fa avanzare l'orologio su una tappa: attese per fascia preferita e orari di apertura */
+function stepAt(I,arr,wd){
+  let st=arr, wait=0; const out={warn:[],soft:[],pen:0};
+  if(I.anchor){ st=Math.max(arr,I.t); if(arr>I.t+5){ out.warn.push(`Arrivi verso le ${fmtT(arr)}, dopo l'orario fissato (${fmtT(I.t)}).`); out.pen+=(arr-I.t)*20; } wait=st-arr; }
+  else {
+    const w=I.win; if(w&&st<w.s&&(w.strong||w.s-st<=120)){ wait+=w.s-st; st=w.s; }
+    const oc=openCheck(I.hrs,wd,st,st+I.dur);
+    if(oc){
+      if(oc.closed){ out.warn.push("Secondo Google in questo giorno è chiuso."); out.pen+=400; }
+      else if(oc.after){ out.warn.push(`Secondo Google chiude alle ${fmtT(oc.closeAt)}: arrivi troppo tardi.`); out.pen+=300; }
+      else { if(oc.st>st){ wait+=oc.st-st; st=oc.st; } if(oc.over>0){ out.warn.push(`Chiude alle ${fmtT(oc.closeAt)}: restano solo ${Math.max(0,Math.round(oc.closeAt-st))} minuti.`); out.pen+=oc.over*3; } }
+    }
+    if(w&&st>w.e+20){ out.soft.push(`Meglio ${w.lbl}.`); out.pen+=(st-w.e)*1.5; }
+    else if(w&&st+I.dur<w.s-20){ out.soft.push(`Meglio ${w.lbl}.`); out.pen+=(w.s-st)*1; }
+  }
+  out.pen+=wait*0.4; out.wait=wait; out.st=st; out.en=st+I.dur; return out;
+}
+function simulate(date,list){
+  const cfg=DAYCFG[date], wd=parseD(date).getDay();
+  let time=toMin(cfg.start), loc=locOf(cfg.from), cost=0, travelTot=0; const rows=[];
+  list.forEach((it,k)=>{
+    const I=itemInfo(date,it); if(!I) return;
+    const tr=travel(loc,I.loc,I.city); travelTot+=tr.min; cost+=tr.min;
+    const s=stepAt(I,time+tr.min,wd); cost+=s.pen;
+    rows.push({k:k,it:it,I:I,tr:tr,wait:s.wait,st:s.st,en:s.en,warn:s.warn,soft:s.soft});
+    time=s.en; loc=I.to||I.loc;
+  });
+  const back=travel(loc,locOf(cfg.to),cfg.city), fin=time+back.min, over=Math.max(0,fin-toMin(cfg.end));
+  cost+=back.min+over*4; travelTot+=back.min;
+  return {rows:rows,back:back,fin:fin,over:over,cost:cost,travelTot:travelTot};
+}
+/* mette le tappe libere nell'ordine dato e infila le tappe a orario fisso quando serve */
+function buildSeq(date,flex,anchors){
+  const cfg=DAYCFG[date], wd=parseD(date).getDay();
+  flex=flex.slice(); anchors=anchors.slice().sort((x,y)=>itemInfo(date,x).t-itemInfo(date,y).t);
+  const out=[]; let time=toMin(cfg.start), loc=locOf(cfg.from);
+  const take=it=>{ const I=itemInfo(date,it), tr=travel(loc,I.loc,I.city), s=stepAt(I,time+tr.min,wd); out.push(it); time=s.en; loc=I.to||I.loc; };
+  while(flex.length||anchors.length){
+    const F=flex[0], A=anchors[0];
+    if(F&&A){
+      const I=itemInfo(date,F), tr=travel(loc,I.loc,I.city), s=stepAt(I,time+tr.min,wd);
+      const AI=itemInfo(date,A), tr2=travel(I.to||I.loc,AI.loc,AI.city);
+      if(s.en+tr2.min>AI.t+5){ take(anchors.shift()); continue; }
+      take(flex.shift());
+    } else if(F) take(flex.shift()); else take(anchors.shift());
+  }
+  return out;
+}
+const isAnchor=it=>it.id.indexOf("fx:")===0||!!it.t;
+function allLists(){
+  const explicit=new Set(); Object.keys(S.sched).forEach(d=>S.sched[d].forEach(it=>explicit.add(it.id)));
+  const seen=new Set(), out={};
+  DAYS.forEach(D=>{
+    const d=D.d, cfg=DAYCFG[d]; if(!cfg) return;
+    const fx=(cfg.fixed||[]).map((f,i)=>({id:"fx:"+i}));
+    if(S.sched[d]){
+      const L=S.sched[d].filter(it=>it.id.indexOf("fx:")===0||(ATTM[it.id]&&S.sel.has(it.id)));
+      fx.forEach(f=>{ if(!L.some(it=>it.id===f.id)) L.push(f); });
+      L.forEach(it=>seen.add(it.id)); out[d]=L; return;
+    }
+    const ids=[].concat.apply([],D.pl.map(b=>b.ids)).filter(id=>ATTM[id]&&S.sel.has(id)&&ATTM[id].cat!=="Dormire"&&!explicit.has(id)&&!seen.has(id));
+    ids.forEach(id=>seen.add(id));
+    out[d]=buildSeq(d,ids.map(id=>({id:id})),fx);
+  });
+  return out;
+}
+function dayOfMap(){ const L=allLists(), m={}; Object.keys(L).forEach(d=>L[d].forEach(it=>{ if(it.id.indexOf("fx:")) m[it.id]=d; })); return m; }
+function mat(d){ if(!S.sched[d]) S.sched[d]=allLists()[d].map(it=>Object.assign({},it)); return S.sched[d]; }
+function rebuild(d){ const L=S.sched[d]; S.sched[d]=buildSeq(d,L.filter(it=>!isAnchor(it)),L.filter(isAnchor)); }
+function unschedule(id){ Object.keys(S.sched).forEach(d=>{ S.sched[d]=S.sched[d].filter(it=>it.id!==id); }); }
+function insertBest(d,item){
+  const L=mat(d); let best=null;
+  const flex=L.filter(it=>!isAnchor(it)), anchors=L.filter(isAnchor);
+  if(isAnchor(item)){ anchors.push(item); S.sched[d]=buildSeq(d,flex,anchors); return; }
+  for(let i=0;i<=flex.length;i++){ const f=flex.slice(); f.splice(i,0,item); const seq=buildSeq(d,f,anchors), c=simulate(d,seq).cost; if(!best||c<best.c) best={c:c,seq:seq}; }
+  S.sched[d]=best.seq;
+}
+function permutations(arr){ if(arr.length<=1) return [arr]; const out=[]; arr.forEach((x,i)=>{ const rest=arr.slice(0,i).concat(arr.slice(i+1)); permutations(rest).forEach(p=>out.push([x].concat(p))); }); return out; }
+function optimizeDay(d){
+  const L=allLists()[d], flex=L.filter(it=>!isAnchor(it)), anchors=L.filter(isAnchor);
+  const evalSeq=f=>{ const seq=buildSeq(d,f,anchors); return {seq:seq,sim:simulate(d,seq)}; };
+  let best=evalSeq(flex);
+  if(flex.length<=8){ permutations(flex).forEach(p=>{ const r=evalSeq(p); if(r.sim.cost<best.sim.cost) best=r; }); }
+  else {
+    let cur=flex.slice(), curR=best, improved=true, guard=0;
+    while(improved&&guard++<60){ improved=false;
+      for(let i=0;i<cur.length-1;i++) for(let j=i+1;j<cur.length;j++){
+        const c=cur.slice(0,i).concat(cur.slice(i,j+1).reverse(),cur.slice(j+1)), r=evalSeq(c);
+        if(r.sim.cost<curR.sim.cost-0.5){ cur=c; curR=r; improved=true; }
+      }
+    }
+    best=curR;
+  }
+  return best;
+}
+function saveSched(){ store.set("sched",S.sched); renderDays(); }
+function refreshAll(){ store.set("sel",Array.from(S.sel)); store.set("sched",S.sched); renderHead(); renderAtt(); renderDays(); renderPanel(); gmapMarkers(); }
+async function fetchHoursFor(ids){
+  if(!GM_KEY||!ids.length) return;
+  try{
+    await loadGM(); const lib=await google.maps.importLibrary("places");
+    const job=Promise.all(ids.map(async id=>{ const a=ATTM[id];
+      try{ const r=await lib.Place.searchByText({textQuery:a.q+", Japan",fields:["regularOpeningHours","location"],maxResultCount:1});
+        const p=r.places&&r.places[0]; HRS[id]=p?(simpleHours(p.regularOpeningHours)||null):null;
+        if(p&&p.location&&!a.ll){ const l=p.location; geoCache[id]=[typeof l.lat==="function"?l.lat():l.lat,typeof l.lng==="function"?l.lng():l.lng]; }
+      }catch(e){ HRS[id]=null; } }));
+    await Promise.race([job,new Promise(r=>setTimeout(r,9000))]);
+    store.set("hrs",HRS); store.set("geo",geoCache);
+  }catch(e){}
+}
+async function dayOptimize(d){
+  const L=allLists()[d], ids=L.filter(it=>it.id.indexOf("fx:")&&ATTM[it.id]&&!ATTM[it.id].custom&&HRS[it.id]===undefined).map(it=>it.id);
+  if(ids.length&&GM_KEY){ S.dayMsg[d]={txt:"Controllo gli orari di apertura su Google…"}; renderDays(); await fetchHoursFor(ids); }
+  const before=simulate(d,allLists()[d]), best=optimizeDay(d);
+  S.sched[d]=best.seq;
+  const s=best.sim, issues=s.rows.filter(r=>r.warn.length).length, softs=s.rows.filter(r=>!r.warn.length&&r.soft.length).length;
+  let txt=`Ordine ottimizzato: ${durTxt(Math.round(s.travelTot))} di spostamenti${before.travelTot-s.travelTot>=5?` (${Math.round(before.travelTot-s.travelTot)} min in meno)`:""}, rientro verso le ${fmtT(s.fin)}.`;
+  if(issues) txt+=` Restano ${issues} ${issues===1?"avviso":"avvisi"}: guarda le tappe segnate in rosso.`;
+  if(s.over>20){ const cand=s.rows.filter(r=>!r.I.fx&&!r.I.anchor).sort((x,y)=>x.I.a.pri-y.I.a.pri||y.I.dur-x.I.dur)[0]; txt+=` La giornata sfora di ${durTxt(Math.round(s.over))}${cand?`: toglierei «${cand.I.name}»`:""}.`; }
+  else if(!issues&&!softs) txt+=" Tutto rispetta orari di apertura e momenti migliori.";
+  if(softs) txt+=` ${softs===1?"Una tappa è":softs+" tappe sono"} fuori dal momento ideale: è il miglior compromesso con gli orari che hai fissato.`;
+  S.dayMsg[d]={txt:txt,ok:!issues&&!softs&&s.over<=20};
+  saveSched();
+}
+function dayOpts(sel){ return DAYS.filter(D=>DAYCFG[D.d]).map(D=>{ const dt=parseD(D.d); return `<option value="${D.d}"${sel===D.d?" selected":""}>${GG[dt.getDay()]} ${dt.getDate()} · ${esc(D.c)}</option>`; }).join(""); }
+function renderTL(D,lists){
+  const d=D.d, cfg=DAYCFG[d]; if(!cfg) return "";
+  const sim=simulate(d,lists[d]), msg=S.dayMsg[d];
+  const startName=cfg.startLabel||("partenza da "+HOT[cfg.from.slice(4)].n);
+  const endName=cfg.to.indexOf("hot:")===0?HOT[cfg.to.slice(4)].n:"";
+  const mv=(tr,wait)=>{ const free=wait>=30?`<span class="tlfree">☕ ${durTxt(Math.round(wait))} di tempo libero</span>`:"";
+    if(tr.none) return free?`<div class="tlmove">${free}</div>`:"";
+    return `<div class="tlmove"><span>${tr.icon} ${tr.txt}</span>${trLink(tr)?` · <a target="_blank" rel="noopener" href="${trLink(tr)}">percorso</a>`:""}${free?`<br>${free}`:""}</div>`; };
+  const durOpts=cur=>[15,20,30,45,60,75,90,120,150,180,240].concat(cur&&[15,20,30,45,60,75,90,120,150,180,240].indexOf(cur)<0?[cur]:[]).sort((x,y)=>x-y).map(m=>`<option value="${m}"${m===cur?" selected":""}>${durTxt(m)}</option>`).join("");
+  let h=`<div class="tl" id="tl-${d}"><div class="tlhead"><div><b>Programma</b> <span class="muted" style="font-size:.86rem">dalle ${cfg.start}, ${esc(startName)}</span></div>
+    <div class="tlbtns"><button class="btn small primary" data-act="dayopt" data-id="${d}">Riorganizza giorno</button><button class="btn small" data-act="addplace" data-id="${d}">+ Aggiungi luogo</button>${S.sched[d]?`<button class="btn small" data-act="dayreset" data-id="${d}" title="Torna alla proposta iniziale">Ripristina</button>`:""}</div></div>`;
+  if(msg) h+=`<p class="tlmsg${msg.ok?" ok":""}">${esc(msg.txt)}</p>`;
+  if(!sim.rows.length) h+=`<p class="empty" style="margin:8px 0">Nessuna tappa: scegline una sopra o aggiungi un luogo.</p>`;
+  sim.rows.forEach(r=>{
+    const I=r.I, k=r.k; h+=mv(r.tr,r.wait);
+    if(I.fx){ h+=`<div class="tlrow fixed"><div class="tltime">${fmtT(r.st)}</div><div><b>${esc(I.name)}</b><div class="muted tlsub">fisso · arrivo verso le ${fmtT(r.en)}</div>${r.warn.map(w=>`<div class="tlwarn">${w}</div>`).join("")}</div><div></div></div>`; return; }
+    const a=I.a;
+    h+=`<div class="tlrow${r.warn.length?" bad":""}"><div><input type="text" inputmode="numeric" maxlength="5" class="tin${I.anchor?" locked":""}" value="${fmtT(r.st)}" data-act="tltime" data-day="${d}" data-k="${k}" aria-label="Orario di ${esc(a.name)}" title="Cambia l'orario per fissarlo"></div>
+      <div><b>${a.fav?'<span class="heart">♥</span> ':""}${esc(a.name)}</b><div class="muted tlsub">${durTxt(I.dur)} · fino alle ${fmtT(r.en)}${I.anchor?` · orario fissato <button class="linkbtn" data-act="tlunlock" data-day="${d}" data-k="${k}">sblocca</button>`:""}${a.custom?" · aggiunto da te":""}</div>
+      ${r.warn.map(w=>`<div class="tlwarn">${w}</div>`).join("")}${r.soft.map(w=>`<div class="tlsoft">${w}</div>`).join("")}</div>
+      <div class="tlbtns"><button class="ib" data-act="tlup" data-day="${d}" data-k="${k}" aria-label="Prima"${k===0?" disabled":""}>↑</button><button class="ib" data-act="tldown" data-day="${d}" data-k="${k}" aria-label="Dopo">↓</button>
+      <select class="mini" data-act="tldur" data-day="${d}" data-k="${k}" aria-label="Durata">${durOpts(I.dur)}</select>
+      <select class="mini" data-act="tlmove" data-day="${d}" data-k="${k}" aria-label="Sposta a un altro giorno"><option value="">Sposta…</option>${dayOpts("").replace(`value="${d}"`,`value="${d}" disabled`)}</select>
+      <button class="ib" data-act="detail" data-kind="att" data-id="${a.id}" aria-label="Scheda">i</button><button class="ib" data-act="tldel" data-day="${d}" data-k="${k}" aria-label="Togli dal viaggio">✕</button></div></div>`;
+  });
+  h+=mv(sim.back);
+  h+=`<div class="tlend">${fmtT(sim.fin)} · fine giornata${endName?`, ${esc(endName)}`:""}</div>`;
+  if(sim.over>20) h+=`<div class="tlwarn">Rientri ${durTxt(Math.round(sim.over))} oltre le ${cfg.end}: la giornata è troppo piena.</div>`;
+  return h+`</div>`;
+}
+
+/* ---------- aggiungere un luogo cercandolo su Google Maps ---------- */
+let ADD={date:null,res:[],pick:null};
+const clean=s=>String(s==null?"":s).replace(/[<>&"]/g,"").trim();
+function catFromTypes(ts){
+  const t=ts.join(" ");
+  if(/restaurant|food|cafe|coffee|bakery|bar\b|meal_|dessert|ice_cream|confection|tea_house/.test(t)) return "Cibo";
+  if(/lodging|hotel|ryokan|inn\b/.test(t)) return "Dormire";
+  if(/museum|art_gallery|aquarium|zoo|amusement|theme_park|spa|onsen|bath/.test(t)) return "Esperienze";
+  if(/shrine|temple|church|place_of_worship|historical|monument|castle|landmark/.test(t)) return "Templi e storia";
+  if(/park|garden|hiking|natural|observation|scenic|beach|mountain/.test(t)) return "Natura e panorami";
+  if(/store|shop|mall|market|department/.test(t)) return "Shopping";
+  return "Esperienze";
+}
+function durFor(cat,ts){ const t=ts.join(" "); if(cat==="Cibo") return /cafe|coffee|bakery|dessert|ice_cream|confection/.test(t)?40:60; return {Dormire:0,Shopping:60,"Natura e panorami":75,"Templi e storia":60,Esperienze:90}[cat]||60; }
+function addCustom(c){ ATT.push(c); ATTM[c.id]=c; }
+function rebuildCustom(){ for(let i=ATT.length-1;i>=0;i--) if(ATT[i].custom){ delete ATTM[ATT[i].id]; ATT.splice(i,1); } (S.custom||[]).forEach(addCustom); }
+function openAdd(date){
+  ADD={date:date||null,res:[],pick:null}; const dlg=$("#modal"); mCur={kind:"add"};
+  dlg.innerHTML=`<div class="mhead"><div><h3 id="mtitle">Aggiungi un luogo</h3><div class="muted" style="font-size:.9rem">${GM_KEY?"Cercalo come su Google Maps: nome, tipo di locale o zona.":"Senza la chiave Google Maps puoi inserirlo a mano."}</div></div><button class="btn small" data-act="closemodal">Chiudi</button></div>
+   <div class="mbody">${GM_KEY?`<div class="addbar"><input type="search" id="addq" placeholder="es. tonkatsu vicino a Ginza, Tsujiri Gion, museo Ghibli" autocomplete="off"><button class="btn primary" data-act="addsearch">Cerca</button></div>`:""}<div id="addres">${GM_KEY?"":addForm(null)}</div></div>`;
+  if(dlg.showModal){ if(!dlg.open) dlg.showModal(); } else dlg.setAttribute("open","");
+  const q=$("#addq"); if(q) setTimeout(()=>q.focus(),50);
+}
+async function addSearch(){
+  const q=$("#addq").value.trim(), box=$("#addres"); if(!q) return;
+  box.innerHTML=`<p class="muted">Cerco su Google Maps…</p>`;
+  try{
+    await loadGM(); const lib=await google.maps.importLibrary("places");
+    const c=ADD.date?CITYLL[DAYCFG[ADD.date].city]:[35.6,137.0];
+    const r=await lib.Place.searchByText({textQuery:q,fields:["id","displayName","formattedAddress","location","rating","userRatingCount","types","primaryTypeDisplayName","regularOpeningHours","googleMapsURI","editorialSummary"],maxResultCount:6,language:"it",region:"jp",locationBias:{center:{lat:c[0],lng:c[1]},radius:ADD.date?20000:50000}});
+    ADD.res=(r.places||[]);
+    box.innerHTML=ADD.res.length?`<div class="addlist">${ADD.res.map((p,i)=>{ const l=p.location, ll=[typeof l.lat==="function"?l.lat():l.lat,typeof l.lng==="function"?l.lng():l.lng], nc=nearestCity(ll);
+        return `<button class="addres" data-act="addpick" data-i="${i}"><b>${esc(p.displayName)}</b><span>${esc(p.primaryTypeDisplayName||"")}${p.rating?` · ★ ${String(p.rating).replace(".",",")} (${fmt(p.userRatingCount||0)})`:""} · ${nc.km<60?CITY[nc.city].n:"lontano dalle tappe"}</span><span class="muted">${esc(p.formattedAddress||"")}</span></button>`; }).join("")}</div>`
+      :`<p class="muted">Nessun risultato. Prova con altre parole.</p>`;
+  }catch(e){ box.innerHTML=`<p class="muted">${modalMsg(e)}</p>`+addForm(null); }
+}
+function addForm(p){
+  let ll=null,nc=null,cat="Esperienze",ts=[],name="",addr="",hrs="";
+  if(p){ const l=p.location; ll=[typeof l.lat==="function"?l.lat():l.lat,typeof l.lng==="function"?l.lng():l.lng]; nc=nearestCity(ll); ts=p.types||[]; cat=catFromTypes(ts); name=p.displayName; addr=p.formattedAddress||"";
+    const wd=p.regularOpeningHours&&p.regularOpeningHours.weekdayDescriptions; if(wd&&wd.length) hrs=`<details style="margin:6px 0"><summary class="muted" style="cursor:pointer">Orari da Google</summary><ul class="hours">${wd.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>`; }
+  const dur=durFor(cat,ts);
+  let def=ADD.date; if(!def&&nc){ const D=DAYS.find(D=>DAYCFG[D.d]&&(DAYCFG[D.d].city===nc.city||(D.pl||[]).some(b=>b.ids.some(id=>ATTM[id]&&ATTM[id].city===nc.city)))); def=D?D.d:""; }
+  const cats=["Templi e storia","Natura e panorami","Quartieri","Cibo","Esperienze","Shopping"];
+  return `<div class="addform">${p?`<h4 style="margin:6px 0 2px">${esc(name)}</h4><p class="muted" style="margin:0 0 6px">${esc(addr)}</p>${nc&&nc.km>=60?`<div class="warn">È a circa ${Math.round(nc.km)} km dalla tappa più vicina (${CITY[nc.city].n}): valuta se ci sta.</div>`:""}${hrs}`:`<label>Nome del luogo <input type="text" id="addname" placeholder="es. Ristorante Tamura"></label>`}
+    <div class="addgrid"><label>Giorno <select id="addday"><option value="">Nessun giorno, solo nella lista</option>${dayOpts(def)}</select></label>
+    <label>Orario <input type="text" inputmode="numeric" maxlength="5" id="addtime" placeholder="es. 15:30" title="Lascia vuoto: lo sistemo io"></label>
+    <label>Durata <select id="adddur">${[15,20,30,40,45,60,75,90,120,150,180,240].map(m=>`<option value="${m}"${m===dur?" selected":""}>${durTxt(m)}</option>`).join("")}</select></label>
+    <label>Tipo <select id="addcat">${cats.map(c=>`<option${c===cat?" selected":""}>${c}</option>`).join("")}</select></label></div>
+    <p class="muted" style="font-size:.86rem;margin:4px 0 0">Lascia vuoto l'orario: lo metto io nel punto del giorno dove allunga meno il giro. Se lo scrivi, resta fissato.</p>
+    <div class="acts"><button class="btn primary" data-act="addconfirm">Aggiungi al viaggio</button>${p?`<button class="btn" data-act="addback">Altri risultati</button>`:""}</div></div>`;
+}
+function addConfirm(){
+  const p=ADD.pick, day=$("#addday").value, time=parseHM($("#addtime").value), dur=+$("#adddur").value, cat=$("#addcat").value;
+  let c;
+  if(p){ const l=p.location, ll=[typeof l.lat==="function"?l.lat():l.lat,typeof l.lng==="function"?l.lng():l.lng], nc=nearestCity(ll), addr=clean(p.formattedAddress);
+    c={id:"cu_"+Date.now().toString(36),custom:1,name:clean(p.displayName),jp:"",city:nc.city,zone:clean(addr.split(",").slice(-3,-2)[0]||CITY[nc.city].n),cat:cat,min:dur,pri:2,kid:true,book:"no",best:"Aggiunto da te",
+      note:clean((p.editorialSummary&&(p.editorialSummary.text||p.editorialSummary))||addr),q:clean(p.displayName)+", "+addr,inc:false,warn:"",ll:ll,gurl:p.googleMapsURI||"",hrs:simpleHours(p.regularOpeningHours),types:(p.types||[]).slice(0,6),rating:p.rating||null,meal:cat==="Cibo"?1:0}; }
+  else { const n=clean($("#addname").value); if(!n){ $("#addname").focus(); return; }
+    const city=day?DAYCFG[day].city:"tokyo";
+    c={id:"cu_"+Date.now().toString(36),custom:1,name:n,jp:"",city:city,zone:CITY[city].n,cat:cat,min:dur,pri:2,kid:true,book:"no",best:"Aggiunto da te",note:"Aggiunto a mano: manca la posizione, gli spostamenti sono stimati.",q:n,inc:false,warn:"",meal:cat==="Cibo"?1:0}; }
+  S.custom.push(c); addCustom(c); store.set("custom",S.custom); S.sel.add(c.id);
+  if(day){ const it={id:c.id,min:dur}; if(time) it.t=time; insertBest(day,it);
+    S.dayMsg[day]={txt:`Ho aggiunto «${c.name}»${time?` alle ${time}`:" nel punto in cui allunga meno il giro"}. Premi «Riorganizza giorno» per ricalcolare l'ordine migliore di tutta la giornata.`}; }
+  closeModal(); refreshAll();
+  if(day){ go("giorni"); const el=$("#tl-"+day); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); }
+}
+
 /* ---------- esportazioni ---------- */
 function download(name,text,type){
   const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:type}));
@@ -1146,10 +1494,12 @@ function downloadCSV(onlySel){
   ATT.filter(a=>!onlySel||S.sel.has(a.id)).forEach(a=>rows.push([a.name,a.q+", Japan",a.fav?"Preferiti di Michela":a.cat,CITY[a.city].n,a.ll?a.ll[0]:"",a.ll?a.ll[1]:"",`${a.best}. ${a.note}${a.why?" Consiglio: "+a.why:""}`]));
   download(onlySel?"giappone-mio-piano-mymaps.csv":"giappone-luoghi-google-mymaps.csv","\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"),"text/csv;charset=utf-8");
 }
-function snapshot(){ return {v:1,upd:store.get("upd",0),sel:Array.from(S.sel),chk:S.chk,pace:S.pace,child:S.child,fx:S.fx,town:S.town,notes:S.notes}; }
+function snapshot(){ return {v:1,upd:store.get("upd",0),sel:Array.from(S.sel),chk:S.chk,pace:S.pace,child:S.child,fx:S.fx,town:S.town,notes:S.notes,custom:S.custom,sched:S.sched}; }
 function applySnap(d){
   if(!d||typeof d!=="object") return false;
   const ed=document.activeElement; if(ed&&ed.classList&&ed.classList.contains("note")) return false;
+  if(Array.isArray(d.custom)){ S.custom=d.custom; rebuildCustom(); }
+  if(d.sched&&typeof d.sched==="object") S.sched=d.sched;
   if(Array.isArray(d.sel)) S.sel=new Set(d.sel.filter(id=>ATTM[id]));
   if(d.chk&&typeof d.chk==="object") S.chk=d.chk;
   if(typeof d.pace==="number") S.pace=d.pace;
@@ -1158,7 +1508,7 @@ function applySnap(d){
   if(typeof d.town==="boolean") S.town=d.town;
   if(d.notes&&typeof d.notes==="object") S.notes=d.notes;
   const keep=Sync.touch; Sync.touch=()=>{};
-  ["chk","pace","child","fx","town","notes"].forEach(k=>store.set(k,S[k])); store.set("sel",Array.from(S.sel));
+  ["chk","pace","child","fx","town","notes","custom","sched"].forEach(k=>store.set(k,S[k])); store.set("sel",Array.from(S.sel));
   Sync.touch=keep; store.set("upd",d.upd||Date.now());
   renderHead(); renderStrip(); renderPanel(); renderDays(); renderAtt(); renderChk(); gmapMarkers();
   $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
@@ -1255,6 +1605,17 @@ document.addEventListener("click",function(e){
   else if(act==="detail") openModal(b.dataset.kind,id);
   else if(act==="closemodal") closeModal();
   else if(act==="fcity"){ S.fcity=id; renderFilters(); renderGrid(); }
+  else if(act==="addplace") openAdd(id||null);
+  else if(act==="addsearch") addSearch();
+  else if(act==="addpick"){ ADD.pick=ADD.res[+b.dataset.i]; $("#addres").innerHTML=addForm(ADD.pick); }
+  else if(act==="addback"){ addSearch(); }
+  else if(act==="addconfirm") addConfirm();
+  else if(act==="dayopt") dayOptimize(id);
+  else if(act==="dayreset"){ delete S.sched[id]; delete S.dayMsg[id]; saveSched(); }
+  else if(act==="tlup"||act==="tldown"){ const d=b.dataset.day, k=+b.dataset.k, L=mat(d), j=act==="tlup"?k-1:k+1; if(j>=0&&j<L.length){ const x=L[k]; L[k]=L[j]; L[j]=x; delete S.dayMsg[d]; saveSched(); } }
+  else if(act==="tlunlock"){ const d=b.dataset.day, L=mat(d); delete L[+b.dataset.k].t; saveSched(); }
+  else if(act==="tldel"){ const d=b.dataset.day, L=mat(d), it=L[+b.dataset.k]; if(it){ S.sel.delete(it.id); unschedule(it.id); refreshAll(); } }
+  else if(act==="delcustom"){ S.custom=S.custom.filter(c=>c.id!==id); store.set("custom",S.custom); rebuildCustom(); S.sel.delete(id); unschedule(id); refreshAll(); }
   else if(act==="ffav"){ S.ffav=!S.ffav; renderFilters(); renderGrid(); }
   else if(act==="mapmode"){ S.mapmode=id; store.set("mapmode",id); renderMapMode(); }
   else if(act==="favday"){ S.ffav=true; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
@@ -1275,6 +1636,7 @@ document.addEventListener("click",function(e){
 });
 document.addEventListener("click",function(e){ const d=$("#modal"); if(e.target===d) closeModal(); });
 document.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&e.target&&e.target.id==="addq"){ e.preventDefault(); addSearch(); return; }
   if(e.key!=="Enter"&&e.key!==" ") return;
   const t=e.target; if(t&&t.getAttribute&&t.getAttribute("role")==="button"&&t.dataset.act){ e.preventDefault(); t.dispatchEvent(new MouseEvent("click",{bubbles:true})); }
 });
@@ -1284,6 +1646,11 @@ document.addEventListener("change",function(e){
   else if(act==="pace"){ S.pace=+t.value; store.set("pace",S.pace); renderBudget(); }
   else if(act==="town"){ S.town=t.checked; store.set("town",S.town); renderBudget(); }
   else if(act==="fcat"){ S.fcat=t.value; renderGrid(); }
+  else if(act==="tltime"){ const d=t.dataset.day, v=t.value.trim(), hm=parseHM(v); if(v&&!hm){ renderDays(); return; } const L=mat(d), it=L[+t.dataset.k]; if(it){ if(hm) it.t=hm; else delete it.t; rebuild(d); delete S.dayMsg[d]; saveSched(); } }
+  else if(act==="tldur"){ const d=t.dataset.day, L=mat(d), it=L[+t.dataset.k]; if(it){ it.min=+t.value; saveSched(); } }
+  else if(act==="tlmove"){ const d=t.dataset.day, to=t.value, L=mat(d), it=L[+t.dataset.k]; if(it&&to){ mat(to); S.sched[d]=L.filter(x=>x!==it); const m={id:it.id}; if(it.min!=null) m.min=it.min; insertBest(to,m);
+      const dt=parseD(to); S.dayMsg[to]={txt:`«${ATTM[it.id].name}» spostato qui. Premi «Riorganizza giorno» per ricalcolare l'ordine.`}; saveSched(); setTimeout(()=>{ const el=$("#tl-"+to); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },50); } }
+  else if(act==="setday"){ const id=t.dataset.id, to=t.value; unschedule(id); if(to){ mat(to); insertBest(to,{id:id}); S.dayMsg[to]={txt:`«${ATTM[id].name}» aggiunto a questo giorno nel punto più comodo.`}; } refreshAll(); }
   else if(act==="lay"){ S.lay[t.dataset.id]=t.checked; store.set("lay",S.lay); gmapMarkers(); }
   else if(act==="importfile") importJSON(t.files&&t.files[0]);
   else if(act==="child"){ S.child=t.value; store.set("child",S.child); renderCalc(); }

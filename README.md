@@ -32,6 +32,21 @@ Le chiavi stanno solo in `config.js`: per cambiarle si modifica quel file.
 - **Giorno per giorno:** per ogni giornata, il pulsante *Giro del giorno su Google Maps* apre il percorso con i luoghi scelti.
 - **Schede dei luoghi:** orari, valutazioni, foto e mini-mappa da Google Places.
 
+## Programma della giornata
+
+Sotto ogni giorno c'è un programma con orari e spostamenti, dalla partenza (hotel o arrivo) al rientro, compresi i trasporti fissi
+(bus per Okuhida, bus da Shirakawa-go, treno per Kyoto, trasferimento a Osaka).
+
+- **Aggiungi luogo:** ricerca su Google Maps (Places), con tipo, durata, orari di apertura e posizione compilati da soli;
+  il luogo va nel punto del giorno dove allunga meno il giro.
+- **Modifiche:** orario (scriverlo lo fissa), durata, ordine, spostamento a un altro giorno, rimozione.
+- **Spostamenti:** a piedi, mezzi pubblici o taxi con tempi e costo stimati, più il link al percorso su Google Maps.
+- **Riorganizza giorno:** prova tutti gli ordini possibili (euristica 2-opt oltre le 8 tappe) e sceglie quello che riduce gli spostamenti
+  rispettando orari fissati, trasporti fissi, orari di apertura da Google e il momento migliore di ogni luogo (alba, pranzo, tramonto, cena).
+  Avvisa se la giornata non ci sta e suggerisce cosa togliere.
+
+Programmi e luoghi aggiunti si sincronizzano con il cloud come il resto.
+
 ## Preferiti di Michela
 
 I 20 luoghi in Giappone salvati sul suo Google Maps sono nel cruscotto: hotel e stazione dei bus erano già presenti,
