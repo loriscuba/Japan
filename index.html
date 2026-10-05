@@ -1,0 +1,1152 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Giappone 2026, il cruscotto del viaggio di nozze</title>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F5; --card:#FFFFFF; --ink:#1B2A46; --muted:#58647E; --line:#D5DCE7;
+  --sea:#21385B; --land:#ECEFE8; --landline:#AEBBB2;
+  --ok:#0C7A55; --okbg:#DCF2E8; --req:#8F5A00; --reqbg:#FFEDC2; --todo:#2054B8; --todobg:#E1EAFB; --risk:#B73030; --riskbg:#FBE0E0;
+  --seal:#C0332B; --focus:#2054B8;
+  --lk-ok:#18A874; --lk-req:#E8A100; --lk-todo:#3F7BEA; --lk-risk:#E5484D;
+  --fd:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --fb:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1423; --card:#162037; --ink:#E7ECF7; --muted:#9BA8C4; --line:#2A3856;
+    --sea:#0A1325; --land:#1C2A45; --landline:#3A4D75;
+    --ok:#4FD8A6; --okbg:#10382C; --req:#F2BC4B; --reqbg:#3A2D0E; --todo:#7FAAFF; --todobg:#14295A; --risk:#FF8585; --riskbg:#471A1A;
+    --seal:#E0483E; --focus:#7FAAFF;
+    --lk-ok:#34D399; --lk-req:#F5B93A; --lk-todo:#6EA2FF; --lk-risk:#FF7B7B;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1423; --card:#162037; --ink:#E7ECF7; --muted:#9BA8C4; --line:#2A3856;
+  --sea:#0A1325; --land:#1C2A45; --landline:#3A4D75;
+  --ok:#4FD8A6; --okbg:#10382C; --req:#F2BC4B; --reqbg:#3A2D0E; --todo:#7FAAFF; --todobg:#14295A; --risk:#FF8585; --riskbg:#471A1A;
+  --seal:#E0483E; --focus:#7FAAFF;
+  --lk-ok:#34D399; --lk-req:#F5B93A; --lk-todo:#6EA2FF; --lk-risk:#FF7B7B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--fb);font-size:16px;line-height:1.6}
+h1,h2,h3{font-family:var(--fd);margin:0;line-height:1.2}
+h1{font-weight:800;font-size:clamp(2rem,6vw,3.2rem);letter-spacing:.01em}
+h2{font-weight:700;font-size:1.45rem;margin-bottom:6px}
+h3{font-weight:700;font-size:1.12rem}
+p{margin:0 0 .7em}
+a{color:var(--todo)}
+button{font-family:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 16px}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* testata */
+.hero{padding:26px 0 8px}
+.lede{max-width:64ch;color:var(--muted);margin-top:10px;font-size:1.05rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:18px}
+.tile{border:1px solid var(--line);background:var(--card);padding:11px 14px;border-radius:6px}
+.tile b{display:block;font-family:var(--fd);font-size:1.75rem;line-height:1.05}
+.tile span{font-size:.86rem;color:var(--muted)}
+
+/* schede */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--paper);border-bottom:1px solid var(--line);margin-top:14px}
+.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:14px 13px 11px;font-size:.98rem;font-weight:700;color:var(--muted);white-space:nowrap;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.view{display:none;padding:22px 0 70px}
+.view.on{display:block}
+.sec{margin-top:30px}
+.sec>p.muted{max-width:70ch}
+
+/* chip, bottoni */
+.chip{display:inline-flex;align-items:center;font-size:.76rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip.ok{color:var(--ok);background:var(--okbg)}
+.chip.req{color:var(--req);background:var(--reqbg)}
+.chip.todo{color:var(--todo);background:var(--todobg)}
+.chip.risk{color:var(--risk);background:var(--riskbg)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:700;font-size:.88rem;text-decoration:none;cursor:pointer;line-height:1.2}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.small{padding:5px 10px;font-size:.8rem;border-radius:6px}
+.btn[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.seal{display:inline-grid;place-items:center;background:var(--seal);color:#fff;font-family:var(--fd);font-weight:800;font-size:.75rem;padding:2px 5px;border-radius:2px;letter-spacing:.06em;line-height:1.2}
+.tag{display:inline-block;font-size:.76rem;font-weight:700;padding:1px 8px;border:1.5px solid var(--ink);border-radius:3px}
+.tag.dim{border-color:var(--line);color:var(--muted)}
+
+/* avvisi */
+.alert{border-left:5px solid var(--risk);background:var(--card);border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:8px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.alert.media{border-left-color:var(--lk-req)}
+.alert.bassa{border-left-color:var(--lk-todo)}
+.alert strong{display:block}
+.alert p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
+
+/* notti */
+.strip{display:flex;gap:0;margin-top:8px}
+.stop{flex:var(--n) 1 0;min-width:74px;background:var(--card);border:1px solid var(--line);border-left-width:0;padding:9px 10px;text-align:left;cursor:pointer;color:var(--ink);font-size:.9rem;position:relative}
+.stop:first-child{border-left-width:1px;border-radius:8px 0 0 8px}
+.stop:last-child{border-radius:0 8px 8px 0}
+.stop b{display:block;font-family:var(--fd);font-size:1.02rem}
+.stop::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--lk-ok)}
+.stop.req::before{background:var(--lk-req)}
+.stop[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:-3px}
+.strip-wrap{overflow-x:auto}
+.strip{min-width:520px}
+
+/* mappa */
+.maprow{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:10px}
+@media (max-width:880px){.maprow{grid-template-columns:minmax(0,1fr)}}
+.mapbox{position:relative;background:var(--sea);border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+#map{display:block;width:100%;height:auto;aspect-ratio:680/660;touch-action:manipulation}
+#map .sea{fill:var(--sea)}
+#map .land{fill:var(--land);stroke:var(--landline);stroke-linejoin:round}
+#map .lbl{fill:var(--ink);font-family:var(--fb);font-weight:700;stroke:var(--land);stroke-linejoin:round;paint-order:stroke}
+#map .seaname{fill:#7F97BC;font-family:var(--fd);font-style:italic;opacity:.8}
+#map .hit{fill:none;stroke:transparent;pointer-events:stroke;cursor:pointer}
+#map .leg{fill:none;stroke-linecap:round;pointer-events:none}
+#map .leg.ok{stroke:var(--lk-ok)} #map .leg.req{stroke:var(--lk-req)} #map .leg.todo{stroke:var(--lk-todo)} #map .leg.risk{stroke:var(--lk-risk)}
+#map .legs.dim .leg{opacity:.35}
+#map .legs.dim .leg.sel{opacity:1}
+#map g.node{cursor:pointer}
+#map .n1.sleep{fill:var(--ink)} #map .n2.sleep{fill:var(--card)}
+#map .n1.min{fill:var(--card)} #map .n2.min{fill:var(--ink)}
+#map .ring{fill:none;stroke:var(--seal)}
+#map .fuji{fill:var(--landline)}
+.zoom{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;max-width:calc(100% - 20px)}
+.zoom button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.82rem;font-weight:700;cursor:pointer}
+.zoom button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 2px 0;font-size:.85rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block;width:28px;height:0;border-top:5px solid}
+.legend .ok{border-color:var(--lk-ok)} .legend .req{border-color:var(--lk-req)}
+.legend .todo{border-color:var(--lk-todo);border-top-style:dashed} .legend .risk{border-color:var(--lk-risk);border-top-style:dotted}
+.caption{font-size:.82rem;color:var(--muted);margin-top:6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.panel h3{font-size:1.3rem;margin-bottom:4px}
+.panel .hotel{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin:10px 0;background:var(--paper)}
+.panel .hotel b{font-family:var(--fd)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.pill{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.84rem;background:var(--paper)}
+.empty{color:var(--muted);font-style:italic}
+.expect{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.expect div{border-top:3px solid var(--ink);padding:8px 2px 0}
+.expect b{font-family:var(--fd)}
+.steps{max-width:72ch;padding-left:1.2em}
+.steps li{margin-bottom:6px}
+
+/* giorni */
+.day{display:grid;grid-template-columns:92px minmax(0,1fr);border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden;margin-bottom:12px}
+.day.today{outline:3px solid var(--seal)}
+.stub{background:var(--paper);border-right:2px dashed var(--line);padding:12px 6px;text-align:center}
+.stub .gg{font-weight:700;color:var(--muted);font-size:.9rem}
+.stub .nn{font-family:var(--fd);font-size:2.3rem;font-weight:800;line-height:1}
+.stub .mm{font-size:.86rem;color:var(--muted)}
+.daybody{padding:13px 16px}
+.dayhead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:6px}
+.dayhead h3{font-size:1.15rem}
+.fx{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:4px 10px;align-items:baseline;font-size:.93rem;margin:6px 0}
+.fx .t{font-weight:700}
+.blk{margin:8px 0}
+.blk b{font-size:.9rem}
+.warn{border:1px solid var(--risk);background:var(--riskbg);border-radius:6px;padding:7px 11px;margin:8px 0;font-size:.92rem;color:var(--ink)}
+.tip{color:var(--muted);font-size:.92rem;margin-top:6px}
+.pill.chipbtn{cursor:pointer;color:var(--ink)}
+.pill.chipbtn[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+@media (max-width:560px){.day{grid-template-columns:70px minmax(0,1fr)}.stub .nn{font-size:1.9rem}.fx{grid-template-columns:minmax(0,1fr) auto}.fx .t{grid-column:1 / -1}}
+
+/* treni */
+.verdict{border:1.5px solid var(--ink);border-radius:10px;padding:16px;background:var(--card)}
+.calc-in{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0}
+.calc-in label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;font-weight:700}
+select,input[type=number]{font:inherit;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--card);color:var(--ink);min-width:130px}
+table.fare{width:100%;border-collapse:collapse;font-size:.92rem;margin-top:6px}
+table.fare th,table.fare td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.fare th:first-child,table.fare td:first-child{text-align:left}
+table.fare tfoot td{font-weight:800;border-bottom:0}
+.tablewrap{overflow-x:auto}
+.leg-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:14px}
+.leg-card header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin:8px 0}
+.opt{border:1px solid var(--line);border-radius:6px;padding:10px 12px;background:var(--paper)}
+.opt.pick{border:2px solid var(--ok)}
+.opt strong{display:block;margin-bottom:3px}
+.opt dl{margin:0 0 4px;display:grid;grid-template-columns:auto 1fr;gap:1px 8px;font-size:.88rem}
+.opt dt{color:var(--muted)} .opt dd{margin:0}
+.opt p{font-size:.9rem;margin:4px 0 0}
+.tips{margin:6px 0 0;padding-left:1.15em;font-size:.93rem}
+.tips li{margin-bottom:3px}
+
+/* attrazioni */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;align-items:center}
+.fbtn{border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:999px;font-size:.88rem;font-weight:700;cursor:pointer}
+.fbtn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.budget{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:10px}
+.brow{display:grid;grid-template-columns:150px minmax(0,1fr) 150px;gap:10px;align-items:center;margin:8px 0;font-size:.92rem}
+.bar{height:11px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--lk-ok)}
+.brow.warnb .bar i{background:var(--lk-req)} .brow.over .bar i{background:var(--lk-risk)}
+.brow .st{text-align:right;color:var(--muted)}
+.brow.over .st{color:var(--risk);font-weight:700}
+@media (max-width:620px){.brow{grid-template-columns:minmax(0,1fr) 110px}.brow .bar{grid-column:1 / -1;order:3}}
+.setrow{display:flex;flex-wrap:wrap;gap:12px 22px;margin-bottom:6px;align-items:center;font-size:.92rem}
+.setrow label{display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
+.att{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.att.is-sel{border-color:var(--ok)}
+.att h3{font-size:1.08rem}
+.att .jp{font-family:var(--fd);color:var(--muted);font-size:.95rem}
+.att .meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.84rem;color:var(--muted)}
+.att .row1{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.att p{margin:0;font-size:.93rem}
+.att .acts{margin-top:auto;padding-top:6px}
+
+/* checklist */
+.prog{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0 4px;max-width:420px}
+.prog i{display:block;height:100%;background:var(--lk-ok)}
+.chk{display:grid;grid-template-columns:26px minmax(0,1fr);gap:8px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--lk-todo);border-radius:0 8px 8px 0;margin-bottom:8px}
+.chk.alta{border-left-color:var(--lk-risk)} .chk.media{border-left-color:var(--lk-req)}
+.chk input{width:20px;height:20px;margin-top:3px;accent-color:var(--ok)}
+.chk.done strong{text-decoration:line-through;color:var(--muted)}
+.chk p{margin:2px 0 0;font-size:.93rem;color:var(--muted)}
+.contact{border:1px dashed var(--line);border-radius:8px;padding:12px 14px;background:var(--card);max-width:70ch}
+
+dialog.modal{border:1px solid var(--line);border-radius:14px;padding:0;max-width:660px;width:calc(100% - 24px);background:var(--card);color:var(--ink);max-height:calc(100vh - 24px);overflow:auto}
+dialog.modal::backdrop{background:rgba(10,19,37,.62)}
+.mhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:16px 18px 6px;position:sticky;top:0;background:var(--card);z-index:2}
+.mhead h3{font-size:1.35rem}
+.mhead .jp{font-family:var(--fd);color:var(--muted)}
+.mbody{padding:4px 18px 18px}
+.mbody p{margin:0 0 .6em}
+.gbox{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:var(--paper)}
+.gbox h4{margin:0 0 6px;font-family:var(--fd);font-size:1.02rem}
+.gmap{height:230px;border-radius:8px;margin:8px 0;background:var(--line)}
+.gdl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:.92rem;margin:8px 0}
+.gdl dt{color:var(--muted)} .gdl dd{margin:0}
+.gphotos{display:flex;gap:6px;overflow-x:auto;margin:8px 0}
+.gphotos img{height:110px;width:auto;border-radius:6px;flex:none}
+.hours{margin:0;padding-left:1.1em;font-size:.88rem}
+.syncbadge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:.84rem;color:var(--muted)}
+.syncbadge i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
+.syncbadge.on i{background:var(--lk-ok)} .syncbadge.err i{background:var(--lk-risk)} .syncbadge.busy i{background:var(--lk-req)}
+.setbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;max-width:760px}
+.setbox label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;font-weight:700;margin:10px 0}
+.setbox input[type=text],.setbox input[type=password]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper);color:var(--ink);width:100%}
+textarea.note{font:inherit;font-size:.93rem;width:100%;min-height:58px;padding:7px 9px;border:1px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--ink);resize:vertical;margin-top:8px}
+textarea.note:focus{border-style:solid;border-color:var(--ink)}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <h1>Giappone, 19–30 ottobre 2026</h1>
+  <p class="lede" id="lede"></p>
+  <div class="tiles" id="tiles"></div>
+  <button class="syncbadge btn small" style="border:0;padding:0;background:none" data-act="tab" data-id="checklist" id="syncbadge"><i></i><span>Salvato su questo dispositivo</span></button>
+</div></header>
+<nav class="tabs" aria-label="Sezioni del cruscotto"><div class="wrap" role="tablist" id="tabs"></div></nav>
+<main class="wrap">
+
+<section class="view" id="v-percorso" role="tabpanel">
+  <div class="sec" style="margin-top:0">
+    <h2>Da sistemare per primi</h2>
+    <p class="muted">Ho letto il preventivo come farebbe un tour operator. Queste sono le cose che possono rovinarti una giornata se non le chiarisci prima della partenza.</p>
+    <div id="alerts"></div>
+    <button class="btn small" data-act="tab" data-id="checklist">Apri tutta la lista</button>
+  </div>
+
+  <div class="sec">
+    <h2>Le tappe e le notti</h2>
+    <p class="muted">Dieci notti in hotel, cinque cambi di base. Tocca una tappa per vederla sulla mappa.</p>
+    <div class="strip-wrap"><div class="strip" id="strip"></div></div>
+  </div>
+
+  <div class="sec">
+    <h2>La mappa del viaggio</h2>
+    <p class="muted">Tocca una tratta o una città. Le linee tratteggiate sono i treni che il preventivo non include e che devi comprare tu.</p>
+    <div class="maprow">
+      <div>
+        <div class="mapbox">
+          <svg id="map" viewBox="0 0 680 660" role="img" aria-label="Mappa schematica del Giappone centrale con le tappe del viaggio"></svg>
+          <div class="zoom" id="zoom"></div>
+        </div>
+        <div class="legend">
+          <span><i class="ok"></i>Disponibile</span>
+          <span><i class="req"></i>Su richiesta</span>
+          <span><i class="todo"></i>Da organizzare</span>
+          <span><i class="risk"></i>Da verificare</span>
+        </div>
+        <p class="caption">Mappa schematica, non in scala. Per le mappe vere usa i pulsanti di Google Maps nel pannello.</p>
+      </div>
+      <div class="panel" id="panel" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h2>Cosa aspettarti a fine ottobre</h2>
+    <div class="expect" id="expect"></div>
+  </div>
+
+  <div class="sec">
+    <h2>Tutti i luoghi su Google Maps</h2>
+    <p class="muted">Scarica il file CSV con hotel e attrazioni (tutte, oppure solo quelle nel tuo piano). Importandolo in Google My Maps ottieni la tua mappa vera, con segnaposto e filtri per categoria.</p>
+    <div class="acts" style="margin-bottom:10px"><button class="btn small primary" data-act="csv" data-id="all">Scarica CSV, tutti i luoghi</button><button class="btn small" data-act="csv" data-id="sel">Scarica CSV, solo il mio piano</button></div>
+    <ol class="steps">
+      <li>Apri mymaps.google.com e crea una nuova mappa.</li>
+      <li>Scegli Importa e carica il file CSV.</li>
+      <li>Come colonna per il posizionamento seleziona Indirizzo per la ricerca, come titolo seleziona Nome.</li>
+      <li>Condividi la mappa con Michela e aprila dall'app Google Maps, sezione Salvati.</li>
+    </ol>
+    <p class="muted">Prima di partire, scarica anche le mappe offline di ogni città: nell'app Google Maps tocca la tua foto, poi Mappe offline.</p>
+  </div>
+</section>
+
+<section class="view" id="v-giorni" role="tabpanel">
+  <h2>Giorno per giorno</h2>
+  <p class="muted">I riquadri con l'orario sono dati del preventivo. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Il tramonto è verso le 17 in tutte le tappe, quindi alle 18 è già buio.</p>
+  <div id="days" style="margin-top:14px"></div>
+</section>
+
+<section class="view" id="v-treni" role="tabpanel">
+  <h2>Treni e bus tra le città</h2>
+  <p class="muted">Il preventivo include solo il bus Nohi del 25 ottobre e i trasferimenti dall'aeroporto. Tutto il resto lo compri tu. Prezzi e durate sono indicativi: verificali prima di acquistare.</p>
+  <div class="verdict" style="margin-top:12px">
+    <h3>Conviene il Japan Rail Pass? No.</h3>
+    <div id="verdict"></div>
+    <div class="calc-in">
+      <label>Età di Umberto
+        <select id="childAge" data-act="child">
+          <option value="0-5">0–5 anni</option>
+          <option value="6-11">6–11 anni</option>
+          <option value="12+">12 anni o più</option>
+        </select>
+      </label>
+      <label>Cambio (JPY per 1 €)
+        <input type="number" id="fx" min="100" max="300" step="1" data-act="fx">
+      </label>
+    </div>
+    <div class="tablewrap" id="calcOut"></div>
+  </div>
+  <div id="legs"></div>
+  <div class="sec">
+    <h2>Come si prenota</h2>
+    <ol class="steps">
+      <li>Shinkansen e Hida: una sola prenotazione su SmartEX o in biglietteria JR, da un mese prima della partenza.</li>
+      <li>Kanazawa → Kyoto: in stazione a Kanazawa, con il passaporto, chiedendo il biglietto per turisti stranieri.</li>
+      <li>Bus Nohi del 25 ottobre: voucher stampato su carta, quello digitale non vale.</li>
+      <li>Metro e treni locali: carta IC (Suica o ICOCA). Google Maps mostra orari, binari e prezzi in tempo reale.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="view" id="v-attrazioni" role="tabpanel">
+  <h2>Cosa vedere</h2>
+  <p class="muted">Ho già selezionato gli imperdibili. Togli e aggiungi: la barra delle ore ti dice quando stai esagerando.</p>
+  <div class="budget" id="budget"></div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="view" id="v-checklist" role="tabpanel">
+  <h2>Prima di partire</h2>
+  <p class="muted">Spunta quello che hai fatto. Con il salvataggio cloud attivo (in fondo alla pagina) i segni si vedono su tutti i vostri telefoni.</p>
+  <div class="prog"><i id="progbar" style="width:0%"></i></div>
+  <p class="muted" id="progtxt"></p>
+  <div id="chklist"></div>
+  <div class="sec">
+    <h3>Contatti utili</h3>
+    <div class="contact">
+      <p><b>Agenzia:</b> Ivaldi Viaggi (FM Viaggi), Piazza del Popolo 22 R, Savona. Preventivo n. 2182416 del 24 giugno 2026.</p>
+      <p><b>Operatore:</b> Alidays, telefono +39 02 87238400, info@alidays.it.</p>
+      <p style="margin:0"><b>In Giappone:</b> assistenza telefonica dalle 20:00 alle 08:00 e chat di giorno (numero e link sui voucher). Non prenota ristoranti né attrazioni.</p>
+    </div>
+  </div>
+  <div class="sec" id="settings">
+    <h3>Salvataggio e Google Maps</h3>
+    <div class="setbox" id="setbox"></div>
+  </div>
+</section>
+
+</main>
+
+<dialog class="modal" id="modal" aria-labelledby="mtitle"></dialog>
+
+<script>
+(function(){
+"use strict";
+/* Configurazione: config.js (vedi README), con override locali inseriti dalla pagina. */
+const CFG = window.JP26_CONFIG || {};
+const lget = k => { try{ return localStorage.getItem("jp26cfg_"+k)||""; }catch(e){ return ""; } };
+const lset = (k,v) => { try{ v?localStorage.setItem("jp26cfg_"+k,v):localStorage.removeItem("jp26cfg_"+k); }catch(e){} };
+const GM_KEY = lget("gmkey") || CFG.googleMapsKey || "";
+const SB = { url:(lget("sburl")||CFG.supabaseUrl||"").replace(/\/+$/,""), key:lget("sbkey")||CFG.supabaseAnonKey||"" };
+const ATT = [{"id": "tk_senso", "city": "tokyo", "zone": "Asakusa", "name": "Senso-ji e Nakamise", "jp": "浅草寺", "cat": "Templi e storia", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "Mattina presto o dopo le 17, quando è illuminato", "note": "Il tempio più antico di Tokyo. Lungo Nakamise assaggia i dolcetti ningyo-yaki, poi passeggia lungo il fiume Sumida.", "q": "Senso-ji Temple Asakusa Tokyo", "inc": false, "warn": ""}, {"id": "tk_meiji", "city": "tokyo", "zone": "Harajuku", "name": "Meiji Jingu", "jp": "明治神宮", "cat": "Templi e storia", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Mattina", "note": "Santuario dentro un bosco, a pochi minuti da Harajuku. Nei fine settimana capita di vedere cortei di nozze shinto.", "q": "Meiji Jingu Shrine Tokyo", "inc": false, "warn": ""}, {"id": "tk_shibuya", "city": "tokyo", "zone": "Shibuya", "name": "Shibuya Crossing e Shibuya Sky", "jp": "渋谷スクランブルスクエア", "cat": "Natura e panorami", "min": 120, "pri": 3, "kid": true, "book": "consigliata", "best": "Slot del tramonto, verso le 16:30", "note": "L'incrocio più famoso del mondo visto dall'alto. Con il cielo limpido si vede anche il Fuji. L'ingresso è a orario: prenota lo slot.", "q": "Shibuya Sky Tokyo", "inc": false, "warn": ""}, {"id": "tk_teamlab", "city": "tokyo", "zone": "Toyosu", "name": "teamLab Planets", "jp": "チームラボプラネッツ", "cat": "Esperienze", "min": 120, "pri": 3, "kid": true, "book": "obbligatoria", "best": "Pomeriggio, con slot prenotato", "note": "Arte immersiva dentro l'acqua, si cammina scalzi: porta pantaloni facili da arrotolare. Gli slot si esauriscono, prenota subito.", "q": "teamLab Planets TOKYO Toyosu", "inc": false, "warn": ""}, {"id": "tk_harajuku", "city": "tokyo", "zone": "Harajuku", "name": "Harajuku e Omotesando", "jp": "原宿・表参道", "cat": "Quartieri", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Takeshita Street per la cultura pop, Omotesando per architettura e caffè. Si abbina bene a Meiji Jingu.", "q": "Takeshita Street Harajuku Tokyo", "inc": false, "warn": ""}, {"id": "tk_tsukiji", "city": "tokyo", "zone": "Tsukiji", "name": "Mercato esterno di Tsukiji", "jp": "築地場外市場", "cat": "Cibo", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Colazione, entro le 10", "note": "Sushi, tamagoyaki e spiedini di mare mangiati in piedi. Molte bancarelle chiudono nel primo pomeriggio.", "q": "Tsukiji Outer Market Tokyo", "inc": false, "warn": ""}, {"id": "tk_shinjuku", "city": "tokyo", "zone": "Shinjuku", "name": "Shinjuku di sera", "jp": "新宿・思い出横丁", "cat": "Quartieri", "min": 90, "pri": 2, "kid": false, "book": "no", "best": "Dopo il tramonto", "note": "Insegne al neon e i vicoli fumosi di Omoide Yokocho. Dal Palazzo del Governo (Tocho) c'è un panorama gratuito.", "q": "Omoide Yokocho Shinjuku Tokyo", "inc": false, "warn": ""}, {"id": "tk_gyoen", "city": "tokyo", "zone": "Shinjuku", "name": "Shinjuku Gyoen", "jp": "新宿御苑", "cat": "Natura e panorami", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Mattina o primo pomeriggio", "note": "Giardino enorme, ottimo per una pausa dal caos e con un bambino. Chiude presto: controlla l'orario.", "q": "Shinjuku Gyoen National Garden Tokyo", "inc": false, "warn": ""}, {"id": "tk_ueno", "city": "tokyo", "zone": "Ueno", "name": "Parco di Ueno e musei", "jp": "上野公園", "cat": "Natura e panorami", "min": 120, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Parco, templi, musei e zoo con i panda. Una passeggiata tranquilla.", "q": "Ueno Park Tokyo", "inc": false, "warn": ""}, {"id": "tk_akiba", "city": "tokyo", "zone": "Akihabara", "name": "Akihabara", "jp": "秋葉原", "cat": "Quartieri", "min": 90, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio o sera", "note": "Anime, retrogame e sale giochi su più piani. Perfetta per souvenir tecnologici.", "q": "Akihabara Electric Town Tokyo", "inc": false, "warn": ""}, {"id": "tk_palace", "city": "tokyo", "zone": "Marunouchi", "name": "Giardini Est del Palazzo Imperiale", "jp": "皇居東御苑", "cat": "Natura e panorami", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Fossati, mura del castello e giardini. Chiusi il lunedì e il venerdì: il 23 ottobre è venerdì.", "q": "Imperial Palace East Gardens Tokyo", "inc": false, "warn": "Chiuso il venerdì: non va bene il 23 ottobre."}, {"id": "tk_skytree", "city": "tokyo", "zone": "Oshiage", "name": "Tokyo Skytree", "jp": "東京スカイツリー", "cat": "Natura e panorami", "min": 90, "pri": 1, "kid": true, "book": "consigliata", "best": "Giornata limpida", "note": "Alternativa a Shibuya Sky: più alto ma più lontano dal centro. Ne basta uno dei due.", "q": "Tokyo Skytree", "inc": false, "warn": ""}, {"id": "tk_ginza", "city": "tokyo", "zone": "Ginza", "name": "Ginza", "jp": "銀座", "cat": "Quartieri", "min": 90, "pri": 1, "kid": true, "book": "no", "best": "Sera", "note": "Grandi magazzini, boutique e il teatro Kabuki-za. Bella al tramonto e utile per lo shopping tax-free.", "q": "Ginza Tokyo", "inc": false, "warn": ""}, {"id": "tk_kamakura", "city": "tokyo", "zone": "Kamakura", "name": "Gita a Kamakura", "jp": "鎌倉", "cat": "Esperienze", "min": 420, "pri": 1, "kid": true, "book": "no", "best": "Giornata intera", "note": "Grande Buddha di bronzo e templi tra le colline, a circa un'ora da Tokyo. Sostituisce una giornata in città.", "q": "Kotoku-in Great Buddha Kamakura", "inc": false, "warn": ""}, {"id": "ta_sanmachi", "city": "takayama", "zone": "Takayama città", "name": "Sanmachi Suji, il centro storico", "jp": "古い町並", "cat": "Quartieri", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "Botteghe di sake, case in legno scuro e spiedini di manzo Hida. È il motivo per cui si viene a Takayama.", "q": "Sanmachi Suji Takayama", "inc": false, "warn": ""}, {"id": "ta_onsen", "city": "takayama", "zone": "Okuhida", "name": "Onsen e cena al ryokan", "jp": "奥飛騨温泉郷", "cat": "Esperienze", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Sera, prima della cena", "note": "Bagni termali con vista montagna e cena kaiseki a mezza pensione. Regole: lavarsi prima, niente costume; se hai tatuaggi chiedi al ryokan.", "q": "Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu", "inc": true, "warn": ""}, {"id": "ta_jinya", "city": "takayama", "zone": "Takayama città", "name": "Takayama Jinya", "jp": "高山陣屋", "cat": "Templi e storia", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "L'antico palazzo del governatore, rimasto intatto. Chiude nel tardo pomeriggio.", "q": "Takayama Jinya", "inc": false, "warn": ""}, {"id": "ta_folk", "city": "takayama", "zone": "Takayama città", "name": "Hida no Sato, villaggio all'aperto", "jp": "飛騨の里", "cat": "Templi e storia", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Case di montagna ricostruite in un parco. È fuori dal centro, serve un bus.", "q": "Hida Folk Village Takayama", "inc": false, "warn": ""}, {"id": "ta_market", "city": "takayama", "zone": "Takayama città", "name": "Mercato del mattino Miyagawa", "jp": "宮川朝市", "cat": "Cibo", "min": 45, "pri": 2, "kid": true, "book": "no", "best": "Mattina, dalle 7", "note": "Ha senso solo se dormi in centro a Takayama: dal ryokan di Okuhida non fai in tempo.", "q": "Miyagawa Morning Market Takayama", "inc": false, "warn": "Non compatibile con il ryokan di Okuhida."}, {"id": "ta_ropeway", "city": "takayama", "zone": "Okuhida", "name": "Funivia Shin-Hotaka", "jp": "新穂高ロープウェイ", "cat": "Natura e panorami", "min": 150, "pri": 2, "kid": true, "book": "no", "best": "Mattina presto del 25", "note": "Doppia funivia fino a circa 2.150 metri, con vista sulle Alpi Giapponesi. A fine ottobre fa freddo e può esserci neve in quota: controlla meteo e orari.", "q": "Shinhotaka Ropeway", "inc": false, "warn": "Ti costringe a spostare il bus per Kanazawa."}, {"id": "sg_ogimachi", "city": "shirakawago", "zone": "Ogimachi", "name": "Villaggio di Ogimachi", "jp": "白川郷 荻町", "cat": "Templi e storia", "min": 100, "pri": 3, "kid": true, "book": "no", "best": "Sosta del bus il 25 ottobre", "note": "Case gassho dal tetto di paglia, Patrimonio UNESCO. Domenica è affollato: vai prima verso il fondo del villaggio.", "q": "Ogimachi Shirakawa-go", "inc": false, "warn": ""}, {"id": "sg_shiroyama", "city": "shirakawago", "zone": "Ogimachi", "name": "Belvedere Shiroyama", "jp": "城山展望台", "cat": "Natura e panorami", "min": 45, "pri": 2, "kid": false, "book": "no", "best": "Se ti resta tempo", "note": "Vista dall'alto sul villaggio. Serve una salita di 15-20 minuti oppure la navetta a pagamento.", "q": "Shiroyama Viewpoint Shirakawa-go", "inc": false, "warn": ""}, {"id": "kz_kenroku", "city": "kanazawa", "zone": "Centro", "name": "Giardino Kenroku-en", "jp": "兼六園", "cat": "Natura e panorami", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Mattina del 26, all'apertura", "note": "Uno dei tre giardini più belli del Giappone. Da metà ottobre gli orari si accorciano e chiude presto: controlla.", "q": "Kenrokuen Garden Kanazawa", "inc": false, "warn": ""}, {"id": "kz_higashi", "city": "kanazawa", "zone": "Higashi Chaya", "name": "Quartiere Higashi Chaya", "jp": "ひがし茶屋街", "cat": "Quartieri", "min": 75, "pri": 3, "kid": true, "book": "no", "best": "Imbrunire del 25", "note": "Vicoli di antiche case da tè e foglia d'oro dappertutto (prova il gelato). Meglio al tramonto.", "q": "Higashi Chaya District Kanazawa", "inc": false, "warn": ""}, {"id": "kz_omicho", "city": "kanazawa", "zone": "Centro", "name": "Mercato Omicho", "jp": "近江町市場", "cat": "Cibo", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "Mattina o pranzo", "note": "Ciotola di pesce crudo (kaisendon), ostriche, granchio. Molte bancarelle chiudono verso le 17.", "q": "Omicho Market Kanazawa", "inc": false, "warn": ""}, {"id": "kz_castle", "city": "kanazawa", "zone": "Centro", "name": "Parco del Castello di Kanazawa", "jp": "金沢城公園", "cat": "Templi e storia", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Insieme al Kenroku-en", "note": "Di fronte al Kenroku-en: porte e torrette ricostruite.", "q": "Kanazawa Castle Park", "inc": false, "warn": ""}, {"id": "kz_nagamachi", "city": "kanazawa", "zone": "Centro", "name": "Quartiere dei samurai Nagamachi", "jp": "長町武家屋敷跡", "cat": "Quartieri", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Muri di fango e canali, a due passi dal Kenroku-en.", "q": "Nagamachi Samurai District Kanazawa", "inc": false, "warn": ""}, {"id": "kz_museum", "city": "kanazawa", "zone": "Centro", "name": "Museo d'Arte Contemporanea del XXI secolo", "jp": "金沢21世紀美術館", "cat": "Esperienze", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Famoso per la piscina di Leandro Erlich. Chiuso il lunedì: il 26 ottobre è lunedì.", "q": "21st Century Museum of Contemporary Art Kanazawa", "inc": false, "warn": "Chiuso il lunedì: il 26 ottobre non si entra."}, {"id": "ky_fushimi", "city": "kyoto", "zone": "Fushimi", "name": "Fushimi Inari Taisha", "jp": "伏見稲荷大社", "cat": "Templi e storia", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Migliaia di torii rossi lungo il sentiero. Il tour lo comprende insieme a Nara.", "q": "Fushimi Inari Taisha Kyoto", "inc": true, "warn": ""}, {"id": "na_todaiji", "city": "nara", "zone": "Nara", "name": "Todai-ji e il Grande Buddha", "jp": "東大寺", "cat": "Templi e storia", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Il Buddha di bronzo nella più grande sala di legno del mondo.", "q": "Todai-ji Nara", "inc": true, "warn": ""}, {"id": "na_park", "city": "nara", "zone": "Nara", "name": "Parco di Nara e i cervi", "jp": "奈良公園", "cat": "Natura e panorami", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Cervi liberi che chiedono i biscotti (shika senbei, circa 200 yen). Con un bambino piccolo fai attenzione: spingono e mordicchiano.", "q": "Nara Park", "inc": true, "warn": ""}, {"id": "ky_kiyomizu", "city": "kyoto", "zone": "Higashiyama", "name": "Kiyomizu-dera e Higashiyama", "jp": "清水寺", "cat": "Templi e storia", "min": 150, "pri": 3, "kid": true, "book": "no", "best": "Dalle 6:00 alle 8:30, prima dei gruppi", "note": "Terrazza di legno sopra Kyoto e le stradine Sannenzaka e Ninenzaka. Apre alle 6: perfetta la mattina del 29, prima di andare a Osaka.", "q": "Kiyomizu-dera Kyoto", "inc": false, "warn": ""}, {"id": "ky_arashiyama", "city": "kyoto", "zone": "Arashiyama", "name": "Arashiyama", "jp": "嵐山 竹林の小径", "cat": "Natura e panorami", "min": 180, "pri": 3, "kid": true, "book": "no", "best": "Alle 7:30, prima della folla", "note": "Bosco di bambù, tempio Tenryu-ji e il ponte Togetsukyo. Dal centro servono 30-40 minuti.", "q": "Arashiyama Bamboo Grove Kyoto", "inc": false, "warn": ""}, {"id": "ky_kinkaku", "city": "kyoto", "zone": "Kita", "name": "Kinkaku-ji, il Padiglione d'Oro", "jp": "金閣寺", "cat": "Templi e storia", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "All'apertura", "note": "Visita rapida ma iconica. Si abbina ad Arashiyama, stesso lato ovest della città.", "q": "Kinkaku-ji Kyoto", "inc": false, "warn": ""}, {"id": "ky_gion", "city": "kyoto", "zone": "Gion", "name": "Gion e Hanamikoji", "jp": "祇園・花見小路", "cat": "Quartieri", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Tramonto e sera", "note": "Case da tè e, con un po' di fortuna, una maiko. Alcune stradine sono private: segui i cartelli e non fotografare le persone.", "q": "Hanamikoji Street Gion Kyoto", "inc": false, "warn": ""}, {"id": "ky_nishiki", "city": "kyoto", "zone": "Centro", "name": "Mercato Nishiki", "jp": "錦市場", "cat": "Cibo", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tarda mattina o primo pomeriggio", "note": "La cucina di Kyoto, a pochi passi dall'hotel. Chiude presto. Evita di mangiare camminando.", "q": "Nishiki Market Kyoto", "inc": false, "warn": ""}, {"id": "ky_pontocho", "city": "kyoto", "zone": "Centro", "name": "Pontocho di sera", "jp": "先斗町", "cat": "Cibo", "min": 60, "pri": 2, "kid": false, "book": "consigliata", "best": "Cena", "note": "Vicolo stretto lungo il fiume Kamo, a due passi dall'hotel. Prenota se vuoi una cena di coppia.", "q": "Pontocho Alley Kyoto", "inc": false, "warn": ""}, {"id": "ky_philosopher", "city": "kyoto", "zone": "Higashiyama", "name": "Sentiero del Filosofo e Nanzen-ji", "jp": "哲学の道・南禅寺", "cat": "Natura e panorami", "min": 120, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Passeggiata lungo il canale tra i templi. A fine ottobre il foliage è ancora acerbo.", "q": "Philosopher's Path Kyoto", "inc": false, "warn": ""}, {"id": "ky_kimono", "city": "kyoto", "zone": "Gion", "name": "Passeggiata in kimono", "jp": "着物レンタル", "cat": "Esperienze", "min": 180, "pri": 2, "kid": true, "book": "consigliata", "best": "Mattina, prenotata", "note": "Noleggio con vestizione e foto a Gion o Higashiyama: un ricordo perfetto per un viaggio di nozze. Prenota online.", "q": "Kimono rental Kyoto Gion", "inc": false, "warn": ""}, {"id": "os_dotonbori", "city": "osaka", "zone": "Namba", "name": "Dotonbori e l'insegna Glico", "jp": "道頓堀", "cat": "Quartieri", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "Sera", "note": "Neon, takoyaki e okonomiyaki. Il quartiere più Osaka di tutti: cena qui.", "q": "Dotonbori Osaka", "inc": false, "warn": ""}, {"id": "os_castle", "city": "osaka", "zone": "Osaka Castle", "name": "Castello di Osaka", "jp": "大阪城", "cat": "Templi e storia", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "Parco e torre. Il giardino si gode anche solo da fuori; la torre chiude presto.", "q": "Osaka Castle", "inc": false, "warn": ""}, {"id": "os_kuromon", "city": "osaka", "zone": "Namba", "name": "Mercato Kuromon", "jp": "黒門市場", "cat": "Cibo", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tarda mattina", "note": "La cucina di Osaka: frutti di mare e carne alla griglia. Le bancarelle chiudono nel pomeriggio.", "q": "Kuromon Market Osaka", "inc": false, "warn": ""}, {"id": "os_umeda", "city": "osaka", "zone": "Umeda", "name": "Umeda Sky Building", "jp": "梅田スカイビル 空中庭園展望台", "cat": "Natura e panorami", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tramonto", "note": "Terrazza panoramica circolare a 173 metri. Alternativa a una cena in centro.", "q": "Umeda Sky Building Osaka", "inc": false, "warn": ""}, {"id": "os_shinsekai", "city": "osaka", "zone": "Shinsekai", "name": "Shinsekai e Tsutenkaku", "jp": "新世界・通天閣", "cat": "Quartieri", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Sera", "note": "Quartiere retro con i kushikatsu (spiedini fritti). Più ruvido, ma pieno di carattere.", "q": "Tsutenkaku Tower Shinsekai Osaka", "inc": false, "warn": ""}, {"id": "os_kaiyukan", "city": "osaka", "zone": "Osaka Bay", "name": "Acquario Kaiyukan", "jp": "海遊館", "cat": "Esperienze", "min": 150, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Uno dei più grandi acquari del mondo, ideale con un bambino.", "q": "Osaka Aquarium Kaiyukan", "inc": false, "warn": ""}, {"id": "os_nakanoshima", "city": "osaka", "zone": "Kitahama", "name": "Passeggiata a Nakanoshima", "jp": "中之島公園", "cat": "Natura e panorami", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Appena arrivi, vicino all'hotel", "note": "Isola-giardino sul fiume, a pochi minuti dall'hotel di Kitahama. Ottima per rilassarti dopo il treno.", "q": "Nakanoshima Park Osaka", "inc": false, "warn": ""}];
+
+/* ---------- utilità ---------- */
+const $ = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.prototype.slice.call((r||document).querySelectorAll(s));
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem("jp26_"+k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem("jp26_"+k,JSON.stringify(v)); }catch(e){} if(SYNCED.indexOf(k)>=0) Sync.touch(); }
+};
+const SYNCED=["sel","chk","pace","child","fx","town","notes"];
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => Math.round(n).toLocaleString("it-IT");
+const ST = {ok:"Disponibile", req:"Su richiesta", todo:"Da organizzare", risk:"Da verificare"};
+const chip = (s,t)=> `<span class="chip ${s}">${t||ST[s]}</span>`;
+const gsearch = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+const gdir = (o,d,m)=> "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+"&travelmode="+(m||"transit");
+const MESI=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
+const GG=["dom","lun","mar","mer","gio","ven","sab"];
+const GGL=["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
+
+/* ---------- dati del viaggio ---------- */
+const HOT = {
+  tokyo:{n:"the b Akasaka",q:"the b akasaka-mitsuke, Tokyo",stars:3,room:"Family 4 per 3 persone, non fumatori, solo pernottamento",dates:"20 → 24 ottobre",nights:4,st:"ok",note:"Nelle camere Family il bambino può non avere un letto proprio e la colazione dei bambini si paga sul posto."},
+  okuhida:{n:"Ryokan Yakenoyu",q:"Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu",stars:3,room:"Camera giapponese con futon, vista montagna, mezza pensione",dates:"24 → 25 ottobre",nights:1,st:"req",note:"È a Okuhida, nella valle termale, a circa 80–90 minuti di bus da Takayama città. Quota soggetta a riconferma."},
+  kanazawa:{n:"Hotel Intergate Kanazawa",q:"Hotel Intergate Kanazawa",stars:4,room:"Standard Double con letto Queen, FUMATORI, solo pernottamento",dates:"25 → 26 ottobre",nights:1,st:"ok",note:"Con un bambino chiedi una camera non fumatori."},
+  kyoto:{n:"Hotel Gracery Kyoto Sanjo",q:"Hotel Gracery Kyoto Sanjo",stars:4,room:"Standard Double per 3 persone, non fumatori, solo pernottamento",dates:"26 → 29 ottobre",nights:3,st:"ok",note:"Conferma come sono sistemati i tre letti."},
+  osaka:{n:"The Royal Park Canvas Osaka Kitahama",q:"The Royal Park Canvas Osaka Kitahama",stars:4,room:"Deluxe Twin con 3 letti, non fumatori, solo pernottamento",dates:"29 → 30 ottobre",nights:1,st:"ok",note:"Una sola notte: lascia i bagagli e vai a Nakanoshima."}
+};
+const CITY = {
+  tokyo:{n:"Tokyo",cap:21,ovh:1.3,origin:HOT.tokyo.q},
+  takayama:{n:"Takayama e Okuhida",cap:2.5,capTown:6.5,ovh:1.1,origin:"JR Takayama Station"},
+  shirakawago:{n:"Shirakawa-go",cap:2.2,ovh:1.0,origin:"Shirakawa-go Bus Terminal"},
+  kanazawa:{n:"Kanazawa",cap:6.5,ovh:1.15,origin:HOT.kanazawa.q},
+  kyoto:{n:"Kyoto",cap:13.5,ovh:1.3,origin:HOT.kyoto.q},
+  nara:{n:"Nara",cap:0,ovh:1,origin:"Kyoto Station"},
+  osaka:{n:"Osaka",cap:5.5,ovh:1.25,origin:HOT.osaka.q}
+};
+const NODES = {
+  tokyo:{n:"Tokyo",lat:35.68,lon:139.76,sleep:1,pos:"r",city:"tokyo",hot:"tokyo"},
+  nagoya:{n:"Nagoya",lat:35.18,lon:136.91,pos:"b",minor:1,info:"Qui cambi tra lo Shinkansen e il treno Hida per Takayama. Il cambio richiede da 5 a 25 minuti."},
+  takayama:{n:"Takayama",lat:36.14,lon:137.25,pos:"l",city:"takayama",zone:"town",info:"Centro storico e stazione dei bus. Qui non dormi: il ryokan è a Okuhida."},
+  okuhida:{n:"Okuhida",lat:36.26,lon:137.54,sleep:1,pos:"r",city:"takayama",zone:"Okuhida",hot:"okuhida"},
+  shirakawago:{n:"Shirakawa-go",lat:36.26,lon:136.91,pos:"l",city:"shirakawago",info:"Sosta di circa due ore dal bus Nohi del 25 ottobre."},
+  kanazawa:{n:"Kanazawa",lat:36.56,lon:136.66,sleep:1,pos:"l",city:"kanazawa",hot:"kanazawa"},
+  tsuruga:{n:"Tsuruga",lat:35.65,lon:136.06,pos:"l",minor:1,info:"Qui cambi tra lo Shinkansen Hokuriku e il Thunderbird per Kyoto. Il cambio richiede circa 10 minuti."},
+  kyoto:{n:"Kyoto",lat:35.01,lon:135.77,sleep:1,pos:"r",city:"kyoto",hot:"kyoto"},
+  nara:{n:"Nara",lat:34.69,lon:135.80,pos:"r",city:"nara",info:"Meta dell'escursione guidata del 27 ottobre, insieme a Fushimi Inari."},
+  osaka:{n:"Osaka",lat:34.69,lon:135.50,sleep:1,pos:"l",city:"osaka",hot:"osaka"},
+  kix:{n:"Aeroporto KIX",lat:34.43,lon:135.24,pos:"l",minor:1,info:"Aeroporto del rientro. Il volo parte alle 9:00 del 30 ottobre."}
+};
+const EDGES = [
+  {leg:"t1",a:"tokyo",b:"nagoya"},{leg:"t1",a:"nagoya",b:"takayama"},
+  {leg:"t1b",a:"takayama",b:"okuhida"},
+  {leg:"t2",a:"takayama",b:"shirakawago"},{leg:"t2",a:"shirakawago",b:"kanazawa"},
+  {leg:"t3",a:"kanazawa",b:"tsuruga"},{leg:"t3",a:"tsuruga",b:"kyoto"},
+  {leg:"t4",a:"kyoto",b:"nara"},
+  {leg:"t5",a:"kyoto",b:"osaka"},
+  {leg:"t6",a:"osaka",b:"kix"}
+];
+const TR = [
+ {id:"t1",date:"24 ottobre",st:"todo",title:"Tokyo → Takayama",
+  sum:"Nel preventivo non c'è: va comprato a parte. La via di Nagoya è la più semplice.",
+  opts:[
+   {n:"Shinkansen fino a Nagoya e treno Hida fino a Takayama",t:"4h30–5h, un cambio a Nagoya",c:"circa 16.500 JPY adulto, posti riservati",nt:"Il Hida è solo a posti riservati: prenota i due tratti insieme in biglietteria JR o su SmartEX.",pick:1},
+   {n:"Shinkansen Hokuriku fino a Toyama e Hida fino a Takayama",t:"circa 5h, un cambio a Toyama",c:"simile alla via di Nagoya",nt:"Ha senso solo se la linea Hida tra Toyama e Takayama è regolare: verifica prima di scegliere."},
+   {n:"Bus diretto Shinjuku → Hirayu e Takayama (Keio e Nohi)",t:"Hirayu in circa 4h30, Takayama in circa 5h55",c:"5.300–6.200 JPY a Hirayu, adulto",nt:"Prenotazione obbligatoria, valigie in stiva. Ha senso se vai dritto a Okuhida: Hirayu è il nodo dei bus locali."}
+  ],
+  tips:["Parti da Tokyo entro le 9:30: arrivi a Takayama prima delle 15 e hai tempo per il centro storico.","I biglietti si prenotano da un mese prima, quindi puoi farlo già ora.","Bambini da 6 a 11 anni: metà tariffa. Sotto i 6 anni gratis se non occupano un posto."],
+  dir:["Tokyo Station","JR Takayama Station"]},
+ {id:"t1b",date:"24 ottobre",st:"risk",title:"Takayama → Okuhida, fino al ryokan",
+  sum:"Il Ryokan Yakenoyu è a Okuhida e non nel centro di Takayama. Serve un bus locale di 80–90 minuti che il preventivo non comprende.",
+  opts:[
+   {n:"Bus Nohi, linea Shin-Hotaka",t:"80–90 minuti dal Nohi Bus Center, davanti alla stazione JR",c:"circa 1.900–2.200 JPY adulto a tratta",nt:"Corse circa ogni ora: la prima alle 7:00, l'ultima alle 18:40 (arriva alle 20:22). Chiedi al ryokan quale fermata è la più vicina.",pick:1},
+   {n:"Bus diretto Tokyo → Hirayu e bus locale",t:"circa 4h30 più 30 minuti",c:"5.300–6.200 JPY più bus locale",nt:"Salti Takayama città: guadagni tempo ma perdi Sanmachi Suji."},
+   {n:"Taxi o navetta del ryokan",t:"circa 1 ora",c:"da chiedere",nt:"Il taxi costa molto. Chiedi al ryokan se offre un passaggio da Hirayu o da Takayama."}
+  ],
+  tips:["Con la mezza pensione la cena è a orario fisso, di solito tra le 18:00 e le 19:00: arriva entro le 18:00.","Il ritorno del 25 ottobre pesa quanto l'andata: il bus per Kanazawa parte da Takayama.","Opzione B: chiedi all'agenzia di spostare la notte in un ryokan in centro a Takayama, se è ancora possibile."],
+  dir:["JR Takayama Station","Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu"]},
+ {id:"t2",date:"25 ottobre",st:"req",title:"Okuhida → Takayama → Shirakawa-go → Kanazawa",
+  sum:"Il bus Nohi da Takayama a Kanazawa è nel preventivo, su richiesta. Il voucher va stampato su carta.",
+  opts:[
+   {n:"Bus delle 8:50",t:"Shirakawa-go 9:40, ripartenza 12:20, Kanazawa 13:35",c:"incluso",nt:"Impossibile dal ryokan di Okuhida."},
+   {n:"Bus delle 10:50, prenotato di default",t:"Shirakawa-go 11:40, ripartenza 13:50, Kanazawa 15:05",c:"incluso",nt:"Fattibile solo con il primo bus locale utile (dal capolinea Shin-Hotaka alle 8:55, a Takayama alle 10:31): margine di 19 minuti. Verifica gli orari sul sito Nohi Bus."},
+   {n:"Bus delle 11:50",t:"Shirakawa-go 12:57, ripartenza 15:10, Kanazawa 16:35",c:"incluso",nt:"Margine comodo dal ryokan, ma arrivi a Kanazawa quando sta per far buio.",pick:1,pl:"Consigliata se resti a Okuhida"}
+  ],
+  tips:["Il voucher cartaceo è obbligatorio: senza carta non sali e non c'è rimborso.","A Shirakawa-go hai circa due ore. Il villaggio di Ogimachi basta; il belvedere solo se avanza tempo.","Domenica è il giorno più affollato: vai subito verso il fondo del villaggio."],
+  dir:["Takayama Nohi Bus Center","Kanazawa Station"]},
+ {id:"t3",date:"26 ottobre",st:"todo",title:"Kanazawa → Kyoto",
+  sum:"Non è nel preventivo. Dal 2024 non esiste più il treno diretto: si cambia a Tsuruga.",
+  opts:[
+   {n:"Shinkansen Hokuriku fino a Tsuruga e Thunderbird fino a Kyoto",t:"2h15–2h30, un cambio a Tsuruga",c:"circa 7.400–7.700 JPY adulto; circa 6.500 con il biglietto JR West per stranieri, se disponibile",nt:"Il Thunderbird è tutto a posti riservati. Il biglietto per stranieri si compra allo sportello JR West con il passaporto.",pick:1},
+   {n:"Bus JR West Kanazawa → Kyoto",t:"circa 4h50 (10:20 → 15:08)",c:"2.500–5.700 JPY secondo il periodo",nt:"Più economico ma molto più lento: con un bambino non conviene."}
+  ],
+  tips:["Parti verso le 12:30–13:30: prima c'è il Kenroku-en, che apre alle 8:00.","Le valigie spedite da Tokyo sono già a Kyoto: in treno hai solo il bagaglio piccolo.","Il cambio a Tsuruga richiede una decina di minuti: segui le indicazioni per il Thunderbird."],
+  dir:["Kanazawa Station","Kyoto Station"]},
+ {id:"t4",date:"27 ottobre",st:"req",title:"Kyoto, Nara e Fushimi Inari (escursione)",
+  sum:"L'escursione di gruppo con guida in italiano è nel preventivo. Treni e ingressi si pagano sul posto.",
+  opts:[
+   {n:"Treni dell'escursione",t:"tutta la giornata",c:"circa 2.500 JPY a persona (circa 500 con il JR Pass)",nt:"La guida indica quali treni prendere.",pick:1},
+   {n:"Ingressi",t:"",c:"circa 1.200 JPY a persona",nt:"Da pagare in contanti sul posto."}
+  ],
+  tips:["Nel preventivo l'escursione risulta per 2 adulti: verifica con l'agenzia che Umberto sia incluso.","Penale del 100% se annulli da 15 giorni prima, cioè dal 12 ottobre.","Fatti confermare punto e ora di ritrovo."],
+  dir:["Kyoto Station","Nara Station"]},
+ {id:"t5",date:"29 ottobre",st:"todo",title:"Kyoto → Osaka (Kitahama)",
+  sum:"Non è nel preventivo. Il treno Keihan ti porta quasi davanti all'hotel di Osaka.",
+  opts:[
+   {n:"Treno Keihan da Sanjo a Kitahama",t:"circa 50 minuti",c:"circa 430 JPY adulto",nt:"Niente passaggio da Kyoto Station e nessun cambio con le valigie. Verifica la stazione più vicina all'hotel di Kyoto.",pick:1},
+   {n:"JR Shinkaisoku da Kyoto a Osaka, poi metro",t:"30 minuti più circa 15",c:"circa 580 JPY più la metro",nt:"Più veloce sul treno ma con un cambio."}
+  ],
+  tips:["Il check-in a Osaka di solito è dalle 15: lascia i bagagli in hotel e vai a Nakanoshima.","Usa la carta IC per pagare: niente biglietti singoli."],
+  dir:["Sanjo Station Kyoto","Kitahama Station Osaka"]},
+ {id:"t6",date:"30 ottobre",st:"req",title:"Hotel di Osaka → aeroporto KIX",
+  sum:"Il trasferimento collettivo è nel preventivo, su richiesta.",
+  opts:[
+   {n:"Navetta collettiva dall'hotel",t:"circa 1h–1h15, da verificare",c:"incluso",nt:"È prevista per voli dalle 8:30 in poi: il tuo è alle 9:00, al limite. Chiedi l'orario di ritiro.",pick:1}
+  ],
+  tips:["Il volo è alle 9:00: conta di essere in aeroporto alle 6:30, quindi parti dall'hotel prima delle 5:30.","Prepara tutto la sera prima: la colazione dell'hotel sarà ancora chiusa.","Chiedi dove e come riconsegnare il router WiFi."],
+  dir:["The Royal Park Canvas Osaka Kitahama","Kansai International Airport"]}
+];
+const TRM = {}; TR.forEach(t=>TRM[t.id]=t);
+const FARES = [
+ {l:"Tokyo → Takayama, Shinkansen e Hida",a:16500,k:"train"},
+ {l:"Takayama → Okuhida, bus locale",a:2000,k:"bus"},
+ {l:"Okuhida → Takayama, bus locale",a:2000,k:"bus"},
+ {l:"Kanazawa → Kyoto, biglietto per stranieri",a:6500,k:"train"},
+ {l:"Escursione di Nara, treni",a:2500,k:"train"},
+ {l:"Kyoto → Osaka, Keihan",a:430,k:"train"}
+];
+const PASS = {adult:50000, jrSingles:16500+7440+2500+580};
+
+const DAYS = [
+ {d:"2026-10-19",c:"Milano",title:"Partenza",fx:[{t:"22:00",x:"Volo KE 928 Milano Malpensa → Seoul Incheon, arrivo alle 16:35 del 20",s:"ok"}],pl:[],w:[],tip:"Volo notturno di circa 11 ore: fai il check-in online e cerca di dormire. Un collo a testa."},
+ {d:"2026-10-20",c:"Seoul e Tokyo",title:"Scalo a Seoul e arrivo a Tokyo",fx:[{t:"16:35",x:"Arrivo a Seoul Incheon",s:"ok"},{t:"18:35",x:"Volo KE 705 Seoul → Tokyo Narita",s:"ok"},{t:"21:05",x:"Arrivo a Narita e trasferimento privato in hotel, solo autista",s:"req"},{t:"in serata",x:"Check-in al the b Akasaka, camera Family 4",s:"ok"}],pl:[],w:["Lo scalo è di due ore: resta nell'area transiti e vai subito al gate."],tip:"Arriverai in hotel verso le 23: cena leggera in aeroporto o in un konbini vicino all'hotel. Mostra i codici di Visit Japan Web per far prima all'arrivo."},
+ {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:[],t:"Cena a Shibuya e a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
+ {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","tk_shinjuku"],t:"Scegli una delle due, non entrambe."}],w:[],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
+ {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto (1 collo a persona, consegna in 36–48 ore)",s:"req"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:[],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Dopo il ritiro hai solo il bagaglio piccolo fino al 26: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere."},
+ {d:"2026-10-24",c:"Tokyo → Okuhida",title:"Dalla metropoli alle montagne",fx:[{t:"mattina",x:"Check-out dall'hotel di Tokyo",s:"ok"},{t:"15:00–18:00",x:"Check-in al Ryokan Yakenoyu, mezza pensione",s:"req"}],pl:[{w:"Mattina",ids:[],t:"Treno Tokyo → Nagoya → Takayama, con partenza entro le 9:30 (circa 4h30–5h)."},{w:"Primo pomeriggio",ids:["ta_sanmachi"],t:"Un'ora e mezza nel centro storico, con pranzo di manzo Hida."},{w:"Fine pomeriggio",ids:["ta_onsen"],t:"Bus locale per Okuhida (80–90 minuti), onsen e cena al ryokan."}],w:["Il ryokan è a Okuhida e non a Takayama: se perdi il bus delle 16:30 circa arrivi dopo l'ora di cena.","Il preventivo non comprende né il treno né il bus locale."],tip:"Una notte in ryokan si gode solo se arrivi con la luce. Non allungare la sosta a Takayama."},
+ {d:"2026-10-25",c:"Okuhida → Kanazawa",title:"Shirakawa-go e arrivo a Kanazawa",fx:[{t:"8:50, 10:50 o 11:50",x:"Bus Nohi Takayama → Shirakawa-go → Kanazawa, con voucher cartaceo",s:"req"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa (nel preventivo è una camera fumatori)",s:"ok"}],pl:[{w:"Mattina",ids:[],t:"Colazione al ryokan e bus locale verso Takayama (circa 90 minuti)."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi"],t:"Higashi Chaya all'imbrunire e cena a Kanazawa."}],w:["Con il bus delle 10:50 il margine dal bus locale è di soli 19 minuti: valuta quello delle 11:50.","Domenica: Shirakawa-go è affollata."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
+ {d:"2026-10-26",c:"Kanazawa → Kyoto",title:"Il giardino al mattino e il treno per Kyoto",fx:[{t:"dalle 15:00",x:"Check-in all'Hotel Gracery Kyoto Sanjo, 3 notti",s:"ok"}],pl:[{w:"Mattina",ids:["kz_kenroku","kz_castle"],t:"Kenroku-en all'apertura (8:00), poi il parco del castello di fronte."},{w:"Pranzo",ids:["kz_omicho"],t:"Ciotola di pesce al mercato Omicho."},{w:"Primo pomeriggio",ids:[],t:"Treno per Kyoto con partenza tra le 12:30 e le 13:30 (circa 2h15–2h30, cambio a Tsuruga)."},{w:"Sera",ids:["ky_nishiki","ky_pontocho"],t:"Nishiki chiude presto; più tardi Pontocho per cena."}],w:["Il Museo del XXI secolo di Kanazawa è chiuso il lunedì.","Le valigie spedite da Tokyo devono essere già in hotel: conferma all'arrivo."],tip:"Il Kenroku-en da metà ottobre chiude presto: l'apertura delle 8:00 è il momento migliore."},
+ {d:"2026-10-27",c:"Kyoto",title:"Nara e Fushimi Inari con la guida",fx:[{t:"giornata intera",x:"Escursione Nara e Fushimi Inari, gruppo con guida in italiano",s:"req"}],pl:[{w:"Giornata",ids:["na_todaiji","na_park","ky_fushimi"],t:"È tutto compreso nel tour. Treni e ingressi si pagano sul posto."},{w:"Sera",ids:["ky_pontocho"],t:"Cena vicino all'hotel."}],w:["Nel preventivo l'escursione risulta per 2 adulti: verifica che Umberto sia incluso.","Penale del 100% se annulli da 15 giorni prima, cioè dal 12 ottobre."],tip:"Porta contanti per gli ingressi e scarpe comode: a Fushimi si cammina molto."},
+ {d:"2026-10-28",c:"Kyoto",title:"Kyoto ovest: Arashiyama e Kinkaku-ji",fx:[],pl:[{w:"Mattina presto",ids:["ky_arashiyama"],t:"Alle 7:30 il bosco di bambù è ancora tuo."},{w:"Pomeriggio",ids:["ky_kinkaku"],t:"Il Padiglione d'Oro, sullo stesso lato della città."},{w:"Tramonto",ids:["ky_gion","ky_kimono"],t:"Gion con calma. Se hai prenotato il kimono, la mattina è meglio di questa fascia."}],w:[],tip:"Dal centro ad Arashiyama servono 30–40 minuti: parti presto e torna per cena."},
+ {d:"2026-10-29",c:"Kyoto → Osaka",title:"Kiyomizu all'alba e trasferimento a Osaka",fx:[{t:"11:00",x:"Check-out dall'hotel di Kyoto",s:"ok"},{t:"dalle 15:00",x:"Check-in al Royal Park Canvas Osaka Kitahama",s:"ok"}],pl:[{w:"Mattina presto",ids:["ky_kiyomizu"],t:"Kiyomizu-dera dalle 6:00 alle 8:30, poi Sannenzaka e Ninenzaka con calma."},{w:"Tarda mattina",ids:[],t:"Torna in hotel per i bagagli e prendi la Keihan da Sanjo a Kitahama (circa 50 minuti)."},{w:"Pomeriggio",ids:["os_nakanoshima","os_castle"],t:"Lascia i bagagli in hotel, poi Nakanoshima e, se ti avanza tempo, il castello."},{w:"Sera",ids:["os_dotonbori"],t:"Dotonbori per cena."}],w:["È l'unica notte a Osaka: massimo due attività."],tip:"Prepara le valigie la sera prima: domani si parte all'alba."},
+ {d:"2026-10-30",c:"Osaka → Milano",title:"Rientro",fx:[{t:"prima delle 5:30",x:"Navetta collettiva hotel → aeroporto KIX (chiedi l'orario di ritiro)",s:"req"},{t:"09:00",x:"Volo KE 722 Osaka KIX → Seoul, arrivo alle 11:05",s:"ok"},{t:"12:25",x:"Volo KE 927 Seoul → Milano Malpensa, arrivo alle 18:05",s:"ok"}],pl:[],w:["Lo scalo a Seoul è di 1h20: bagagli etichettati fino a Milano e subito al gate.","Il router WiFi va restituito: 10 € per ogni giorno di ritardo, circa 300 € se lo smarrisci."],tip:"Spendi gli ultimi yen prima di partire: il cambio in aeroporto è sfavorevole."}
+];
+
+const CHK = [
+ {g:"agenzia",id:"c1",sev:"alta",t:"Ryokan di Okuhida: orari e trasferimenti",x:"Il Ryokan Yakenoyu è a Okuhida (365 Okuhida Onsengo Nakao), a circa 80–90 minuti di bus da Takayama. Chiedi se c'è una navetta, a che ora devi arrivare per la cena e se è ancora possibile spostare la notte in un ryokan in centro a Takayama."},
+ {g:"agenzia",id:"c2",sev:"alta",t:"Voucher del bus Nohi stampati su carta",x:"I voucher digitali non sono accettati: senza carta non sali e non c'è rimborso. Fatti inviare i voucher definitivi, stampali e conferma l'orario (di default 10:50)."},
+ {g:"agenzia",id:"c3",sev:"alta",t:"Escursione Nara e Fushimi Inari: c'è anche Umberto?",x:"Nel preventivo l'escursione risulta per 2 adulti, mentre è prevista una tariffa bambino. Chiedi conferma, orario e punto di ritrovo. Penale del 100% da 15 giorni prima, cioè dal 12 ottobre."},
+ {g:"agenzia",id:"c4",sev:"alta",t:"Kanazawa: camera non fumatori",x:"All'Hotel Intergate la camera nel preventivo è una Standard Double fumatori. Con un bambino chiedi il cambio."},
+ {g:"agenzia",id:"c5",sev:"media",t:"Kyoto: tre persone in una Standard Double",x:"Chiedi com'è composta la camera (letto Queen più un letto aggiunto o un futon). Gli hotel giapponesi non garantiscono il letto matrimoniale: segnala il viaggio di nozze."},
+ {g:"agenzia",id:"c6",sev:"media",t:"Orario del transfer per KIX",x:"Il volo del 30 ottobre è alle 9:00 e la navetta collettiva è prevista per voli dalle 8:30. Chiedi l'orario di ritiro in hotel e se esiste un'alternativa privata."},
+ {g:"agenzia",id:"c7",sev:"media",t:"Router WiFi: dove si ritira e dove si riconsegna",x:"Noleggio dal 20 al 30 ottobre. Se non lo restituisci paghi 10 € al giorno, circa 300 € se lo smarrisci."},
+ {g:"agenzia",id:"c8",sev:"media",t:"Ritiro dei bagagli a Tokyo il 23 ottobre",x:"Un solo collo a persona: gli extra si pagano anche dopo il rientro. Chiedi l'orario di ritiro. Le valigie arrivano a Kyoto in 36–48 ore."},
+ {g:"online",id:"o1",sev:"alta",t:"Biglietti Tokyo → Takayama del 24 ottobre",x:"Shinkansen e Hida in un'unica prenotazione su SmartEX o in biglietteria JR. Le vendite si aprono un mese prima, quindi puoi farlo già ora. Il Hida è solo a posti riservati.",l:[["SmartEX","https://smart-ex.jp/en/"]]},
+ {g:"online",id:"o2",sev:"alta",t:"teamLab Planets con slot orario",x:"L'ingresso è a orario e si esaurisce. Punta al pomeriggio del 22 ottobre.",l:[["Sito ufficiale","https://www.teamlab.art/e/planets/"]]},
+ {g:"online",id:"o3",sev:"media",t:"Shibuya Sky al tramonto",x:"Prenota lo slot verso le 16:30 del 21 ottobre: il tramonto è verso le 17.",l:[["Sito ufficiale","https://www.shibuya-scramble-square.com/sky/"]]},
+ {g:"online",id:"o4",sev:"media",t:"Cena di coppia a Kyoto",x:"Il 27 o il 28 ottobre: un kaiseki o un tavolo a Pontocho. I posti migliori vanno prenotati con anticipo."},
+ {g:"online",id:"o5",sev:"bassa",t:"Kimono a Kyoto (facoltativo)",x:"Noleggio con vestizione e foto: prenota online per il 28 ottobre. Richiede 2–3 ore."},
+ {g:"online",id:"o6",sev:"media",t:"Biglietto Kanazawa → Kyoto",x:"Si compra in stazione a Kanazawa il 26 ottobre. Allo sportello JR West chiedi il biglietto per turisti stranieri (circa 6.500 JPY adulto invece di circa 7.400): serve il passaporto. Il Thunderbird è a posti riservati."},
+ {g:"doc",id:"d1",sev:"alta",t:"Visit Japan Web",x:"Registra passaporti, immigrazione e dogana prima di partire e salva i codici QR: a Narita risparmi la fila.",l:[["Visit Japan Web","https://www.vjw.digital.go.jp/"]]},
+ {g:"doc",id:"d2",sev:"media",t:"Passaporti e assicurazioni",x:"Passaporto valido per tutto il viaggio (per la Corea almeno 3 mesi oltre l'uscita). Porta i documenti delle polizze ALI TOP 24 e ALI Health 3 mln. Controlla i requisiti d'ingresso sul sito ufficiale.",l:[["Viaggiare Sicuri","https://www.viaggiaresicuri.it/"]]},
+ {g:"doc",id:"d3",sev:"media",t:"Scalo a Seoul, solo in transito",x:"Se non esci dall'area transiti non entri in Corea: in teoria non servono né la K-ETA né l'Arrival Card (gli italiani sono comunque esenti dalla K-ETA fino al 31 dicembre 2026). Verifica su Viaggiare Sicuri."},
+ {g:"doc",id:"d4",sev:"media",t:"Carta IC (Suica o ICOCA)",x:"Metro, treni locali e konbini si pagano con la carta IC. Verifica se puoi aggiungerla al telefono (iPhone) o se serve quella fisica."},
+ {g:"doc",id:"d5",sev:"bassa",t:"Mappe offline e traduttore",x:"Scarica le mappe offline di Google Maps per Tokyo, Takayama, Kanazawa, Kyoto e Osaka, e il giapponese in Google Traduttore (funziona anche con la fotocamera)."},
+ {g:"doc",id:"d6",sev:"media",t:"Yen in contanti",x:"Templi, mercati, ryokan e bus locali spesso accettano solo contanti. Ritira ai bancomat dei konbini (7-Eleven) e tieni banconote per il bus locale di Okuhida."},
+ {g:"valigia",id:"v1",sev:"media",t:"Borsa piccola per tre giorni",x:"Dal 23 ottobre le valigie viaggiano da sole verso Kyoto. Nella borsa piccola: ricambi per il 24, 25 e 26 ottobre, beauty case, caricabatterie, documenti, voucher stampati."},
+ {g:"valigia",id:"v2",sev:"media",t:"Strati e freddo in quota",x:"Tokyo e Kyoto sono miti, ma a Okuhida e a Shirakawa-go la sera fa freddo, anche sotto i 10 °C. Kanazawa è spesso piovosa: porta un k-way."},
+ {g:"valigia",id:"v3",sev:"bassa",t:"Calzini senza buchi",x:"Ryokan, templi e molti ristoranti si visitano senza scarpe."},
+ {g:"valigia",id:"v4",sev:"bassa",t:"Adattatore e power bank",x:"Le prese giapponesi sono a due lamelle piatte. Il router consente fino a 5 dispositivi e 10 GB al giorno."},
+ {g:"regole",id:"r1",sev:"bassa",t:"Onsen",x:"Ci si lava prima di entrare, niente costume, l'asciugamano resta fuori dall'acqua. Se hai tatuaggi, chiedi al ryokan."},
+ {g:"regole",id:"r2",sev:"bassa",t:"Mance e cibo",x:"Non si lasciano mance. Nelle zone turistiche non si mangia camminando: fermati accanto al banco."},
+ {g:"regole",id:"r3",sev:"bassa",t:"Treni silenziosi",x:"Niente telefonate su treni e bus, e con Umberto voce bassa."},
+ {g:"regole",id:"r4",sev:"bassa",t:"Tax-free",x:"Nei grandi negozi i prezzi senza tasse si ottengono mostrando il passaporto."}
+];
+const GRP = {agenzia:"Da chiarire subito con l'agenzia",online:"Da prenotare online",doc:"Documenti e app",valigia:"Valigia e logistica",regole:"Buone regole in Giappone"};
+
+const EXPECT = [
+ {t:"Colori delle foglie",x:"Più sali di quota, prima arrivano: Okuhida è la zona più avanti, Takayama e Shirakawa-go sono a metà. A Tokyo, Kyoto e Osaka il picco è previsto tra fine novembre e dicembre, quindi in città troverai soprattutto verde."},
+ {t:"Clima",x:"Fresco e spesso limpido. In città da 12 a 22 gradi circa, in montagna la notte scende sotto i 10. Kanazawa è la tappa più piovosa."},
+ {t:"Luce",x:"Il tramonto è verso le 17 e alle 18 è buio. Programma le visite all'aperto la mattina e tieni la sera per mercati, quartieri e cene."},
+ {t:"Giorni da ricordare",x:"24 e 25 ottobre sono sabato e domenica: Takayama e Shirakawa-go sono affollate. Lunedì 26 è chiuso il museo di Kanazawa, venerdì 23 i giardini del Palazzo Imperiale."}
+];
+
+/* ---------- stato ---------- */
+const defSel = () => ATT.filter(a=>a.pri===3||a.inc).map(a=>a.id);
+const S = {
+  view: store.get("view","percorso"),
+  sel: new Set(store.get("sel",defSel())),
+  chk: store.get("chk",{}),
+  pace: store.get("pace",1),
+  child: store.get("child","6-11"),
+  fx: store.get("fx",175),
+  town: store.get("town",false),
+  notes: store.get("notes",{}),
+  fcity:"all", fcat:"all", fkid:false, fpri:false,
+  node:null, leg:null, region:"all"
+};
+const ATTM = {}; ATT.forEach(a=>ATTM[a.id]=a);
+
+/* ---------- testata ---------- */
+function parseD(s){ const p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+function todayIdx(){
+  const t=new Date(); t.setHours(0,0,0,0);
+  return Math.round((t-parseD("2026-10-19"))/86400000);
+}
+function renderHead(){
+  const ti=todayIdx();
+  let line="Da Milano Malpensa lunedì 19 ottobre alle 22:00 con Korean Air via Seoul. ";
+  if(ti<0) line+=`Mancano ${-ti} ${-ti===1?"giorno":"giorni"} alla partenza.`;
+  else if(ti<=11) line+=`Oggi è il giorno ${ti+1} di 12.`;
+  else line+="Il viaggio è finito: buon rientro!";
+  $("#lede").textContent=line+" Loris, Michela e Umberto: cinque città, dieci notti in hotel.";
+  const todo=TR.filter(t=>t.st==="todo"||t.st==="risk").length;
+  const tiles=[];
+  tiles.push(ti<0?[String(-ti),"giorni alla partenza"]:ti<=11?[`${ti+1}/12`,"giorno del viaggio"]:["12","giorni di viaggio"]);
+  tiles.push(["10","notti in hotel, in 5 città"]);
+  tiles.push([String(todo),"spostamenti da sistemare"]);
+  tiles.push([String(S.sel.size),"luoghi nel tuo piano"]);
+  $("#tiles").innerHTML=tiles.map(t=>`<div class="tile"><b>${t[0]}</b><span>${t[1]}</span></div>`).join("");
+}
+function renderTabs(){
+  const T=[["percorso","Percorso e mappa"],["giorni","Giorno per giorno"],["treni","Treni e bus"],["attrazioni","Attrazioni"],["checklist","Prima di partire"]];
+  $("#tabs").innerHTML=T.map(t=>`<button class="tab" role="tab" data-act="tab" data-id="${t[0]}" aria-selected="${S.view===t[0]}">${t[1]}</button>`).join("");
+  $$(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+S.view));
+}
+function go(v){ S.view=v; store.set("view",v); renderTabs(); window.scrollTo({top:0}); }
+
+/* ---------- percorso ---------- */
+function renderAlerts(){
+  const ids=["c1","c2","c3","c4","o1","o2"];
+  $("#alerts").innerHTML=ids.map(id=>{ const c=CHK.find(x=>x.id===id); return `<div class="alert ${c.sev}"><strong>${c.t}</strong><p>${c.x}</p></div>`; }).join("");
+}
+function renderStrip(){
+  const L=[["tokyo",4],["okuhida",1],["kanazawa",1],["kyoto",3],["osaka",1]];
+  $("#strip").innerHTML=L.map(l=>{ const h=HOT[l[0]]; const nm=l[0]==="okuhida"?"Okuhida":NODES[l[0]].n;
+    return `<button class="stop ${h.st}" style="--n:${l[1]}" data-act="node" data-id="${l[0]}" aria-pressed="${S.node===l[0]}"><b>${nm}</b>${l[1]} ${l[1]===1?"notte":"notti"}<br><span class="muted">${h.dates.split(" → ")[0].replace(" ottobre","")} ott</span></button>`; }).join("");
+}
+/* mappa */
+const MV={lon0:134.9,lon1:140.5,lat0:33.6,lat1:38.0,k:150};
+const KX=Math.cos(36*Math.PI/180);
+const px=lon=>(lon-MV.lon0)*KX*MV.k, py=lat=>(MV.lat1-lat)*MV.k;
+const MW=px(MV.lon1), MH=py(MV.lat0);
+const COAST=[[141.6,38.7],[141.05,38.3],[141.0,37.7],[140.95,37.0],[140.65,36.4],[140.85,35.75],[140.35,35.35],[140.15,35.0],[139.88,34.9],[139.85,35.2],[139.85,35.4],[140.05,35.6],[139.8,35.64],[139.65,35.45],[139.7,35.25],[139.62,35.14],[139.5,35.3],[139.15,35.25],[139.08,35.1],[139.12,34.8],[138.85,34.6],[138.78,34.85],[138.85,35.05],[138.5,35.0],[138.2,34.6],[137.7,34.65],[137.0,34.58],[136.95,34.8],[136.88,35.05],[136.6,34.95],[136.55,34.7],[136.85,34.48],[136.2,34.07],[135.77,33.43],[135.15,33.88],[135.15,34.25],[135.4,34.58],[135.4,34.68],[135.2,34.68],[134.7,34.78],[134.3,34.85],[134.2,35.55],[134.8,35.65],[135.22,35.78],[135.2,35.55],[135.4,35.5],[135.75,35.5],[136.07,35.67],[135.97,35.98],[136.1,36.2],[136.3,36.38],[136.62,36.62],[136.77,36.9],[136.85,37.2],[136.9,37.4],[137.3,37.52],[137.0,37.05],[137.05,36.85],[137.25,36.78],[137.5,36.9],[137.85,37.05],[138.25,37.17],[138.5,37.4],[139.05,37.95],[139.45,38.25],[140.0,39.1],[141.6,39.1]];
+const BIWA=[[135.95,35.0],[135.9,35.2],[136.05,35.5],[136.25,35.4],[136.2,35.15],[136.05,34.98]];
+function smooth(pts){
+  const P=pts.map(p=>[px(p[0]),py(p[1])]), n=P.length;
+  const mid=(a,b)=>[(a[0]+b[0])/2,(a[1]+b[1])/2], f=v=>v.toFixed(1);
+  const m0=mid(P[n-1],P[0]); let d="M"+f(m0[0])+" "+f(m0[1]);
+  for(let i=0;i<n;i++){ const p=P[i], m=mid(p,P[(i+1)%n]); d+="Q"+f(p[0])+" "+f(p[1])+" "+f(m[0])+" "+f(m[1]); }
+  return d+"Z";
+}
+function box(lo0,lo1,la0,la1){
+  let x0=px(lo0),x1=px(lo1),y0=py(la1),y1=py(la0);
+  let w=x1-x0,h=y1-y0,cx=(x0+x1)/2,cy=(y0+y1)/2; const asp=680/660;
+  if(w/h<asp) w=h*asp; else h=w/asp;
+  return {x:cx-w/2,y:cy-h/2,w:w,h:h};
+}
+const REG={all:box(134.9,140.5,33.6,38.0),tokyo:box(139.0,140.3,35.1,36.1),alps:box(136.3,138.0,35.0,36.9),kansai:box(135.0,136.3,34.35,35.75)};
+const REGN={all:"Tutto",tokyo:"Tokyo",alps:"Alpi",kansai:"Kansai"};
+let curBox={x:0,y:0,w:680,h:660};
+function buildMap(){
+  const svg=$("#map");
+  let h=`<rect class="sea" x="-600" y="-600" width="2000" height="2000"/>`;
+  h+=`<path class="land sz" data-w="1.3" d="${smooth(COAST)}"/>`;
+  h+=`<path class="sea" d="${smooth(BIWA)}"/>`;
+  h+=`<path class="fuji" d="M${px(138.73)-9} ${py(35.36)+6}L${px(138.73)} ${py(35.36)-9}L${px(138.73)+9} ${py(35.36)+6}Z"/>`;
+  h+=`<text class="seaname sz" data-f="13" x="${px(137.2)}" y="${py(38.0)+10}">Mar del Giappone</text>`;
+  h+=`<text class="seaname sz" data-f="13" x="${px(139.6)}" y="${py(34.2)}">Oceano Pacifico</text>`;
+  h+=`<g class="legs" id="legs">`;
+  EDGES.forEach((e,i)=>{
+    const A=NODES[e.a],B=NODES[e.b],st=TRM[e.leg].st;
+    const d=`M${px(A.lon).toFixed(1)} ${py(A.lat).toFixed(1)}L${px(B.lon).toFixed(1)} ${py(B.lat).toFixed(1)}`;
+    h+=`<path class="leg ${st} sz" data-leg="${e.leg}" data-w="5" data-dash="${st==="todo"?"9,7":st==="risk"?"1,7":""}" d="${d}"/>`;
+  });
+  h+=`</g><g id="hits">`;
+  EDGES.forEach(e=>{
+    const A=NODES[e.a],B=NODES[e.b];
+    const d=`M${px(A.lon).toFixed(1)} ${py(A.lat).toFixed(1)}L${px(B.lon).toFixed(1)} ${py(B.lat).toFixed(1)}`;
+    h+=`<path class="hit sz" data-w="26" data-act="leg" data-id="${e.leg}" tabindex="0" role="button" aria-label="Tratta: ${TRM[e.leg].title}" d="${d}"/>`;
+  });
+  h+=`</g>`;
+  Object.keys(NODES).forEach(k=>{
+    const n=NODES[k], x=px(n.lon).toFixed(1), y=py(n.lat).toFixed(1);
+    h+=`<g class="node${n.minor?" minor":""}" data-act="node" data-id="${k}" tabindex="0" role="button" aria-label="${n.n}">`;
+    h+=`<circle class="ring sz" data-nid="${k}" data-r="${n.sleep?17:12}" data-w="3" cx="${x}" cy="${y}" style="display:none"/>`;
+    h+=`<circle class="n1 ${n.sleep?"sleep":"min"} sz" data-r="${n.sleep?11:6.5}" cx="${x}" cy="${y}"/>`;
+    h+=`<circle class="n2 ${n.sleep?"sleep":"min"} sz" data-r="${n.sleep?6.5:4}" cx="${x}" cy="${y}"/>`;
+    h+=`<circle class="sz" data-r="22" data-fill="1" fill="transparent" cx="${x}" cy="${y}"/>`;
+    h+=`<text class="lbl sz" data-f="13" data-lw="3.5" data-pos="${n.pos}" data-nx="${x}" data-ny="${y}" data-or="${n.sleep?11:6.5}" data-minor="${n.minor?1:0}">${n.n}</text></g>`;
+  });
+  svg.innerHTML=h;
+  $("#zoom").innerHTML=Object.keys(REG).map(k=>`<button data-act="zoom" data-id="${k}" aria-pressed="${S.region===k}">${REGN[k]}</button>`).join("");
+  applyBox(); 
+}
+function applyBox(){
+  const svg=$("#map"); const b=curBox;
+  svg.setAttribute("viewBox",`${b.x.toFixed(1)} ${b.y.toFixed(1)} ${b.w.toFixed(1)} ${b.h.toFixed(1)}`);
+  const wpx=(svg.getBoundingClientRect().width)||680; const u=b.w/wpx;
+  $$(".sz",svg).forEach(e=>{
+    const d=e.dataset;
+    if(d.r) e.setAttribute("r",(+d.r*u).toFixed(2));
+    if(d.w) e.setAttribute("stroke-width",(+d.w*u).toFixed(2));
+    if(d.dash!==undefined && d.dash!==""){ const p=d.dash.split(","); e.setAttribute("stroke-dasharray",(+p[0]*u).toFixed(2)+" "+(+p[1]*u).toFixed(2)); }
+    if(d.f){
+      e.setAttribute("font-size",(+d.f*u).toFixed(2));
+      if(d.lw) e.style.strokeWidth=(+d.lw*u).toFixed(2);
+      if(d.pos){
+        const nx=+d.nx, ny=+d.ny, or=+d.or, g=(or+7)*u;
+        let x=nx,y=ny,a="start";
+        if(d.pos==="r"){x=nx+g;y=ny+4.5*u;a="start";}
+        else if(d.pos==="l"){x=nx-g;y=ny+4.5*u;a="end";}
+        else if(d.pos==="b"){x=nx;y=ny+g+10*u;a="middle";}
+        else {x=nx;y=ny-g;a="middle";}
+        e.setAttribute("x",x.toFixed(1)); e.setAttribute("y",y.toFixed(1)); e.setAttribute("text-anchor",a);
+        e.style.display=(d.minor==="1" && S.region==="all")?"none":"";
+      }
+    }
+  });
+  const legs=$("#legs",svg);
+  $$(".leg",svg).forEach(l=>{
+    const on=S.leg===l.dataset.leg;
+    l.classList.toggle("sel",on);
+    l.setAttribute("stroke-width",((on?8:5)*u).toFixed(2));
+  });
+  legs.classList.toggle("dim",!!S.leg);
+  $$(".ring",svg).forEach(r=>{ r.style.display=(S.node===r.dataset.nid)?"":"none"; });
+}
+let anim=null;
+function setRegion(name){
+  S.region=name; const t=REG[name];
+  $$("#zoom button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.id===name)));
+  const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(anim) cancelAnimationFrame(anim);
+  if(reduce||!window.requestAnimationFrame){ curBox=Object.assign({},t); applyBox(); return; }
+  const f=Object.assign({},curBox), t0=performance.now(), D=450;
+  (function step(now){
+    let p=Math.min(1,(now-t0)/D); p=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    curBox={x:f.x+(t.x-f.x)*p,y:f.y+(t.y-f.y)*p,w:f.w+(t.w-f.w)*p,h:f.h+(t.h-f.h)*p};
+    applyBox();
+    if(p<1) anim=requestAnimationFrame(step);
+  })(performance.now());
+}
+function regionFor(key){
+  if(key==="tokyo") return "tokyo";
+  if(["nagoya","takayama","okuhida","shirakawago","kanazawa"].indexOf(key)>=0) return "alps";
+  if(["tsuruga","kyoto","nara","osaka","kix"].indexOf(key)>=0) return "kansai";
+  return "all";
+}
+function itemsFor(nodeKey){
+  const n=NODES[nodeKey]; if(!n||!n.city) return [];
+  return ATT.filter(a=>{
+    if(a.city!==n.city) return false;
+    if(n.zone==="Okuhida") return a.zone==="Okuhida";
+    if(n.zone==="town") return a.zone!=="Okuhida";
+    return true;
+  });
+}
+function renderPanel(){
+  const p=$("#panel");
+  if(S.leg){
+    const t=TRM[S.leg];
+    p.innerHTML=`<h3>${t.title}</h3><p class="muted">${t.date} ${chip(t.st)}</p><p>${t.sum}</p>
+      ${t.opts.filter(o=>o.pick).map(o=>`<div class="hotel"><b>${o.pl||"Consigliata"}</b><br>${o.n}<br><span class="muted">${o.t?o.t+". ":""}${o.c}</span></div>`).join("")}
+      <div class="acts"><a class="btn primary" target="_blank" rel="noopener" href="${gdir(t.dir[0],t.dir[1])}">Percorso su Google Maps</a><button class="btn" data-act="goleg" data-id="${t.id}">Tutti i dettagli</button></div>`;
+    return;
+  }
+  const k=S.node;
+  if(!k){
+    p.innerHTML=`<h3>Scegli una tappa</h3><p class="muted">Tocca una città o una tratta sulla mappa, oppure una tappa nella striscia delle notti. Qui vedrai hotel, spostamenti e i luoghi che hai scelto.</p>
+      <div class="acts"><a class="btn primary" target="_blank" rel="noopener" href="${gdir("Tokyo Station","Kansai International Airport","transit")}">Tokyo → Osaka su Google Maps</a></div>`;
+    return;
+  }
+  const n=NODES[k], h=n.hot?HOT[n.hot]:null, its=itemsFor(k).filter(a=>S.sel.has(a.id));
+  let html=`<h3>${n.n}</h3>`;
+  if(h){
+    html+=`<div class="hotel"><b>${h.n}</b> ${chip(h.st)}<br><span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span><br>${h.room}<br><span class="muted">${h.note}</span>
+      <div class="acts"><button class="btn small primary" data-act="detail" data-kind="hot" data-id="${n.hot}">Scheda hotel</button><a class="btn small" target="_blank" rel="noopener" href="${gsearch(h.q)}">Hotel su Google Maps</a></div></div>`;
+  } else if(n.info){ html+=`<p>${n.info}</p>`; }
+  if(n.city){
+    html+=`<p style="margin-bottom:2px"><b>I tuoi luoghi qui</b></p>`;
+    html+=its.length?`<div class="pills">${its.map(a=>`<span class="pill">${a.name}</span>`).join("")}</div>`:`<p class="empty">Nessun luogo scelto.</p>`;
+    html+=`<div class="acts"><button class="btn primary" data-act="goatt" data-id="${n.city}">Scegli cosa vedere</button></div>`;
+  }
+  p.innerHTML=html;
+}
+function selNode(k){ S.node=k; S.leg=null; S.region=S.region; renderStrip(); renderPanel(); applyBox(); const r=regionFor(k); if(r!==S.region||true) setRegion(r); }
+function selLeg(id){
+  S.leg=id; S.node=null; renderStrip(); renderPanel();
+  const e=EDGES.filter(x=>x.leg===id)[0]; setRegion(regionFor(e.a)===regionFor(e.b)?regionFor(e.a):"all"); applyBox();
+}
+function renderExpect(){ $("#expect").innerHTML=EXPECT.map(e=>`<div><b>${e.t}</b><p>${e.x}</p></div>`).join(""); }
+
+/* ---------- giorni ---------- */
+function renderDays(){
+  const ti=todayIdx();
+  $("#days").innerHTML=DAYS.map((D,i)=>{
+    const dt=parseD(D.d);
+    const fx=D.fx.map(f=>`<div class="fx"><span class="t">${f.t}</span><span>${f.x}</span>${chip(f.s)}</div>`).join("");
+    const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}">${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
+    const w=D.w.map(x=>`<div class="warn">${x}</div>`).join("");
+    return `<article class="day${ti===i?" today":""}">
+      <div class="stub"><div class="gg">${GG[dt.getDay()]}</div><div class="nn">${dt.getDate()}</div><div class="mm">${MESI[dt.getMonth()]}</div></div>
+      <div class="daybody"><div class="dayhead"><h3>${D.title}</h3><span class="chip todo" style="background:var(--paper);color:var(--muted)">${D.c}</span>${ti===i?'<span class="seal">Oggi</span>':""}</div>
+      ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}
+      <textarea class="note" data-act="note" data-id="${D.d}" aria-label="Note del ${dt.getDate()} ${MESI[dt.getMonth()]}" placeholder="Note vostre: ristoranti, orari, prenotazioni…">${esc(S.notes[D.d]||"")}</textarea></div></article>`;
+  }).join("");
+}
+
+/* ---------- treni ---------- */
+function factor(kind){ if(S.child==="12+") return 1; if(S.child==="6-11") return .5; return 0; }
+function renderCalc(){
+  const f=factor(), fx=+S.fx||175;
+  let tA=0,tC=0;
+  const rows=FARES.map(r=>{ const ad=r.a*2, ch=r.a*f; tA+=ad; tC+=ch; return `<tr><td>${r.l}</td><td>${fmt(ad)}</td><td>${fmt(ch)}</td><td>${fmt(ad+ch)}</td></tr>`; }).join("");
+  const tot=tA+tC;
+  const jrAd=PASS.jrSingles*2, jrCh=PASS.jrSingles*f;
+  const passTot=PASS.adult*2 + PASS.adult*f + 500*(2+f) + 4000*(2+f);
+  $("#calcOut").innerHTML=`<table class="fare"><thead><tr><th>Tratta</th><th>2 adulti</th><th>Umberto</th><th>Totale JPY</th></tr></thead><tbody>${rows}</tbody>
+   <tfoot><tr><td>Totale biglietti da comprare</td><td>${fmt(tA)}</td><td>${fmt(tC)}</td><td>${fmt(tot)}</td></tr><tr><td>In euro, al cambio indicato</td><td></td><td></td><td>circa ${fmt(tot/fx)} €</td></tr></tfoot></table>
+   <p class="muted" style="margin-top:8px">Con il Japan Rail Pass da 7 giorni (circa ${fmt(PASS.adult)} JPY a adulto, metà prezzo per i bambini da 6 a 11 anni) spenderesti circa ${fmt(passTot)} JPY, contando anche i bus che il pass non copre. Gli stessi tratti JR in biglietti singoli costano circa ${fmt(jrAd+jrCh)} JPY.</p>`;
+  $("#verdict").innerHTML=`<p>I tratti in treno sono quattro e non vanno oltre i 27.000 JPY a persona: i biglietti singoli costano meno della metà del pass. Compra i singoli.</p>`;
+}
+function renderLegs(){
+  $("#legs").innerHTML=TR.map(t=>`<article class="leg-card" id="tr-${t.id}">
+    <header><div><h3>${t.title}</h3><p class="muted" style="margin:0">${t.date}</p></div>${chip(t.st)}</header>
+    <p style="margin-top:8px">${t.sum}</p>
+    <div class="opts">${t.opts.map(o=>`<div class="opt${o.pick?" pick":""}"><strong>${o.n}</strong>${o.pick?`<span class="chip ok">${o.pl||"Consigliata"}</span>`:""}<dl><dt>Durata</dt><dd>${o.t||"vedi note"}</dd><dt>Costo</dt><dd>${o.c}</dd></dl><p>${o.nt}</p></div>`).join("")}</div>
+    <ul class="tips">${t.tips.map(x=>`<li>${x}</li>`).join("")}</ul>
+    <div class="acts"><a class="btn primary" target="_blank" rel="noopener" href="${gdir(t.dir[0],t.dir[1])}">Percorso su Google Maps</a><button class="btn" data-act="goleg" data-id="${t.id}" data-map="1">Vedi sulla mappa</button></div>
+  </article>`).join("");
+}
+
+/* ---------- attrazioni ---------- */
+function cap(city){ const c=CITY[city]; const base=(city==="takayama"&&S.town)?c.capTown:c.cap; return base*S.pace; }
+function renderBudget(){
+  const rows=Object.keys(CITY).filter(k=>CITY[k].cap>0).map(k=>{
+    const its=ATT.filter(a=>a.city===k&&!a.inc&&S.sel.has(a.id));
+    const used=its.reduce((s,a)=>s+a.min,0)/60*CITY[k].ovh, c=cap(k), r=used/c;
+    const cls=r>1?"over":r>.85?"warnb":"";
+    const txt=r>1?`Troppo: togli circa ${(used-c).toFixed(1).replace(".",",")} h`:r>.85?"Quasi pieno":its.length?"Hai ancora spazio":"Nessun luogo scelto";
+    return `<div class="brow ${cls}"><span><b>${CITY[k].n}</b></span><div class="bar"><i style="width:${Math.min(100,r*100).toFixed(0)}%"></i></div><span class="st">${used.toFixed(1).replace(".",",")} di ${c.toFixed(1).replace(".",",")} h. ${txt}</span></div>`;
+  }).join("");
+  const n=S.sel.size;
+  $("#budget").innerHTML=`<h3>Quanto spazio hai</h3><p class="muted">Le ore includono gli spostamenti in città. Nara e Fushimi Inari non pesano: sono nel tour del 27.</p>
+   <div class="setrow"><span><b>Ritmo</b></span>
+    ${[[.8,"Tranquillo"],[1,"Normale"],[1.2,"Intenso"]].map(p=>`<label><input type="radio" name="pace" data-act="pace" value="${p[0]}" ${S.pace===p[0]?"checked":""}> ${p[1]}</label>`).join("")}
+    <label><input type="checkbox" data-act="town" ${S.town?"checked":""}> Dormo a Takayama città (se cambio ryokan)</label></div>
+   ${rows}
+   <div class="acts"><button class="btn small" data-act="copy">Copia il mio piano</button><button class="btn small" data-act="reset">Torna ai consigli iniziali</button><span class="muted" id="copied" style="align-self:center"></span></div>
+   <p class="muted" style="margin:8px 0 0">${n} luoghi scelti.</p>`;
+}
+function renderFilters(){
+  const cats=["Templi e storia","Natura e panorami","Quartieri","Cibo","Esperienze"];
+  const cities=Object.keys(CITY);
+  $("#filters").innerHTML=`<button class="fbtn" data-act="fcity" data-id="all" aria-pressed="${S.fcity==="all"}">Tutte le città</button>`+
+   cities.map(c=>`<button class="fbtn" data-act="fcity" data-id="${c}" aria-pressed="${S.fcity===c}">${CITY[c].n} (${ATT.filter(a=>a.city===c&&S.sel.has(a.id)).length})</button>`).join("")+
+   `<span style="flex-basis:100%"></span><label class="muted" for="fcat">Tipo</label><select id="fcat" data-act="fcat"><option value="all">Tutti</option>${cats.map(c=>`<option ${S.fcat===c?"selected":""}>${c}</option>`).join("")}</select>
+    <button class="fbtn" data-act="fkid" aria-pressed="${S.fkid}">Adatte a un bambino</button>
+    <button class="fbtn" data-act="fpri" aria-pressed="${S.fpri}">Solo imperdibili e consigliate</button>`;
+}
+function attCard(a){
+  const on=S.sel.has(a.id);
+  const pri=a.pri===3?'<span class="seal" title="Imperdibile">必見</span>':a.pri===2?'<span class="tag">Consigliata</span>':'<span class="tag dim">Se hai tempo</span>';
+  const org=a.zone==="Okuhida"?HOT.okuhida.q:CITY[a.city].origin;
+  const hrs=a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
+  return `<article class="att${on?" is-sel":""}">
+   <div class="row1">${pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
+   <h3>${a.name}</h3><div class="jp" lang="ja">${a.jp}</div>
+   <div class="meta"><span>${a.cat}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}${a.inc?'<span class="chip ok">Già nel preventivo</span>':""}</div>
+   <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.warn?`<div class="warn">${a.warn}</div>`:""}
+   <div class="acts"><button class="btn small" data-act="toggle" data-id="${a.id}" aria-pressed="${on}">${on?"Nel piano":"Aggiungi al piano"}</button>
+   <button class="btn small primary" data-act="detail" data-kind="att" data-id="${a.id}">Dettagli</button>
+   <a class="btn small" target="_blank" rel="noopener" href="${gsearch(a.q)}">Mappa</a>
+   <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Dall'hotel</a></div></article>`;
+}
+function renderGrid(){
+  let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2));
+  const order=Object.keys(CITY);
+  list.sort((a,b)=>order.indexOf(a.city)-order.indexOf(b.city)||b.pri-a.pri);
+  $("#grid").innerHTML=list.length?list.map(attCard).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
+}
+function renderAtt(){ renderBudget(); renderFilters(); renderGrid(); }
+function toggle(id){
+  if(S.sel.has(id)) S.sel.delete(id); else S.sel.add(id);
+  store.set("sel",Array.from(S.sel));
+  renderHead(); renderAtt(); renderDays(); renderPanel();
+}
+function planText(){
+  let t="Il nostro piano in Giappone, 19-30 ottobre 2026\n";
+  Object.keys(CITY).forEach(k=>{
+    const its=ATT.filter(a=>a.city===k&&S.sel.has(a.id)).sort((a,b)=>b.pri-a.pri);
+    if(its.length) t+=`\n${CITY[k].n}\n`+its.map(a=>`- ${a.name} (${a.jp})`).join("\n")+"\n";
+  });
+  const nd=DAYS.filter(D=>S.notes[D.d]);
+  if(nd.length) t+="\nNote\n"+nd.map(D=>`- ${D.d}: ${S.notes[D.d]}`).join("\n")+"\n";
+  return t;
+}
+
+/* ---------- checklist ---------- */
+function renderChk(){
+  const done=CHK.filter(c=>S.chk[c.id]).length;
+  $("#progbar").style.width=(done/CHK.length*100).toFixed(0)+"%";
+  $("#progtxt").textContent=`${done} di ${CHK.length} cose fatte.`;
+  $("#chklist").innerHTML=Object.keys(GRP).map(g=>{
+    const items=CHK.filter(c=>c.g===g);
+    return `<div class="sec"><h3>${GRP[g]}</h3><div style="margin-top:8px">`+items.map(c=>`<div class="chk ${c.sev}${S.chk[c.id]?" done":""}"><input type="checkbox" id="k-${c.id}" data-act="chk" data-id="${c.id}" ${S.chk[c.id]?"checked":""}><div><label for="k-${c.id}"><strong>${c.t}</strong></label><p>${c.x}</p>${c.l?`<div class="acts">${c.l.map(l=>`<a class="btn small" target="_blank" rel="noopener" href="${l[1]}">${l[0]}</a>`).join("")}</div>`:""}</div></div>`).join("")+`</div></div>`;
+  }).join("");
+}
+
+
+/* ---------- scheda luogo (modal) con dati Google ---------- */
+let gmPromise=null, mCur=null;
+function loadGM(){
+  if(!GM_KEY) return Promise.reject(new Error("nokey"));
+  if(window.google&&google.maps&&google.maps.importLibrary) return Promise.resolve();
+  if(gmPromise) return gmPromise;
+  gmPromise=new Promise((res,rej)=>{
+    window.__gmReady=()=>res();
+    const s=document.createElement("script");
+    s.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(GM_KEY)+"&v=weekly&language=it&region=JP&loading=async&callback=__gmReady";
+    s.async=true; s.onerror=()=>{ gmPromise=null; rej(new Error("blocked")); };
+    setTimeout(()=>{ rej(new Error("timeout")); },10000);
+    document.head.appendChild(s);
+  });
+  return gmPromise;
+}
+async function fetchPlace(q){
+  const lib=await google.maps.importLibrary("places");
+  const r=await lib.Place.searchByText({textQuery:q+", Japan",fields:["displayName","formattedAddress","location","rating","userRatingCount","regularOpeningHours","websiteURI","nationalPhoneNumber","photos","googleMapsURI","editorialSummary","businessStatus"],maxResultCount:1,language:"it",region:"jp"});
+  if(!r.places||!r.places.length) throw new Error("notfound");
+  return r.places[0];
+}
+async function renderGoogle(p,box){
+  const rows=[];
+  if(p.businessStatus==="CLOSED_PERMANENTLY") rows.push("<dt>Stato</dt><dd><b>Chiuso definitivamente</b></dd>");
+  else if(p.businessStatus==="CLOSED_TEMPORARILY") rows.push("<dt>Stato</dt><dd><b>Chiuso temporaneamente</b></dd>");
+  if(p.rating) rows.push(`<dt>Valutazione</dt><dd>${esc(p.rating.toFixed(1).replace(".",","))} su 5 (${fmt(p.userRatingCount||0)} recensioni)</dd>`);
+  if(p.formattedAddress) rows.push(`<dt>Indirizzo</dt><dd>${esc(p.formattedAddress)}</dd>`);
+  if(p.nationalPhoneNumber) rows.push(`<dt>Telefono</dt><dd>${esc(p.nationalPhoneNumber)}</dd>`);
+  if(p.websiteURI) rows.push(`<dt>Sito</dt><dd><a href="${esc(p.websiteURI)}" target="_blank" rel="noopener">Apri il sito</a></dd>`);
+  const hrs=p.regularOpeningHours&&p.regularOpeningHours.weekdayDescriptions;
+  let html=`<h4>Da Google Maps</h4>`;
+  if(p.editorialSummary) html+=`<p>${esc(typeof p.editorialSummary==="string"?p.editorialSummary:p.editorialSummary.text||"")}</p>`;
+  html+=`<div class="gmap" id="gmap"></div>`;
+  html+=`<dl class="gdl">${rows.join("")}</dl>`;
+  if(hrs&&hrs.length) html+=`<p style="margin:0 0 4px"><b>Orari</b></p><ul class="hours">${hrs.map(h=>`<li>${esc(h)}</li>`).join("")}</ul><p class="muted" style="font-size:.82rem;margin-top:4px">Gli orari sono quelli abituali: i giorni speciali possono cambiare.</p>`;
+  html+=`<div class="gphotos" id="gphotos"></div>`;
+  box.innerHTML=html;
+  try{
+    const ph=(p.photos||[]).slice(0,4).map(x=>x.getURI({maxWidth:480}));
+    $("#gphotos").innerHTML=ph.map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join("");
+    const m=await google.maps.importLibrary("maps"), mk=await google.maps.importLibrary("marker");
+    const map=new m.Map($("#gmap"),{center:p.location,zoom:16,mapId:"DEMO_MAP_ID",gestureHandling:"cooperative"});
+    new mk.AdvancedMarkerElement({map:map,position:p.location,title:p.displayName});
+  }catch(e){ const g=$("#gmap"); if(g) g.remove(); }
+}
+function modalMsg(e){
+  const m=e&&e.message;
+  if(m==="nokey") return "I dati live di Google (orari, valutazioni, foto, telefono, mappa) si attivano nella versione ospitata da te, con una chiave API. Qui hai i dati del cruscotto e i link diretti a Google Maps.";
+  if(m==="notfound") return "Google non ha trovato questo luogo. Usa il pulsante Mappa per cercarlo a mano.";
+  return "Google Maps non è raggiungibile da questa pagina (blocco di sicurezza o chiave non valida). Usa i pulsanti qui sotto per aprirlo.";
+}
+function openModal(kind,id){
+  const d=$("#modal"); mCur={kind:kind,id:id};
+  let name,jp="",q,body="",acts="";
+  if(kind==="att"){
+    const a=ATTM[id]; name=a.name; jp=a.jp; q=a.q;
+    const org=a.zone==="Okuhida"?HOT.okuhida.q:CITY[a.city].origin;
+    const hrs=a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
+    body=`<div class="meta" style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.88rem;color:var(--muted);margin:2px 0 8px"><span>${a.cat}</span><span>${CITY[a.city].n}, ${a.zone}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}</div>
+      <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.warn?`<div class="warn">${a.warn}</div>`:""}`;
+    acts=`<button class="btn small" id="mtoggle" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${S.sel.has(a.id)?"Nel piano":"Aggiungi al piano"}</button>
+      <a class="btn small" target="_blank" rel="noopener" href="${gsearch(a.q)}">Apri in Google Maps</a>
+      <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Come arrivare dall'hotel</a>`;
+  } else {
+    const h=HOT[id]; name=h.n; q=h.q;
+    body=`<p>${chip(h.st)} <span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span></p><p>${h.room}</p><p class="muted">${h.note}</p>`;
+    acts=`<a class="btn small" target="_blank" rel="noopener" href="${gsearch(h.q)}">Apri in Google Maps</a>`;
+  }
+  d.innerHTML=`<div class="mhead"><div><h3 id="mtitle">${name}</h3>${jp?`<div class="jp" lang="ja">${jp}</div>`:""}</div><button class="btn small" data-act="closemodal" aria-label="Chiudi la scheda">Chiudi</button></div>
+    <div class="mbody">${body}<div class="gbox" id="gbox"><p class="muted" style="margin:0">${GM_KEY?"Carico i dati da Google Maps…":modalMsg(new Error("nokey"))}</p></div><div class="acts">${acts}</div></div>`;
+  if(d.showModal){ if(!d.open) d.showModal(); } else d.setAttribute("open","");
+  if(GM_KEY){
+    const mine=mCur;
+    loadGM().then(()=>fetchPlace(q)).then(p=>{ if(mCur===mine) return renderGoogle(p,$("#gbox")); })
+      .catch(e=>{ if(mCur===mine){ const g=$("#gbox"); if(g) g.innerHTML=`<p class="muted" style="margin:0">${modalMsg(e)}</p>`; } });
+  }
+}
+function closeModal(){ const d=$("#modal"); mCur=null; if(d.close) d.close(); else d.removeAttribute("open"); }
+function refreshModalBtn(){
+  const b=$("#mtoggle"); if(!b||!mCur||mCur.kind!=="att") return;
+  const on=S.sel.has(mCur.id); b.setAttribute("aria-pressed",String(on)); b.textContent=on?"Nel piano":"Aggiungi al piano";
+}
+
+/* ---------- esportazioni ---------- */
+function download(name,text,type){
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:type}));
+  a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500);
+}
+function downloadCSV(onlySel){
+  const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+  const rows=[["Nome","Indirizzo per la ricerca","Categoria","Città","Note"]];
+  Object.keys(HOT).forEach(k=>{ const h=HOT[k]; rows.push([h.n,h.q+", Japan","Hotel",k==="okuhida"?"Okuhida":NODES[k].n,`${h.dates}. ${h.room}`]); });
+  ATT.filter(a=>!onlySel||S.sel.has(a.id)).forEach(a=>rows.push([a.name,a.q+", Japan",a.cat,CITY[a.city].n,`${a.best}. ${a.note}`]));
+  download(onlySel?"giappone-mio-piano-mymaps.csv":"giappone-luoghi-google-mymaps.csv","\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"),"text/csv;charset=utf-8");
+}
+function snapshot(){ return {v:1,upd:store.get("upd",0),sel:Array.from(S.sel),chk:S.chk,pace:S.pace,child:S.child,fx:S.fx,town:S.town,notes:S.notes}; }
+function applySnap(d){
+  if(!d||typeof d!=="object") return false;
+  const ed=document.activeElement; if(ed&&ed.classList&&ed.classList.contains("note")) return false;
+  if(Array.isArray(d.sel)) S.sel=new Set(d.sel.filter(id=>ATTM[id]));
+  if(d.chk&&typeof d.chk==="object") S.chk=d.chk;
+  if(typeof d.pace==="number") S.pace=d.pace;
+  if(typeof d.child==="string") S.child=d.child;
+  if(typeof d.fx==="number") S.fx=d.fx;
+  if(typeof d.town==="boolean") S.town=d.town;
+  if(d.notes&&typeof d.notes==="object") S.notes=d.notes;
+  const keep=Sync.touch; Sync.touch=()=>{};
+  ["chk","pace","child","fx","town","notes"].forEach(k=>store.set(k,S[k])); store.set("sel",Array.from(S.sel));
+  Sync.touch=keep; store.set("upd",d.upd||Date.now());
+  renderHead(); renderStrip(); renderPanel(); renderDays(); renderAtt(); renderChk();
+  $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
+  return true;
+}
+function exportJSON(){ download("giappone-2026-backup.json",JSON.stringify(snapshot(),null,2),"application/json"); }
+function importJSON(f){
+  if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); d.upd=Date.now(); if(applySnap(d)){ Sync.touch(); setMsg("Backup importato."); } }catch(e){ setMsg("File non valido."); } };
+  r.readAsText(f); $("#importfile").value="";
+}
+function randCode(){
+  const A="abcdefghjkmnpqrstuvwxyz23456789", b=new Uint8Array(15); crypto.getRandomValues(b);
+  return Array.from(b,x=>A[x%A.length]).join("").replace(/(.{5})(?=.)/g,"$1-");
+}
+function setMsg(t){ const m=$("#setmsg"); if(m) m.textContent=t; }
+
+/* ---------- salvataggio cloud (Supabase) ---------- */
+const Sync={
+  code: store.get("code",""), timer:null, state:"local", busy:false,
+  on(){ return !!(SB.url&&SB.key&&this.code); },
+  rpc(fn,body){
+    return fetch(SB.url+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"Content-Type":"application/json",apikey:SB.key,Authorization:"Bearer "+SB.key},body:JSON.stringify(body)})
+      .then(r=>{ if(!r.ok) return r.text().then(t=>{ throw new Error(t||r.status); }); return r.status===204?null:r.json(); });
+  },
+  touch(){
+    store.set("upd",Date.now());
+    if(!Sync.on()) return;
+    clearTimeout(Sync.timer); Sync.badge("busy"); Sync.timer=setTimeout(()=>Sync.push(),900);
+  },
+  push(){
+    if(!this.on()) return Promise.resolve();
+    this.badge("busy");
+    return this.rpc("save_trip_state",{p_code:this.code,p_data:snapshot()})
+      .then(()=>this.badge("on"),e=>{ this.badge("err"); console.warn(e); });
+  },
+  pull(manual){
+    if(!this.on()){ this.badge(); return Promise.resolve(); }
+    if(this.busy) return Promise.resolve(); this.busy=true; this.badge("busy");
+    return this.rpc("get_trip_state",{p_code:this.code}).then(d=>{
+      const loc=store.get("upd",0);
+      if(d&&d.upd>loc){ if(!applySnap(d)){ this.badge("on"); return; } this.badge("on"); if(manual) setMsg("Dati aggiornati dal cloud."); }
+      else if(!d||d.upd<loc) return this.push().then(()=>{ if(manual) setMsg("Dati di questo dispositivo salvati sul cloud."); });
+      else { this.badge("on"); if(manual) setMsg("Già tutto allineato."); }
+    }).catch(e=>{ this.badge("err"); console.warn(e); if(manual) setMsg("Salvataggio cloud non raggiungibile: controlla URL e chiave."); })
+      .then(()=>{ this.busy=false; });
+  },
+  badge(st){
+    this.state=st||(this.on()?"on":"local");
+    const b=$("#syncbadge"); if(!b) return;
+    b.className="syncbadge btn small "+(this.state==="local"?"":this.state);
+    b.lastElementChild.textContent={local:"Salvato solo su questo dispositivo",on:"Salvato sul cloud, condiviso",busy:"Salvataggio in corso…",err:"Cloud non raggiungibile, salvato sul dispositivo"}[this.state];
+  }
+};
+function renderSettings(){
+  $("#setbox").innerHTML=`<p class="muted" style="margin-top:0">Piano, spunte, impostazioni e note restano sempre su questo dispositivo. Con il salvataggio cloud si condividono tra tutti i telefoni che usano lo <b>stesso codice viaggio</b>: inseriscilo uguale sul telefono di Michela.</p>
+   <label>Codice viaggio <input type="text" id="s-code" autocomplete="off" spellcheck="false" value="${esc(Sync.code)}" placeholder="almeno 8 caratteri, es. generato qui sotto"></label>
+   <div class="acts" style="margin-top:0"><button class="btn small" data-act="newcode">Genera un codice</button></div>
+   <details style="margin-top:12px"><summary class="muted" style="cursor:pointer">Chiavi tecniche (di solito sono già in config.js)</summary>
+    <label>Supabase URL <input type="text" id="s-sburl" value="${esc(lget("sburl"))}" placeholder="${esc(CFG.supabaseUrl||"https://xxxx.supabase.co")}"></label>
+    <label>Supabase anon key <input type="password" id="s-sbkey" value="${esc(lget("sbkey"))}" placeholder="${CFG.supabaseAnonKey?"impostata in config.js":"eyJ…"}"></label>
+    <label>Chiave Google Maps <input type="password" id="s-gmkey" value="${esc(lget("gmkey"))}" placeholder="${CFG.googleMapsKey?"impostata in config.js":"AIza…"}"></label>
+   </details>
+   <div class="acts"><button class="btn small primary" data-act="savecfg">Salva e sincronizza</button><button class="btn small" data-act="syncnow"${Sync.on()?"":" disabled"}>Sincronizza ora</button></div>
+   <p class="muted" style="margin:10px 0 0">Google Maps nelle schede: <b>${GM_KEY?"attivo":"non configurato"}</b>. Cloud: <b>${SB.url&&SB.key?"configurato":"non configurato"}</b>.</p>
+   <div class="acts"><button class="btn small" data-act="export">Scarica backup</button><button class="btn small" data-act="import">Carica backup</button><input type="file" id="importfile" accept="application/json,.json" data-act="importfile" hidden></div>
+   <p class="muted" id="setmsg" aria-live="polite" style="margin:8px 0 0"></p>`;
+}
+function saveCfg(){
+  const code=$("#s-code").value.trim();
+  if(code&&code.length<8){ setMsg("Il codice deve avere almeno 8 caratteri."); return; }
+  const gm=$("#s-gmkey").value.trim(), oldGm=lget("gmkey");
+  lset("sburl",$("#s-sburl").value.trim()); lset("sbkey",$("#s-sbkey").value.trim()); lset("gmkey",gm);
+  SB.url=(lget("sburl")||CFG.supabaseUrl||"").replace(/\/+$/,""); SB.key=lget("sbkey")||CFG.supabaseAnonKey||"";
+  Sync.code=code; store.set("code",code);
+  if(gm!==oldGm){ setMsg("Salvato. Ricarico la pagina per attivare la chiave Google Maps…"); setTimeout(()=>location.reload(),900); return; }
+  renderSettings();
+  if(Sync.on()) Sync.pull(true); else { Sync.badge(); setMsg(code?"Codice salvato. Manca la configurazione Supabase.":"Salvataggio cloud disattivato."); }
+}
+
+/* ---------- eventi ---------- */
+document.addEventListener("click",function(e){
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act, id=b.dataset.id;
+  if(act==="tab") go(id);
+  else if(act==="node") selNode(id);
+  else if(act==="leg") selLeg(id);
+  else if(act==="zoom") setRegion(id);
+  else if(act==="goleg"){ go("percorso"); selLeg(id); const m=$(".maprow"); if(m&&b.dataset.map) m.scrollIntoView({behavior:"smooth",block:"start"}); }
+  else if(act==="goatt"){ S.fcity=id; go("attrazioni"); renderAtt(); }
+  else if(act==="toggle"){ toggle(id); refreshModalBtn(); }
+  else if(act==="detail") openModal(b.dataset.kind,id);
+  else if(act==="closemodal") closeModal();
+  else if(act==="fcity"){ S.fcity=id; renderFilters(); renderGrid(); }
+  else if(act==="fkid"){ S.fkid=!S.fkid; renderFilters(); renderGrid(); }
+  else if(act==="fpri"){ S.fpri=!S.fpri; renderFilters(); renderGrid(); }
+  else if(act==="reset"){ S.sel=new Set(defSel()); store.set("sel",Array.from(S.sel)); renderHead(); renderAtt(); renderDays(); renderPanel(); }
+  else if(act==="csv") downloadCSV(id==="sel");
+  else if(act==="export") exportJSON();
+  else if(act==="import") $("#importfile").click();
+  else if(act==="newcode"){ $("#s-code").value=randCode(); }
+  else if(act==="savecfg") saveCfg();
+  else if(act==="syncnow") Sync.pull(true);
+  else if(act==="copy"){
+    const t=planText(), out=$("#copied");
+    const fb=()=>{ try{ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); const ok=document.execCommand("copy"); document.body.removeChild(ta); out.textContent=ok?"Copiato.":"Copia non riuscita."; }catch(x){ out.textContent="Copia non riuscita."; } };
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(()=>{out.textContent="Copiato.";},fb); } else fb();
+  }
+});
+document.addEventListener("click",function(e){ const d=$("#modal"); if(e.target===d) closeModal(); });
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Enter"&&e.key!==" ") return;
+  const t=e.target; if(t&&t.getAttribute&&t.getAttribute("role")==="button"&&t.dataset.act){ e.preventDefault(); t.dispatchEvent(new MouseEvent("click",{bubbles:true})); }
+});
+document.addEventListener("change",function(e){
+  const t=e.target, act=t.dataset&&t.dataset.act; if(!act) return;
+  if(act==="chk"){ S.chk[t.dataset.id]=t.checked; store.set("chk",S.chk); renderChk(); }
+  else if(act==="pace"){ S.pace=+t.value; store.set("pace",S.pace); renderBudget(); }
+  else if(act==="town"){ S.town=t.checked; store.set("town",S.town); renderBudget(); }
+  else if(act==="fcat"){ S.fcat=t.value; renderGrid(); }
+  else if(act==="importfile") importJSON(t.files&&t.files[0]);
+  else if(act==="child"){ S.child=t.value; store.set("child",S.child); renderCalc(); }
+});
+document.addEventListener("input",function(e){
+  const t=e.target; if(t.dataset&&t.dataset.act==="fx"){ S.fx=+t.value||175; store.set("fx",S.fx); renderCalc(); }
+  else if(t.dataset&&t.dataset.act==="note"){ const v=t.value.trim(); if(v) S.notes[t.dataset.id]=t.value; else delete S.notes[t.dataset.id]; store.set("notes",S.notes); }
+});
+window.addEventListener("resize",function(){ applyBox(); });
+document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") Sync.pull(); });
+setInterval(function(){ if(document.visibilityState==="visible") Sync.pull(); },60000);
+
+/* ---------- avvio ---------- */
+renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect();
+renderDays(); renderLegs(); renderAtt(); renderChk();
+$("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
+renderSettings(); Sync.badge(); Sync.pull();
+})();
+</script>
+</body>
+</html>
