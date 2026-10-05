@@ -415,7 +415,8 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 "use strict";
 /* Configurazione: config.js (vedi README), con override locali inseriti dalla pagina. */
 const CFG = window.JP26_CONFIG || {};
-const lget = k => { try{ return localStorage.getItem("jp26cfg_"+k)||""; }catch(e){ return ""; } };
+const CFGOK = {sburl:v=>/^https:\/\/[^\s\/@]+\.[^\s\/@]+/.test(v), sbkey:v=>/^(sb_publishable_|eyJ)/.test(v), gmkey:v=>/^AIza/.test(v)};
+const lget = k => { try{ const v=(localStorage.getItem("jp26cfg_"+k)||"").trim(); return v&&CFGOK[k]&&!CFGOK[k](v)?"":v; }catch(e){ return ""; } };
 const lset = (k,v) => { try{ v?localStorage.setItem("jp26cfg_"+k,v):localStorage.removeItem("jp26cfg_"+k); }catch(e){} };
 const GM_KEY = lget("gmkey") || CFG.googleMapsKey || "";
 const SB = { url:(lget("sburl")||CFG.supabaseUrl||"").replace(/\/+$/,""), key:lget("sbkey")||CFG.supabaseAnonKey||"", schema:CFG.supabaseSchema||"japan" };
@@ -1244,6 +1245,9 @@ function saveCfg(){
   const code=$("#s-code").value.trim();
   if(code&&code.length<8){ setMsg("Il codice deve avere almeno 8 caratteri."); return; }
   const gm=$("#s-gmkey").value.trim(), oldGm=lget("gmkey");
+  const bad=[["s-sburl","sburl","Supabase URL (deve iniziare con https:// ed essere l'indirizzo del progetto, non un'email)"],["s-sbkey","sbkey","Supabase anon key (inizia con sb_publishable_ o eyJ)"],["s-gmkey","gmkey","Chiave Google Maps (inizia con AIza)"]]
+    .filter(f=>{ const v=$("#"+f[0]).value.trim(); return v&&!CFGOK[f[1]](v); });
+  if(bad.length){ setMsg("Valore non valido: "+bad.map(f=>f[2]).join("; ")+". Lascia il campo vuoto per usare config.js."); return; }
   lset("sburl",$("#s-sburl").value.trim()); lset("sbkey",$("#s-sbkey").value.trim()); lset("gmkey",gm);
   SB.url=(lget("sburl")||CFG.supabaseUrl||"").replace(/\/+$/,""); SB.key=lget("sbkey")||CFG.supabaseAnonKey||"";
   Sync.code=code; store.set("code",code);
