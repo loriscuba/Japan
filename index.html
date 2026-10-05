@@ -242,6 +242,32 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .setbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;max-width:760px}
 .setbox label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;font-weight:700;margin:10px 0}
 .setbox input[type=text],.setbox input[type=password]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper);color:var(--ink);width:100%}
+.heart{color:#C2366B;font-weight:700;font-size:.84rem;white-space:nowrap}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .heart{color:#FF8FB8}}
+:root[data-theme="dark"] .heart{color:#FF8FB8}
+.att.is-fav{border-top:4px solid #D6457A}
+.advice{border-left:4px solid var(--ink);background:var(--paper);border-radius:0 6px 6px 0;padding:6px 10px;font-size:.9rem}
+.favbox{background:var(--card);border:1px solid var(--line);border-top:4px solid #D6457A;border-radius:10px;padding:16px;margin-bottom:14px}
+.favday{margin-top:12px}
+.favday h4{margin:0 0 4px;font-family:var(--fd);font-size:1rem}
+.favrow{display:grid;grid-template-columns:minmax(150px,220px) auto minmax(0,1fr);gap:4px 10px;align-items:start;padding:6px 0;border-top:1px dashed var(--line);font-size:.9rem}
+.favrow .pill{text-align:left}
+@media (max-width:620px){.favrow{grid-template-columns:auto minmax(0,1fr)}.favrow>span:last-child{grid-column:1 / -1}}
+.mapmode{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.layers{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.86rem;margin-left:4px}
+.layers label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+.layers i{display:inline-block;width:11px;height:11px;border-radius:50%}
+#gmapMain{width:100%;aspect-ratio:680/660;background:var(--sea)}
+#gmapMain .gmerr{color:#fff;padding:60px 20px;text-align:center}
+.gpin{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font:700 12px/1 system-ui,sans-serif;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer;background:#8C97AD}
+.gpin.other{width:15px;height:15px}
+.gpin.plan{background:#18A874}
+.gpin.fav{background:#D6457A}
+.gpin.fav.sel{box-shadow:0 0 0 3px #18A874,0 1px 4px rgba(0,0,0,.45)}
+.gpin.hot{background:#1B2A46;border-radius:6px;width:26px;height:26px}
+.ginfo{--ink:#1B2A46;--paper:#F3F5F8;--card:#fff;--muted:#58647E;--line:#D5DCE7;--ok:#0C7A55;--okbg:#DCF2E8;--req:#8F5A00;--reqbg:#FFEDC2;--todo:#2054B8;--todobg:#E1EAFB;--risk:#B73030;--riskbg:#FBE0E0;color:#1B2A46;max-width:280px;font-family:var(--fb);font-size:.88rem;line-height:1.45}
+.ginfo .heart{color:#C2366B}
+.ginfo .btn[aria-pressed="true"]{color:#fff}
 textarea.note{font:inherit;font-size:.93rem;width:100%;min-height:58px;padding:7px 9px;border:1px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--ink);resize:vertical;margin-top:8px}
 textarea.note:focus{border-style:solid;border-color:var(--ink)}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
@@ -273,10 +299,12 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
   <div class="sec">
     <h2>La mappa del viaggio</h2>
-    <p class="muted">Tocca una tratta o una città. Le linee tratteggiate sono i treni che il preventivo non include e che devi comprare tu.</p>
+    <p class="muted">Tocca una tratta, una città o un segnaposto. Le linee tratteggiate sono i treni che il preventivo non include e che devi comprare tu. Il cuore ♥ indica i posti salvati da Michela.</p>
     <div class="maprow">
       <div>
+        <div class="mapmode" id="mapmode"></div>
         <div class="mapbox">
+          <div id="gmapMain" hidden></div>
           <svg id="map" viewBox="0 0 680 660" role="img" aria-label="Mappa schematica del Giappone centrale con le tappe del viaggio"></svg>
           <div class="zoom" id="zoom"></div>
         </div>
@@ -286,7 +314,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
           <span><i class="todo"></i>Da organizzare</span>
           <span><i class="risk"></i>Da verificare</span>
         </div>
-        <p class="caption">Mappa schematica, non in scala. Per le mappe vere usa i pulsanti di Google Maps nel pannello.</p>
+        <p class="caption" id="mapcap"></p>
       </div>
       <div class="panel" id="panel" aria-live="polite"></div>
     </div>
@@ -352,6 +380,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 <section class="view" id="v-attrazioni" role="tabpanel">
   <h2>Cosa vedere</h2>
   <p class="muted">Ho già selezionato gli imperdibili. Togli e aggiungi: la barra delle ore ti dice quando stai esagerando.</p>
+  <div class="favbox" id="favbox"></div>
   <div class="budget" id="budget"></div>
   <div class="filters" id="filters"></div>
   <div class="grid" id="grid"></div>
@@ -391,6 +420,32 @@ const lset = (k,v) => { try{ v?localStorage.setItem("jp26cfg_"+k,v):localStorage
 const GM_KEY = lget("gmkey") || CFG.googleMapsKey || "";
 const SB = { url:(lget("sburl")||CFG.supabaseUrl||"").replace(/\/+$/,""), key:lget("sbkey")||CFG.supabaseAnonKey||"", schema:CFG.supabaseSchema||"japan" };
 const ATT = [{"id": "tk_senso", "city": "tokyo", "zone": "Asakusa", "name": "Senso-ji e Nakamise", "jp": "浅草寺", "cat": "Templi e storia", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "Mattina presto o dopo le 17, quando è illuminato", "note": "Il tempio più antico di Tokyo. Lungo Nakamise assaggia i dolcetti ningyo-yaki, poi passeggia lungo il fiume Sumida.", "q": "Senso-ji Temple Asakusa Tokyo", "inc": false, "warn": ""}, {"id": "tk_meiji", "city": "tokyo", "zone": "Harajuku", "name": "Meiji Jingu", "jp": "明治神宮", "cat": "Templi e storia", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Mattina", "note": "Santuario dentro un bosco, a pochi minuti da Harajuku. Nei fine settimana capita di vedere cortei di nozze shinto.", "q": "Meiji Jingu Shrine Tokyo", "inc": false, "warn": ""}, {"id": "tk_shibuya", "city": "tokyo", "zone": "Shibuya", "name": "Shibuya Crossing e Shibuya Sky", "jp": "渋谷スクランブルスクエア", "cat": "Natura e panorami", "min": 120, "pri": 3, "kid": true, "book": "consigliata", "best": "Slot del tramonto, verso le 16:30", "note": "L'incrocio più famoso del mondo visto dall'alto. Con il cielo limpido si vede anche il Fuji. L'ingresso è a orario: prenota lo slot.", "q": "Shibuya Sky Tokyo", "inc": false, "warn": ""}, {"id": "tk_teamlab", "city": "tokyo", "zone": "Toyosu", "name": "teamLab Planets", "jp": "チームラボプラネッツ", "cat": "Esperienze", "min": 120, "pri": 3, "kid": true, "book": "obbligatoria", "best": "Pomeriggio, con slot prenotato", "note": "Arte immersiva dentro l'acqua, si cammina scalzi: porta pantaloni facili da arrotolare. Gli slot si esauriscono, prenota subito.", "q": "teamLab Planets TOKYO Toyosu", "inc": false, "warn": ""}, {"id": "tk_harajuku", "city": "tokyo", "zone": "Harajuku", "name": "Harajuku e Omotesando", "jp": "原宿・表参道", "cat": "Quartieri", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Takeshita Street per la cultura pop, Omotesando per architettura e caffè. Si abbina bene a Meiji Jingu.", "q": "Takeshita Street Harajuku Tokyo", "inc": false, "warn": ""}, {"id": "tk_tsukiji", "city": "tokyo", "zone": "Tsukiji", "name": "Mercato esterno di Tsukiji", "jp": "築地場外市場", "cat": "Cibo", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Colazione, entro le 10", "note": "Sushi, tamagoyaki e spiedini di mare mangiati in piedi. Molte bancarelle chiudono nel primo pomeriggio.", "q": "Tsukiji Outer Market Tokyo", "inc": false, "warn": ""}, {"id": "tk_shinjuku", "city": "tokyo", "zone": "Shinjuku", "name": "Shinjuku di sera", "jp": "新宿・思い出横丁", "cat": "Quartieri", "min": 90, "pri": 2, "kid": false, "book": "no", "best": "Dopo il tramonto", "note": "Insegne al neon e i vicoli fumosi di Omoide Yokocho. Dal Palazzo del Governo (Tocho) c'è un panorama gratuito.", "q": "Omoide Yokocho Shinjuku Tokyo", "inc": false, "warn": ""}, {"id": "tk_gyoen", "city": "tokyo", "zone": "Shinjuku", "name": "Shinjuku Gyoen", "jp": "新宿御苑", "cat": "Natura e panorami", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Mattina o primo pomeriggio", "note": "Giardino enorme, ottimo per una pausa dal caos e con un bambino. Chiude presto: controlla l'orario.", "q": "Shinjuku Gyoen National Garden Tokyo", "inc": false, "warn": ""}, {"id": "tk_ueno", "city": "tokyo", "zone": "Ueno", "name": "Parco di Ueno e musei", "jp": "上野公園", "cat": "Natura e panorami", "min": 120, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Parco, templi, musei e zoo con i panda. Una passeggiata tranquilla.", "q": "Ueno Park Tokyo", "inc": false, "warn": ""}, {"id": "tk_akiba", "city": "tokyo", "zone": "Akihabara", "name": "Akihabara", "jp": "秋葉原", "cat": "Quartieri", "min": 90, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio o sera", "note": "Anime, retrogame e sale giochi su più piani. Perfetta per souvenir tecnologici.", "q": "Akihabara Electric Town Tokyo", "inc": false, "warn": ""}, {"id": "tk_palace", "city": "tokyo", "zone": "Marunouchi", "name": "Giardini Est del Palazzo Imperiale", "jp": "皇居東御苑", "cat": "Natura e panorami", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Fossati, mura del castello e giardini. Chiusi il lunedì e il venerdì: il 23 ottobre è venerdì.", "q": "Imperial Palace East Gardens Tokyo", "inc": false, "warn": "Chiuso il venerdì: non va bene il 23 ottobre."}, {"id": "tk_skytree", "city": "tokyo", "zone": "Oshiage", "name": "Tokyo Skytree", "jp": "東京スカイツリー", "cat": "Natura e panorami", "min": 90, "pri": 1, "kid": true, "book": "consigliata", "best": "Giornata limpida", "note": "Alternativa a Shibuya Sky: più alto ma più lontano dal centro. Ne basta uno dei due.", "q": "Tokyo Skytree", "inc": false, "warn": ""}, {"id": "tk_ginza", "city": "tokyo", "zone": "Ginza", "name": "Ginza", "jp": "銀座", "cat": "Quartieri", "min": 90, "pri": 1, "kid": true, "book": "no", "best": "Sera", "note": "Grandi magazzini, boutique e il teatro Kabuki-za. Bella al tramonto e utile per lo shopping tax-free.", "q": "Ginza Tokyo", "inc": false, "warn": ""}, {"id": "tk_kamakura", "city": "tokyo", "zone": "Kamakura", "name": "Gita a Kamakura", "jp": "鎌倉", "cat": "Esperienze", "min": 420, "pri": 1, "kid": true, "book": "no", "best": "Giornata intera", "note": "Grande Buddha di bronzo e templi tra le colline, a circa un'ora da Tokyo. Sostituisce una giornata in città.", "q": "Kotoku-in Great Buddha Kamakura", "inc": false, "warn": ""}, {"id": "ta_sanmachi", "city": "takayama", "zone": "Takayama città", "name": "Sanmachi Suji, il centro storico", "jp": "古い町並", "cat": "Quartieri", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "Botteghe di sake, case in legno scuro e spiedini di manzo Hida. È il motivo per cui si viene a Takayama.", "q": "Sanmachi Suji Takayama", "inc": false, "warn": ""}, {"id": "ta_onsen", "city": "takayama", "zone": "Okuhida", "name": "Onsen e cena al ryokan", "jp": "奥飛騨温泉郷", "cat": "Esperienze", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Sera, prima della cena", "note": "Bagni termali con vista montagna e cena kaiseki a mezza pensione. Regole: lavarsi prima, niente costume; se hai tatuaggi chiedi al ryokan.", "q": "Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu", "inc": true, "warn": ""}, {"id": "ta_jinya", "city": "takayama", "zone": "Takayama città", "name": "Takayama Jinya", "jp": "高山陣屋", "cat": "Templi e storia", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "L'antico palazzo del governatore, rimasto intatto. Chiude nel tardo pomeriggio.", "q": "Takayama Jinya", "inc": false, "warn": ""}, {"id": "ta_folk", "city": "takayama", "zone": "Takayama città", "name": "Hida no Sato, villaggio all'aperto", "jp": "飛騨の里", "cat": "Templi e storia", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Case di montagna ricostruite in un parco. È fuori dal centro, serve un bus.", "q": "Hida Folk Village Takayama", "inc": false, "warn": ""}, {"id": "ta_market", "city": "takayama", "zone": "Takayama città", "name": "Mercato del mattino Miyagawa", "jp": "宮川朝市", "cat": "Cibo", "min": 45, "pri": 2, "kid": true, "book": "no", "best": "Mattina, dalle 7", "note": "Ha senso solo se dormi in centro a Takayama: dal ryokan di Okuhida non fai in tempo.", "q": "Miyagawa Morning Market Takayama", "inc": false, "warn": "Non compatibile con il ryokan di Okuhida."}, {"id": "ta_ropeway", "city": "takayama", "zone": "Okuhida", "name": "Funivia Shin-Hotaka", "jp": "新穂高ロープウェイ", "cat": "Natura e panorami", "min": 150, "pri": 2, "kid": true, "book": "no", "best": "Mattina presto del 25", "note": "Doppia funivia fino a circa 2.150 metri, con vista sulle Alpi Giapponesi. A fine ottobre fa freddo e può esserci neve in quota: controlla meteo e orari.", "q": "Shinhotaka Ropeway", "inc": false, "warn": "Ti costringe a spostare il bus per Kanazawa."}, {"id": "sg_ogimachi", "city": "shirakawago", "zone": "Ogimachi", "name": "Villaggio di Ogimachi", "jp": "白川郷 荻町", "cat": "Templi e storia", "min": 100, "pri": 3, "kid": true, "book": "no", "best": "Sosta del bus il 25 ottobre", "note": "Case gassho dal tetto di paglia, Patrimonio UNESCO. Domenica è affollato: vai prima verso il fondo del villaggio.", "q": "Ogimachi Shirakawa-go", "inc": false, "warn": ""}, {"id": "sg_shiroyama", "city": "shirakawago", "zone": "Ogimachi", "name": "Belvedere Shiroyama", "jp": "城山展望台", "cat": "Natura e panorami", "min": 45, "pri": 2, "kid": false, "book": "no", "best": "Se ti resta tempo", "note": "Vista dall'alto sul villaggio. Serve una salita di 15-20 minuti oppure la navetta a pagamento.", "q": "Shiroyama Viewpoint Shirakawa-go", "inc": false, "warn": ""}, {"id": "kz_kenroku", "city": "kanazawa", "zone": "Centro", "name": "Giardino Kenroku-en", "jp": "兼六園", "cat": "Natura e panorami", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Mattina del 26, all'apertura", "note": "Uno dei tre giardini più belli del Giappone. Da metà ottobre gli orari si accorciano e chiude presto: controlla.", "q": "Kenrokuen Garden Kanazawa", "inc": false, "warn": ""}, {"id": "kz_higashi", "city": "kanazawa", "zone": "Higashi Chaya", "name": "Quartiere Higashi Chaya", "jp": "ひがし茶屋街", "cat": "Quartieri", "min": 75, "pri": 3, "kid": true, "book": "no", "best": "Imbrunire del 25", "note": "Vicoli di antiche case da tè e foglia d'oro dappertutto (prova il gelato). Meglio al tramonto.", "q": "Higashi Chaya District Kanazawa", "inc": false, "warn": ""}, {"id": "kz_omicho", "city": "kanazawa", "zone": "Centro", "name": "Mercato Omicho", "jp": "近江町市場", "cat": "Cibo", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "Mattina o pranzo", "note": "Ciotola di pesce crudo (kaisendon), ostriche, granchio. Molte bancarelle chiudono verso le 17.", "q": "Omicho Market Kanazawa", "inc": false, "warn": ""}, {"id": "kz_castle", "city": "kanazawa", "zone": "Centro", "name": "Parco del Castello di Kanazawa", "jp": "金沢城公園", "cat": "Templi e storia", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Insieme al Kenroku-en", "note": "Di fronte al Kenroku-en: porte e torrette ricostruite.", "q": "Kanazawa Castle Park", "inc": false, "warn": ""}, {"id": "kz_nagamachi", "city": "kanazawa", "zone": "Centro", "name": "Quartiere dei samurai Nagamachi", "jp": "長町武家屋敷跡", "cat": "Quartieri", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Muri di fango e canali, a due passi dal Kenroku-en.", "q": "Nagamachi Samurai District Kanazawa", "inc": false, "warn": ""}, {"id": "kz_museum", "city": "kanazawa", "zone": "Centro", "name": "Museo d'Arte Contemporanea del XXI secolo", "jp": "金沢21世紀美術館", "cat": "Esperienze", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Mattina", "note": "Famoso per la piscina di Leandro Erlich. Chiuso il lunedì: il 26 ottobre è lunedì.", "q": "21st Century Museum of Contemporary Art Kanazawa", "inc": false, "warn": "Chiuso il lunedì: il 26 ottobre non si entra."}, {"id": "ky_fushimi", "city": "kyoto", "zone": "Fushimi", "name": "Fushimi Inari Taisha", "jp": "伏見稲荷大社", "cat": "Templi e storia", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Migliaia di torii rossi lungo il sentiero. Il tour lo comprende insieme a Nara.", "q": "Fushimi Inari Taisha Kyoto", "inc": true, "warn": ""}, {"id": "na_todaiji", "city": "nara", "zone": "Nara", "name": "Todai-ji e il Grande Buddha", "jp": "東大寺", "cat": "Templi e storia", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Il Buddha di bronzo nella più grande sala di legno del mondo.", "q": "Todai-ji Nara", "inc": true, "warn": ""}, {"id": "na_park", "city": "nara", "zone": "Nara", "name": "Parco di Nara e i cervi", "jp": "奈良公園", "cat": "Natura e panorami", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "27 ottobre, nel tour incluso", "note": "Cervi liberi che chiedono i biscotti (shika senbei, circa 200 yen). Con un bambino piccolo fai attenzione: spingono e mordicchiano.", "q": "Nara Park", "inc": true, "warn": ""}, {"id": "ky_kiyomizu", "city": "kyoto", "zone": "Higashiyama", "name": "Kiyomizu-dera e Higashiyama", "jp": "清水寺", "cat": "Templi e storia", "min": 150, "pri": 3, "kid": true, "book": "no", "best": "Dalle 6:00 alle 8:30, prima dei gruppi", "note": "Terrazza di legno sopra Kyoto e le stradine Sannenzaka e Ninenzaka. Apre alle 6: perfetta la mattina del 29, prima di andare a Osaka.", "q": "Kiyomizu-dera Kyoto", "inc": false, "warn": ""}, {"id": "ky_arashiyama", "city": "kyoto", "zone": "Arashiyama", "name": "Arashiyama", "jp": "嵐山 竹林の小径", "cat": "Natura e panorami", "min": 180, "pri": 3, "kid": true, "book": "no", "best": "Alle 7:30, prima della folla", "note": "Bosco di bambù, tempio Tenryu-ji e il ponte Togetsukyo. Dal centro servono 30-40 minuti.", "q": "Arashiyama Bamboo Grove Kyoto", "inc": false, "warn": ""}, {"id": "ky_kinkaku", "city": "kyoto", "zone": "Kita", "name": "Kinkaku-ji, il Padiglione d'Oro", "jp": "金閣寺", "cat": "Templi e storia", "min": 60, "pri": 3, "kid": true, "book": "no", "best": "All'apertura", "note": "Visita rapida ma iconica. Si abbina ad Arashiyama, stesso lato ovest della città.", "q": "Kinkaku-ji Kyoto", "inc": false, "warn": ""}, {"id": "ky_gion", "city": "kyoto", "zone": "Gion", "name": "Gion e Hanamikoji", "jp": "祇園・花見小路", "cat": "Quartieri", "min": 90, "pri": 3, "kid": true, "book": "no", "best": "Tramonto e sera", "note": "Case da tè e, con un po' di fortuna, una maiko. Alcune stradine sono private: segui i cartelli e non fotografare le persone.", "q": "Hanamikoji Street Gion Kyoto", "inc": false, "warn": ""}, {"id": "ky_nishiki", "city": "kyoto", "zone": "Centro", "name": "Mercato Nishiki", "jp": "錦市場", "cat": "Cibo", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tarda mattina o primo pomeriggio", "note": "La cucina di Kyoto, a pochi passi dall'hotel. Chiude presto. Evita di mangiare camminando.", "q": "Nishiki Market Kyoto", "inc": false, "warn": ""}, {"id": "ky_pontocho", "city": "kyoto", "zone": "Centro", "name": "Pontocho di sera", "jp": "先斗町", "cat": "Cibo", "min": 60, "pri": 2, "kid": false, "book": "consigliata", "best": "Cena", "note": "Vicolo stretto lungo il fiume Kamo, a due passi dall'hotel. Prenota se vuoi una cena di coppia.", "q": "Pontocho Alley Kyoto", "inc": false, "warn": ""}, {"id": "ky_philosopher", "city": "kyoto", "zone": "Higashiyama", "name": "Sentiero del Filosofo e Nanzen-ji", "jp": "哲学の道・南禅寺", "cat": "Natura e panorami", "min": 120, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Passeggiata lungo il canale tra i templi. A fine ottobre il foliage è ancora acerbo.", "q": "Philosopher's Path Kyoto", "inc": false, "warn": ""}, {"id": "ky_kimono", "city": "kyoto", "zone": "Gion", "name": "Passeggiata in kimono", "jp": "着物レンタル", "cat": "Esperienze", "min": 180, "pri": 2, "kid": true, "book": "consigliata", "best": "Mattina, prenotata", "note": "Noleggio con vestizione e foto a Gion o Higashiyama: un ricordo perfetto per un viaggio di nozze. Prenota online.", "q": "Kimono rental Kyoto Gion", "inc": false, "warn": ""}, {"id": "os_dotonbori", "city": "osaka", "zone": "Namba", "name": "Dotonbori e l'insegna Glico", "jp": "道頓堀", "cat": "Quartieri", "min": 120, "pri": 3, "kid": true, "book": "no", "best": "Sera", "note": "Neon, takoyaki e okonomiyaki. Il quartiere più Osaka di tutti: cena qui.", "q": "Dotonbori Osaka", "inc": false, "warn": ""}, {"id": "os_castle", "city": "osaka", "zone": "Osaka Castle", "name": "Castello di Osaka", "jp": "大阪城", "cat": "Templi e storia", "min": 90, "pri": 2, "kid": true, "book": "no", "best": "Primo pomeriggio", "note": "Parco e torre. Il giardino si gode anche solo da fuori; la torre chiude presto.", "q": "Osaka Castle", "inc": false, "warn": ""}, {"id": "os_kuromon", "city": "osaka", "zone": "Namba", "name": "Mercato Kuromon", "jp": "黒門市場", "cat": "Cibo", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tarda mattina", "note": "La cucina di Osaka: frutti di mare e carne alla griglia. Le bancarelle chiudono nel pomeriggio.", "q": "Kuromon Market Osaka", "inc": false, "warn": ""}, {"id": "os_umeda", "city": "osaka", "zone": "Umeda", "name": "Umeda Sky Building", "jp": "梅田スカイビル 空中庭園展望台", "cat": "Natura e panorami", "min": 60, "pri": 2, "kid": true, "book": "no", "best": "Tramonto", "note": "Terrazza panoramica circolare a 173 metri. Alternativa a una cena in centro.", "q": "Umeda Sky Building Osaka", "inc": false, "warn": ""}, {"id": "os_shinsekai", "city": "osaka", "zone": "Shinsekai", "name": "Shinsekai e Tsutenkaku", "jp": "新世界・通天閣", "cat": "Quartieri", "min": 75, "pri": 1, "kid": true, "book": "no", "best": "Sera", "note": "Quartiere retro con i kushikatsu (spiedini fritti). Più ruvido, ma pieno di carattere.", "q": "Tsutenkaku Tower Shinsekai Osaka", "inc": false, "warn": ""}, {"id": "os_kaiyukan", "city": "osaka", "zone": "Osaka Bay", "name": "Acquario Kaiyukan", "jp": "海遊館", "cat": "Esperienze", "min": 150, "pri": 1, "kid": true, "book": "no", "best": "Pomeriggio", "note": "Uno dei più grandi acquari del mondo, ideale con un bambino.", "q": "Osaka Aquarium Kaiyukan", "inc": false, "warn": ""}, {"id": "os_nakanoshima", "city": "osaka", "zone": "Kitahama", "name": "Passeggiata a Nakanoshima", "jp": "中之島公園", "cat": "Natura e panorami", "min": 45, "pri": 1, "kid": true, "book": "no", "best": "Appena arrivi, vicino all'hotel", "note": "Isola-giardino sul fiume, a pochi minuti dall'hotel di Kitahama. Ottima per rilassarti dopo il treno.", "q": "Nakanoshima Park Osaka", "inc": false, "warn": ""}];
+/* coordinate (lat, lon) dei luoghi del cruscotto */
+const LL={tk_senso:[35.7147651,139.7966553],tk_meiji:[35.6764,139.6993],tk_shibuya:[35.6585,139.7022],tk_teamlab:[35.6491,139.7898],tk_harajuku:[35.6716,139.7031],tk_tsukiji:[35.6655,139.7707],tk_shinjuku:[35.6930,139.6997],tk_gyoen:[35.6852,139.7101],tk_ueno:[35.7148,139.7740],tk_akiba:[35.6984,139.7731],tk_palace:[35.6852,139.7580],tk_skytree:[35.7101,139.8107],tk_ginza:[35.6717,139.7650],tk_kamakura:[35.3167,139.5359],
+ ta_sanmachi:[36.1415,137.2614],ta_jinya:[36.1393,137.2577],ta_folk:[36.1357,137.2370],ta_market:[36.1446,137.2595],ta_ropeway:[36.2867,137.5755],sg_ogimachi:[36.2576,136.9063],sg_shiroyama:[36.2620,136.9070],
+ kz_kenroku:[36.5621,136.6627],kz_higashi:[36.5725,136.6669],kz_omicho:[36.5714,136.6566],kz_castle:[36.5652,136.6596],kz_nagamachi:[36.5627,136.6497],kz_museum:[36.5608,136.6582],
+ ky_fushimi:[34.9671,135.7727],na_todaiji:[34.6890,135.8398],na_park:[34.6851,135.8430],ky_kiyomizu:[34.9949,135.7850],ky_arashiyama:[35.0170,135.6713],ky_kinkaku:[35.0394,135.7292],ky_gion:[35.0037,135.7752],ky_nishiki:[35.0050,135.7649],ky_pontocho:[35.0055,135.7708],ky_philosopher:[35.0212,135.7944],ky_kimono:[35.0036,135.7780],
+ os_dotonbori:[34.6687,135.5013],os_castle:[34.6873,135.5262],os_kuromon:[34.6654,135.5066],os_umeda:[34.7053,135.4906],os_shinsekai:[34.6525,135.5063],os_kaiyukan:[34.6545,135.4290],os_nakanoshima:[34.6930,135.5080]};
+ATT.forEach(a=>{ if(LL[a.id]) a.ll=LL[a.id]; });
+/* preferiti salvati da Michela su Google Maps (settembre 2026), con il mio consiglio (v: si / forse / no) */
+const FAV=[
+ {id:"mf_jangara",d:"2026-10-21",city:"tokyo",zone:"Harajuku",name:"Kyushu Jangara Ramen",cat:"Cibo",min:45,meal:1,kid:true,book:"no",v:"si",best:"Pranzo del 21, dopo Meiji Jingu",note:"Ramen tonkotsu in stile Kyushu, a due passi dalla stazione di Harajuku. Veloce, economico, va bene anche per Umberto.",why:"È esattamente sul percorso del 21, tra Meiji Jingu e Takeshita Street.",ll:[35.6696379,139.7033883],cid:"1540020763857042144",addr:"1-13-21 Jingumae, Shibuya, Tokyo"},
+ {id:"mf_marion",d:"2026-10-21",city:"tokyo",zone:"Harajuku",name:"Marion Crêpes",cat:"Cibo",min:20,meal:1,kid:true,book:"no",v:"si",best:"Merenda del 21 su Takeshita Street",note:"Le crêpe storiche di Harajuku, da mangiare in piedi davanti al chiosco.",why:"È la crêpe classica di Takeshita Street. Delle due crêperie salvate, scegli questa.",ll:[35.6712605,139.7048981],cid:"7863998576175866232",addr:"1-6-15 Jingumae, Shibuya, Tokyo"},
+ {id:"mf_sweetpalace",d:"2026-10-21",city:"tokyo",zone:"Harajuku",name:"Sweet Palace Crêpes",cat:"Cibo",min:20,meal:1,kid:true,book:"no",v:"no",best:"Solo come riserva",note:"Crêperie su Takeshita Street, a pochi metri da Marion.",why:"Stessa strada e stesso dolce di Marion. Tienila come riserva se lì c'è troppa coda.",ll:[35.6711808,139.7047294],cid:"3298274947206246999",addr:"1-16-6 Jingumae, Shibuya, Tokyo"},
+ {id:"mf_flippers",d:"2026-10-21",city:"tokyo",zone:"Shibuya",name:"Flipper's Shibuya",cat:"Cibo",min:45,meal:1,kid:true,book:"no",v:"forse",best:"Merenda del 21, prima di Shibuya Sky",note:"Pancake soufflé altissimi e morbidissimi. Spesso c'è coda: meglio a metà pomeriggio.",why:"È sulla strada tra Harajuku e Shibuya, ma dopo ramen e crêpe sarebbe il terzo dolce o pasto della giornata. Se lo volete, saltate la crêpe.",ll:[35.6635532,139.6995535],cid:"7607061285523302708",addr:"1-15-5 Jinnan, Shibuya, Tokyo"},
+ {id:"mf_misawa",d:"2026-10-21",city:"tokyo",zone:"Shibuya",name:"Misawa, soba in piedi",cat:"Cibo",min:45,meal:1,kid:true,book:"no",v:"si",best:"Cena del 21 a Shibuya",note:"Un ex konbini diventato bar di soba e udon fatti in casa, da mangiare in piedi. Tokyo vera, senza turisti, a circa 15 minuti a piedi da Shibuya.",why:"Chiude bene il primo giorno, costa poco e non serve prenotare. Si mangia in piedi: se Umberto è stanco, ripiegate su Shibuya.",ll:[35.6546292,139.6931607],cid:"15864038119582020184",addr:"9-7 Shinsencho, Shibuya, Tokyo"},
+ {id:"mf_uniqlo",d:"2026-10-22",city:"tokyo",zone:"Ginza",name:"Uniqlo Ginza, il negozio principale",cat:"Shopping",min:60,kid:true,book:"no",v:"si",best:"Sera del 22, prima di cena",note:"Dodici piani di Uniqlo, con capi e collaborazioni che in Italia non arrivano. Tax-free con il passaporto.",why:"È a cinque minuti da Sushiro. Comprate qui gli strati caldi per Okuhida e Shirakawa-go.",ll:[35.6702448,139.7634686],cid:"5036491705805576403",addr:"6-9-5 Ginza, Chuo, Tokyo"},
+ {id:"mf_sushiro",d:"2026-10-22",city:"tokyo",zone:"Ginza",name:"Sushiro Yurakucho",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"si",best:"Cena del 22 a Ginza",note:"Sushi sul nastro al 6° piano di Bic Camera, accanto a Ginza. Si ordina dal tablet, anche in inglese.",why:"La cena più divertente per Umberto e la più economica. C'è spesso coda: andate prima delle 18.",ll:[35.675413,139.76285],cid:"16481673796641751364",addr:"Bic Camera 6F, 1-11-1 Yurakucho, Chiyoda, Tokyo"},
+ {id:"mf_minoru",d:"2026-10-22",city:"tokyo",zone:"Ginza",name:"Minoru Shokudo, Mitsukoshi Ginza",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"forse",best:"Pranzo o cena a Ginza",note:"Il ristorante della cooperativa agricola giapponese al 9° piano del Mitsukoshi: piatti semplici con riso, verdure e carni delle varie prefetture.",why:"Alternativa a Sushiro se preferite mangiare seduti e tranquilli. Va bene anche per il pranzo del 22, dopo Tsukiji.",ll:[35.6711377,139.7660786],cid:"16431527554016273232",addr:"Ginza Mitsukoshi 9F, 4-6-16 Ginza, Chuo, Tokyo"},
+ {id:"mf_fujiya",d:"2026-10-22",city:"tokyo",zone:"Ginza",name:"Fujiya Restaurant Sukiyabashi",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"forse",best:"Merenda a Ginza",note:"Il ristorante della storica pasticceria Fujiya, quella della bambina Peko-chan: cucina all'occidentale in stile giapponese e dolci.",why:"Piacerà a Umberto per i dolci, ma con Sushiro e Minoru a pochi passi ne basta uno. Meglio come merenda.",ll:[35.6725158,139.7636706],cid:"8700190724604378849",addr:"Ginza Crystal Bldg 2F, 4-2-12 Ginza, Chuo, Tokyo"},
+ {id:"mf_royalhost",d:"2026-10-22",city:"tokyo",zone:"Ginza",name:"Royal Host Ginza",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"no",best:"Piano B",note:"Catena di family restaurant giapponesi: hamburger steak, curry, parfait. Comoda e affidabile.",why:"È una catena che trovate ovunque. Tenetela come piano B se Umberto vuole qualcosa di semplice.",ll:[35.6746541,139.7647909],cid:"4332065634806026951",addr:"Ginza Inz 2, Nishi-Ginza 2-2, Chuo, Tokyo"},
+ {id:"mf_hakuun",d:"2026-10-24",city:"takayama",zone:"Takayama città",name:"Futarishizuka Hakuun (ryokan)",cat:"Dormire",min:0,meal:1,kid:true,book:"obbligatoria",v:"si",pri:2,best:"Notte del 24, al posto del ryokan di Okuhida",note:"Ryokan sulla collina sopra Takayama, con vista sulla città, bagni termali e cena kaiseki. Il centro storico è vicino.",why:"È il preferito più utile di tutti: dormendo qui evitate circa tre ore di bus locale tra il 24 e il 25, vi godete Takayama con calma e potete prendere anche il bus delle 8:50 o delle 10:50 per Shirakawa-go. Chiedete all'agenzia se si può cambiare.",ll:[36.1402406,137.262593],cid:"15150520844317588558",addr:"67 Horibatamachi, Takayama, Gifu"},
+ {id:"mf_tamura",d:"2026-10-25",city:"kanazawa",zone:"Higashi Chaya",name:"Tamura, izakaya di pesce",cat:"Cibo",min:90,meal:1,kid:true,book:"consigliata",v:"si",best:"Cena del 25, dopo Higashi Chaya",note:"Izakaya kappo vicino al fiume Asano, a 5 minuti a piedi da Higashi Chaya: sashimi, pesce alla griglia, udon fatti a mano, granchio dalle vasche. Tel. +81 76-222-0517.",why:"La cena di Kanazawa più facile da far funzionare con Umberto. Fatevi prenotare dall'hotel: domenica sera molti locali chiudono presto.",ll:[36.5704636,136.6662592],cid:"8702902203214034235",addr:"2-18 Namikimachi, Kanazawa, Ishikawa"},
+ {id:"mf_busaku",d:"2026-10-25",city:"kanazawa",zone:"Higashi Chaya",name:"Busaku, kaiseki al bancone",cat:"Cibo",min:120,meal:1,kid:false,book:"obbligatoria",v:"forse",best:"Cena del 25, solo su prenotazione",note:"Bancone di 8 posti a Higashi Chaya: cucina giapponese con tocchi francesi, 10 portate la sera, lo chef spiega i piatti in inglese. Tel. +81 76-255-2034.",why:"Sarebbe la cena da viaggio di nozze perfetta, ma 10 portate al bancone con Umberto sono impegnative. Chiedete se accettano bambini e se aprono la domenica. Cancellazione gratuita fino a una settimana prima.",ll:[36.5721801,136.6664146],cid:"5196892244935817544",addr:"1-5-12 Kannonmachi, Kanazawa, Ishikawa"},
+ {id:"mf_shamaron",d:"2026-10-25",city:"kanazawa",zone:"Higashi Chaya",name:"Shamaron (syamaron.)",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"forse",best:"Pranzo, se l'orario lo permette",note:"Trattoria in una casetta gialla a 5 minuti da Higashi Chaya: piatti con le verdure del proprio orto e di Kaga, mini parfait.",why:"È soprattutto un posto da pranzo ed è chiuso il lunedì, mentre voi siete a Kanazawa domenica pomeriggio e lunedì mattina. Ha senso solo se domenica è aperto anche la sera: verificate su Google.",warn:"Chiuso il lunedì: il 26 ottobre non va bene.",ll:[36.574327,136.6653872],cid:"15627795294611083855",addr:"3-4-15 Higashiyama, Kanazawa, Ishikawa"}
+];
+FAV.forEach(f=>ATT.push(Object.assign({jp:"",pri:f.v==="si"?3:f.v==="forse"?2:1,inc:false,warn:"",fav:true,q:f.name.split(",")[0].replace(/ \(.*\)/,"")+", "+f.addr},f)));
+Object.assign(ATT.find(a=>a.id==="tk_senso"),{fav:true,v:"si",d:"2026-10-23",cid:"7785923974874169613",why:"Era già tra gli imperdibili, mattina presto del 23."});
 
 /* ---------- utilità ---------- */
 const $ = (s,r)=> (r||document).querySelector(s);
@@ -405,6 +460,8 @@ const fmt = n => Math.round(n).toLocaleString("it-IT");
 const ST = {ok:"Disponibile", req:"Su richiesta", todo:"Da organizzare", risk:"Da verificare"};
 const chip = (s,t)=> `<span class="chip ${s}">${t||ST[s]}</span>`;
 const gsearch = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+const placeUrl = a => a.cid ? "https://maps.google.com/?cid="+a.cid : gsearch(a.q);
+const verdictChip = v => v==="si"?chip("ok","Consigliato"):v==="forse"?chip("req","Forse"):chip("todo","Salterei");
 const gdir = (o,d,m)=> "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+"&travelmode="+(m||"transit");
 const MESI=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
 const GG=["dom","lun","mar","mer","gio","ven","sab"];
@@ -412,11 +469,11 @@ const GGL=["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","s
 
 /* ---------- dati del viaggio ---------- */
 const HOT = {
-  tokyo:{n:"the b Akasaka",q:"the b akasaka-mitsuke, Tokyo",stars:3,room:"Family 4 per 3 persone, non fumatori, solo pernottamento",dates:"20 → 24 ottobre",nights:4,st:"ok",note:"Nelle camere Family il bambino può non avere un letto proprio e la colazione dei bambini si paga sul posto."},
+  tokyo:{ll:[35.6714763,139.7330338],n:"the b Akasaka",q:"the b akasaka-mitsuke, Tokyo",stars:3,room:"Family 4 per 3 persone, non fumatori, solo pernottamento",dates:"20 → 24 ottobre",nights:4,st:"ok",note:"Nelle camere Family il bambino può non avere un letto proprio e la colazione dei bambini si paga sul posto."},
   okuhida:{n:"Ryokan Yakenoyu",q:"Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu",stars:3,room:"Camera giapponese con futon, vista montagna, mezza pensione",dates:"24 → 25 ottobre",nights:1,st:"req",note:"È a Okuhida, nella valle termale, a circa 80–90 minuti di bus da Takayama città. Quota soggetta a riconferma."},
-  kanazawa:{n:"Hotel Intergate Kanazawa",q:"Hotel Intergate Kanazawa",stars:4,room:"Standard Double con letto Queen, FUMATORI, solo pernottamento",dates:"25 → 26 ottobre",nights:1,st:"ok",note:"Con un bambino chiedi una camera non fumatori."},
-  kyoto:{n:"Hotel Gracery Kyoto Sanjo",q:"Hotel Gracery Kyoto Sanjo",stars:4,room:"Standard Double per 3 persone, non fumatori, solo pernottamento",dates:"26 → 29 ottobre",nights:3,st:"ok",note:"Conferma come sono sistemati i tre letti."},
-  osaka:{n:"The Royal Park Canvas Osaka Kitahama",q:"The Royal Park Canvas Osaka Kitahama",stars:4,room:"Deluxe Twin con 3 letti, non fumatori, solo pernottamento",dates:"29 → 30 ottobre",nights:1,st:"ok",note:"Una sola notte: lascia i bagagli e vai a Nakanoshima."}
+  kanazawa:{ll:[36.5682402,136.6535862],n:"Hotel Intergate Kanazawa",q:"Hotel Intergate Kanazawa",stars:4,room:"Standard Double con letto Queen, FUMATORI, solo pernottamento",dates:"25 → 26 ottobre",nights:1,st:"ok",note:"Con un bambino chiedi una camera non fumatori."},
+  kyoto:{ll:[35.0078272,135.7670939],n:"Hotel Gracery Kyoto Sanjo",q:"Hotel Gracery Kyoto Sanjo",stars:4,room:"Standard Double per 3 persone, non fumatori, solo pernottamento",dates:"26 → 29 ottobre",nights:3,st:"ok",note:"Conferma come sono sistemati i tre letti."},
+  osaka:{ll:[34.6909208,135.5069232],n:"The Royal Park Canvas Osaka Kitahama",q:"The Royal Park Canvas Osaka Kitahama",stars:4,room:"Deluxe Twin con 3 letti, non fumatori, solo pernottamento",dates:"29 → 30 ottobre",nights:1,st:"ok",note:"Una sola notte: lascia i bagagli e vai a Nakanoshima."}
 };
 const CITY = {
   tokyo:{n:"Tokyo",cap:21,ovh:1.3,origin:HOT.tokyo.q},
@@ -466,7 +523,7 @@ const TR = [
    {n:"Bus diretto Tokyo → Hirayu e bus locale",t:"circa 4h30 più 30 minuti",c:"5.300–6.200 JPY più bus locale",nt:"Salti Takayama città: guadagni tempo ma perdi Sanmachi Suji."},
    {n:"Taxi o navetta del ryokan",t:"circa 1 ora",c:"da chiedere",nt:"Il taxi costa molto. Chiedi al ryokan se offre un passaggio da Hirayu o da Takayama."}
   ],
-  tips:["Con la mezza pensione la cena è a orario fisso, di solito tra le 18:00 e le 19:00: arriva entro le 18:00.","Il ritorno del 25 ottobre pesa quanto l'andata: il bus per Kanazawa parte da Takayama.","Opzione B: chiedi all'agenzia di spostare la notte in un ryokan in centro a Takayama, se è ancora possibile."],
+  tips:["Con la mezza pensione la cena è a orario fisso, di solito tra le 18:00 e le 19:00: arriva entro le 18:00.","Il ritorno del 25 ottobre pesa quanto l'andata: il bus per Kanazawa parte da Takayama.","Opzione B: chiedi all'agenzia di spostare la notte a Takayama città, per esempio al ryokan Futarishizuka Hakuun che Michela ha già salvato."],
   dir:["JR Takayama Station","Ryokan Yakenoyu, 365 Okuhida Onsengo Nakao, Takayama, Gifu"]},
  {id:"t2",date:"25 ottobre",st:"req",title:"Okuhida → Takayama → Shirakawa-go → Kanazawa",
   sum:"Il bus Nohi da Takayama a Kanazawa è nel preventivo, su richiesta. Il voucher va stampato su carta.",
@@ -523,11 +580,11 @@ const PASS = {adult:50000, jrSingles:16500+7440+2500+580};
 const DAYS = [
  {d:"2026-10-19",c:"Milano",title:"Partenza",fx:[{t:"22:00",x:"Volo KE 928 Milano Malpensa → Seoul Incheon, arrivo alle 16:35 del 20",s:"ok"}],pl:[],w:[],tip:"Volo notturno di circa 11 ore: fai il check-in online e cerca di dormire. Un collo a testa."},
  {d:"2026-10-20",c:"Seoul e Tokyo",title:"Scalo a Seoul e arrivo a Tokyo",fx:[{t:"16:35",x:"Arrivo a Seoul Incheon",s:"ok"},{t:"18:35",x:"Volo KE 705 Seoul → Tokyo Narita",s:"ok"},{t:"21:05",x:"Arrivo a Narita e trasferimento privato in hotel, solo autista",s:"req"},{t:"in serata",x:"Check-in al the b Akasaka, camera Family 4",s:"ok"}],pl:[],w:["Lo scalo è di due ore: resta nell'area transiti e vai subito al gate."],tip:"Arriverai in hotel verso le 23: cena leggera in aeroporto o in un konbini vicino all'hotel. Mostra i codici di Visit Japan Web per far prima all'arrivo."},
- {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:[],t:"Cena a Shibuya e a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
- {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","tk_shinjuku"],t:"Scegli una delle due, non entrambe."}],w:[],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
+ {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Pranzo e merenda",ids:["mf_jangara","mf_marion","mf_sweetpalace","mf_flippers"],t:"Ramen da Jangara, poi una crêpe su Takeshita Street: delle due salvate da Michela basta Marion. Flipper's solo se rinunciate alla crêpe."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:["mf_misawa"],t:"Cena a Shibuya: soba e udon in piedi da Misawa, a circa 15 minuti a piedi dall'incrocio. Poi a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
+ {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","mf_uniqlo","mf_sushiro","mf_minoru","mf_fujiya","mf_royalhost","tk_shinjuku"],t:"Ginza, dove Michela ha salvato cinque posti: Uniqlo, poi cena da Sushiro (sushi sul nastro, perfetto con Umberto) oppure da Minoru Shokudo. Shinjuku diventa l'alternativa: non tutte e due."}],w:[],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
  {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto (1 collo a persona, consegna in 36–48 ore)",s:"req"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:[],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Dopo il ritiro hai solo il bagaglio piccolo fino al 26: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere."},
- {d:"2026-10-24",c:"Tokyo → Okuhida",title:"Dalla metropoli alle montagne",fx:[{t:"mattina",x:"Check-out dall'hotel di Tokyo",s:"ok"},{t:"15:00–18:00",x:"Check-in al Ryokan Yakenoyu, mezza pensione",s:"req"}],pl:[{w:"Mattina",ids:[],t:"Treno Tokyo → Nagoya → Takayama, con partenza entro le 9:30 (circa 4h30–5h)."},{w:"Primo pomeriggio",ids:["ta_sanmachi"],t:"Un'ora e mezza nel centro storico, con pranzo di manzo Hida."},{w:"Fine pomeriggio",ids:["ta_onsen"],t:"Bus locale per Okuhida (80–90 minuti), onsen e cena al ryokan."}],w:["Il ryokan è a Okuhida e non a Takayama: se perdi il bus delle 16:30 circa arrivi dopo l'ora di cena.","Il preventivo non comprende né il treno né il bus locale."],tip:"Una notte in ryokan si gode solo se arrivi con la luce. Non allungare la sosta a Takayama."},
- {d:"2026-10-25",c:"Okuhida → Kanazawa",title:"Shirakawa-go e arrivo a Kanazawa",fx:[{t:"8:50, 10:50 o 11:50",x:"Bus Nohi Takayama → Shirakawa-go → Kanazawa, con voucher cartaceo",s:"req"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa (nel preventivo è una camera fumatori)",s:"ok"}],pl:[{w:"Mattina",ids:[],t:"Colazione al ryokan e bus locale verso Takayama (circa 90 minuti)."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi"],t:"Higashi Chaya all'imbrunire e cena a Kanazawa."}],w:["Con il bus delle 10:50 il margine dal bus locale è di soli 19 minuti: valuta quello delle 11:50.","Domenica: Shirakawa-go è affollata."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
+ {d:"2026-10-24",c:"Tokyo → Okuhida",title:"Dalla metropoli alle montagne",fx:[{t:"mattina",x:"Check-out dall'hotel di Tokyo",s:"ok"},{t:"15:00–18:00",x:"Check-in al Ryokan Yakenoyu, mezza pensione",s:"req"}],pl:[{w:"Mattina",ids:[],t:"Treno Tokyo → Nagoya → Takayama, con partenza entro le 9:30 (circa 4h30–5h)."},{w:"Primo pomeriggio",ids:["ta_sanmachi"],t:"Un'ora e mezza nel centro storico, con pranzo di manzo Hida."},{w:"Fine pomeriggio",ids:["ta_onsen"],t:"Bus locale per Okuhida (80–90 minuti), onsen e cena al ryokan."},{w:"Alternativa",ids:["mf_hakuun"],t:"Futarishizuka Hakuun, il ryokan sopra Takayama salvato da Michela. Se l'agenzia riesce a spostare la notte, la giornata si semplifica: niente bus per Okuhida."}],w:["Il ryokan è a Okuhida e non a Takayama: se perdi il bus delle 16:30 circa arrivi dopo l'ora di cena.","Il preventivo non comprende né il treno né il bus locale."],tip:"Una notte in ryokan si gode solo se arrivi con la luce. Non allungare la sosta a Takayama."},
+ {d:"2026-10-25",c:"Okuhida → Kanazawa",title:"Shirakawa-go e arrivo a Kanazawa",fx:[{t:"8:50, 10:50 o 11:50",x:"Bus Nohi Takayama → Shirakawa-go → Kanazawa, con voucher cartaceo",s:"req"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa (nel preventivo è una camera fumatori)",s:"ok"}],pl:[{w:"Mattina",ids:[],t:"Colazione al ryokan e bus locale verso Takayama (circa 90 minuti)."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi","mf_tamura","mf_busaku","mf_shamaron"],t:"Higashi Chaya all'imbrunire, poi cena a pochi passi: Tamura (izakaya di pesce) oppure Busaku (kaiseki da 8 posti, da prenotare). Scegline uno."}],w:["Con il bus delle 10:50 il margine dal bus locale è di soli 19 minuti: valuta quello delle 11:50.","Domenica: Shirakawa-go è affollata."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
  {d:"2026-10-26",c:"Kanazawa → Kyoto",title:"Il giardino al mattino e il treno per Kyoto",fx:[{t:"dalle 15:00",x:"Check-in all'Hotel Gracery Kyoto Sanjo, 3 notti",s:"ok"}],pl:[{w:"Mattina",ids:["kz_kenroku","kz_castle"],t:"Kenroku-en all'apertura (8:00), poi il parco del castello di fronte."},{w:"Pranzo",ids:["kz_omicho"],t:"Ciotola di pesce al mercato Omicho."},{w:"Primo pomeriggio",ids:[],t:"Treno per Kyoto con partenza tra le 12:30 e le 13:30 (circa 2h15–2h30, cambio a Tsuruga)."},{w:"Sera",ids:["ky_nishiki","ky_pontocho"],t:"Nishiki chiude presto; più tardi Pontocho per cena."}],w:["Il Museo del XXI secolo di Kanazawa è chiuso il lunedì.","Le valigie spedite da Tokyo devono essere già in hotel: conferma all'arrivo."],tip:"Il Kenroku-en da metà ottobre chiude presto: l'apertura delle 8:00 è il momento migliore."},
  {d:"2026-10-27",c:"Kyoto",title:"Nara e Fushimi Inari con la guida",fx:[{t:"giornata intera",x:"Escursione Nara e Fushimi Inari, gruppo con guida in italiano",s:"req"}],pl:[{w:"Giornata",ids:["na_todaiji","na_park","ky_fushimi"],t:"È tutto compreso nel tour. Treni e ingressi si pagano sul posto."},{w:"Sera",ids:["ky_pontocho"],t:"Cena vicino all'hotel."}],w:["Nel preventivo l'escursione risulta per 2 adulti: verifica che Umberto sia incluso.","Penale del 100% se annulli da 15 giorni prima, cioè dal 12 ottobre."],tip:"Porta contanti per gli ingressi e scarpe comode: a Fushimi si cammina molto."},
  {d:"2026-10-28",c:"Kyoto",title:"Kyoto ovest: Arashiyama e Kinkaku-ji",fx:[],pl:[{w:"Mattina presto",ids:["ky_arashiyama"],t:"Alle 7:30 il bosco di bambù è ancora tuo."},{w:"Pomeriggio",ids:["ky_kinkaku"],t:"Il Padiglione d'Oro, sullo stesso lato della città."},{w:"Tramonto",ids:["ky_gion","ky_kimono"],t:"Gion con calma. Se hai prenotato il kimono, la mattina è meglio di questa fascia."}],w:[],tip:"Dal centro ad Arashiyama servono 30–40 minuti: parti presto e torna per cena."},
@@ -536,7 +593,7 @@ const DAYS = [
 ];
 
 const CHK = [
- {g:"agenzia",id:"c1",sev:"alta",t:"Ryokan di Okuhida: orari e trasferimenti",x:"Il Ryokan Yakenoyu è a Okuhida (365 Okuhida Onsengo Nakao), a circa 80–90 minuti di bus da Takayama. Chiedi se c'è una navetta, a che ora devi arrivare per la cena e se è ancora possibile spostare la notte in un ryokan in centro a Takayama."},
+ {g:"agenzia",id:"c1",sev:"alta",t:"Ryokan di Okuhida: orari e trasferimenti",x:"Il Ryokan Yakenoyu è a Okuhida (365 Okuhida Onsengo Nakao), a circa 80–90 minuti di bus da Takayama. Chiedi se c'è una navetta, a che ora devi arrivare per la cena e se è ancora possibile spostare la notte a Takayama città: Michela ha salvato Futarishizuka Hakuun, un ryokan sopra il centro, proponilo come alternativa."},
  {g:"agenzia",id:"c2",sev:"alta",t:"Voucher del bus Nohi stampati su carta",x:"I voucher digitali non sono accettati: senza carta non sali e non c'è rimborso. Fatti inviare i voucher definitivi, stampali e conferma l'orario (di default 10:50)."},
  {g:"agenzia",id:"c3",sev:"alta",t:"Escursione Nara e Fushimi Inari: c'è anche Umberto?",x:"Nel preventivo l'escursione risulta per 2 adulti, mentre è prevista una tariffa bambino. Chiedi conferma, orario e punto di ritrovo. Penale del 100% da 15 giorni prima, cioè dal 12 ottobre."},
  {g:"agenzia",id:"c4",sev:"alta",t:"Kanazawa: camera non fumatori",x:"All'Hotel Intergate la camera nel preventivo è una Standard Double fumatori. Con un bambino chiedi il cambio."},
@@ -548,6 +605,7 @@ const CHK = [
  {g:"online",id:"o2",sev:"alta",t:"teamLab Planets con slot orario",x:"L'ingresso è a orario e si esaurisce. Punta al pomeriggio del 22 ottobre.",l:[["Sito ufficiale","https://www.teamlab.art/e/planets/"]]},
  {g:"online",id:"o3",sev:"media",t:"Shibuya Sky al tramonto",x:"Prenota lo slot verso le 16:30 del 21 ottobre: il tramonto è verso le 17.",l:[["Sito ufficiale","https://www.shibuya-scramble-square.com/sky/"]]},
  {g:"online",id:"o4",sev:"media",t:"Cena di coppia a Kyoto",x:"Il 27 o il 28 ottobre: un kaiseki o un tavolo a Pontocho. I posti migliori vanno prenotati con anticipo."},
+ {g:"online",id:"o7",sev:"media",t:"Cena a Kanazawa del 25 ottobre (preferiti di Michela)",x:"È domenica sera: prenotate. Tamura, izakaya di pesce, tel. +81 76-222-0517 (o fatevi aiutare dall'hotel). Busaku, kaiseki al bancone da 8 posti, tel. +81 76-255-2034: solo su prenotazione, chiedete se accettano bambini."},
  {g:"online",id:"o5",sev:"bassa",t:"Kimono a Kyoto (facoltativo)",x:"Noleggio con vestizione e foto: prenota online per il 28 ottobre. Richiede 2–3 ore."},
  {g:"online",id:"o6",sev:"media",t:"Biglietto Kanazawa → Kyoto",x:"Si compra in stazione a Kanazawa il 26 ottobre. Allo sportello JR West chiedi il biglietto per turisti stranieri (circa 6.500 JPY adulto invece di circa 7.400): serve il passaporto. Il Thunderbird è a posti riservati."},
  {g:"doc",id:"d1",sev:"alta",t:"Visit Japan Web",x:"Registra passaporti, immigrazione e dogana prima di partire e salva i codici QR: a Narita risparmi la fila.",l:[["Visit Japan Web","https://www.vjw.digital.go.jp/"]]},
@@ -575,7 +633,7 @@ const EXPECT = [
 ];
 
 /* ---------- stato ---------- */
-const defSel = () => ATT.filter(a=>a.pri===3||a.inc).map(a=>a.id);
+const defSel = () => ATT.filter(a=>(a.pri===3||a.inc)&&a.cat!=="Dormire").map(a=>a.id);
 const S = {
   view: store.get("view","percorso"),
   sel: new Set(store.get("sel",defSel())),
@@ -589,6 +647,13 @@ const S = {
   node:null, leg:null, region:"all"
 };
 const ATTM = {}; ATT.forEach(a=>ATTM[a.id]=a);
+S.ffav=false;
+S.mapmode=GM_KEY?store.get("mapmode","google"):"schema";
+S.lay=Object.assign({plan:true,other:false,fav:true,hot:true},store.get("lay",{}));
+if(!store.get("favinit",false)){
+  ATT.filter(a=>a.fav&&a.v==="si"&&a.cat!=="Dormire").forEach(a=>S.sel.add(a.id));
+  try{ localStorage.setItem("jp26_sel",JSON.stringify(Array.from(S.sel))); localStorage.setItem("jp26_favinit","true"); }catch(e){}
+}
 
 /* ---------- testata ---------- */
 function parseD(s){ const p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
@@ -720,7 +785,7 @@ function applyBox(){
 }
 let anim=null;
 function setRegion(name){
-  S.region=name; const t=REG[name];
+  S.region=name; const t=REG[name]; gmapFit(name);
   $$("#zoom button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.id===name)));
   const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(anim) cancelAnimationFrame(anim);
@@ -789,12 +854,16 @@ function renderDays(){
   $("#days").innerHTML=DAYS.map((D,i)=>{
     const dt=parseD(D.d);
     const fx=D.fx.map(f=>`<div class="fx"><span class="t">${f.t}</span><span>${f.x}</span>${chip(f.s)}</div>`).join("");
-    const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}">${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
+    const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}">${a.fav?"♥ ":""}${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
     const w=D.w.map(x=>`<div class="warn">${x}</div>`).join("");
+    const rp=[].concat.apply([],D.pl.map(b=>b.ids)).filter((id,k,arr)=>arr.indexOf(id)===k&&S.sel.has(id)&&ATTM[id]&&ATTM[id].cat!=="Dormire").map(id=>ATTM[id]);
+    const pt=a=>a.ll?a.ll.join(","):a.q;
+    const route=rp.length>=2?`<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pt(rp[0]))}&destination=${encodeURIComponent(pt(rp[rp.length-1]))}${rp.length>2?"&waypoints="+encodeURIComponent(rp.slice(1,-1).map(pt).join("|")):""}">Giro del giorno su Google Maps (${rp.length} tappe)</a>`
+      :rp.length===1?`<a class="btn small" target="_blank" rel="noopener" href="${placeUrl(rp[0])}">${esc(rp[0].name)} su Google Maps</a>`:"";
     return `<article class="day${ti===i?" today":""}">
       <div class="stub"><div class="gg">${GG[dt.getDay()]}</div><div class="nn">${dt.getDate()}</div><div class="mm">${MESI[dt.getMonth()]}</div></div>
       <div class="daybody"><div class="dayhead"><h3>${D.title}</h3><span class="chip todo" style="background:var(--paper);color:var(--muted)">${D.c}</span>${ti===i?'<span class="seal">Oggi</span>':""}</div>
-      ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}
+      ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}${route?`<div class="acts" style="margin-top:6px">${route}</div>`:""}
       <textarea class="note" data-act="note" data-id="${D.d}" aria-label="Note del ${dt.getDate()} ${MESI[dt.getMonth()]}" placeholder="Note vostre: ristoranti, orari, prenotazioni…">${esc(S.notes[D.d]||"")}</textarea></div></article>`;
   }).join("");
 }
@@ -827,14 +896,14 @@ function renderLegs(){
 function cap(city){ const c=CITY[city]; const base=(city==="takayama"&&S.town)?c.capTown:c.cap; return base*S.pace; }
 function renderBudget(){
   const rows=Object.keys(CITY).filter(k=>CITY[k].cap>0).map(k=>{
-    const its=ATT.filter(a=>a.city===k&&!a.inc&&S.sel.has(a.id));
+    const its=ATT.filter(a=>a.city===k&&!a.inc&&!a.meal&&S.sel.has(a.id));
     const used=its.reduce((s,a)=>s+a.min,0)/60*CITY[k].ovh, c=cap(k), r=used/c;
     const cls=r>1?"over":r>.85?"warnb":"";
     const txt=r>1?`Troppo: togli circa ${(used-c).toFixed(1).replace(".",",")} h`:r>.85?"Quasi pieno":its.length?"Hai ancora spazio":"Nessun luogo scelto";
     return `<div class="brow ${cls}"><span><b>${CITY[k].n}</b></span><div class="bar"><i style="width:${Math.min(100,r*100).toFixed(0)}%"></i></div><span class="st">${used.toFixed(1).replace(".",",")} di ${c.toFixed(1).replace(".",",")} h. ${txt}</span></div>`;
   }).join("");
   const n=S.sel.size;
-  $("#budget").innerHTML=`<h3>Quanto spazio hai</h3><p class="muted">Le ore includono gli spostamenti in città. Nara e Fushimi Inari non pesano: sono nel tour del 27.</p>
+  $("#budget").innerHTML=`<h3>Quanto spazio hai</h3><p class="muted">Le ore includono gli spostamenti in città. Ristoranti e dolci non pesano (si mangia comunque), e nemmeno Nara e Fushimi Inari: sono nel tour del 27.</p>
    <div class="setrow"><span><b>Ritmo</b></span>
     ${[[.8,"Tranquillo"],[1,"Normale"],[1.2,"Intenso"]].map(p=>`<label><input type="radio" name="pace" data-act="pace" value="${p[0]}" ${S.pace===p[0]?"checked":""}> ${p[1]}</label>`).join("")}
     <label><input type="checkbox" data-act="town" ${S.town?"checked":""}> Dormo a Takayama città (se cambio ryokan)</label></div>
@@ -843,11 +912,12 @@ function renderBudget(){
    <p class="muted" style="margin:8px 0 0">${n} luoghi scelti.</p>`;
 }
 function renderFilters(){
-  const cats=["Templi e storia","Natura e panorami","Quartieri","Cibo","Esperienze"];
+  const cats=["Templi e storia","Natura e panorami","Quartieri","Cibo","Esperienze","Shopping","Dormire"];
   const cities=Object.keys(CITY);
   $("#filters").innerHTML=`<button class="fbtn" data-act="fcity" data-id="all" aria-pressed="${S.fcity==="all"}">Tutte le città</button>`+
    cities.map(c=>`<button class="fbtn" data-act="fcity" data-id="${c}" aria-pressed="${S.fcity===c}">${CITY[c].n} (${ATT.filter(a=>a.city===c&&S.sel.has(a.id)).length})</button>`).join("")+
    `<span style="flex-basis:100%"></span><label class="muted" for="fcat">Tipo</label><select id="fcat" data-act="fcat"><option value="all">Tutti</option>${cats.map(c=>`<option ${S.fcat===c?"selected":""}>${c}</option>`).join("")}</select>
+    <button class="fbtn" data-act="ffav" aria-pressed="${S.ffav}">♥ Preferiti di Michela</button>
     <button class="fbtn" data-act="fkid" aria-pressed="${S.fkid}">Adatte a un bambino</button>
     <button class="fbtn" data-act="fpri" aria-pressed="${S.fpri}">Solo imperdibili e consigliate</button>`;
 }
@@ -855,28 +925,37 @@ function attCard(a){
   const on=S.sel.has(a.id);
   const pri=a.pri===3?'<span class="seal" title="Imperdibile">必見</span>':a.pri===2?'<span class="tag">Consigliata</span>':'<span class="tag dim">Se hai tempo</span>';
   const org=a.zone==="Okuhida"?HOT.okuhida.q:CITY[a.city].origin;
-  const hrs=a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
-  return `<article class="att${on?" is-sel":""}">
-   <div class="row1">${pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
+  const hrs=a.cat==="Dormire"?"alternativa per la notte":a.meal?"pasto, non pesa sul tempo":a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
+  return `<article class="att${on?" is-sel":""}${a.fav?" is-fav":""}">
+   <div class="row1">${a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
    <h3>${a.name}</h3><div class="jp" lang="ja">${a.jp}</div>
    <div class="meta"><span>${a.cat}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}${a.inc?'<span class="chip ok">Già nel preventivo</span>':""}</div>
-   <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.warn?`<div class="warn">${a.warn}</div>`:""}
+   <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}
    <div class="acts"><button class="btn small" data-act="toggle" data-id="${a.id}" aria-pressed="${on}">${on?"Nel piano":"Aggiungi al piano"}</button>
    <button class="btn small primary" data-act="detail" data-kind="att" data-id="${a.id}">Dettagli</button>
-   <a class="btn small" target="_blank" rel="noopener" href="${gsearch(a.q)}">Mappa</a>
+   <a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Mappa</a>
    <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Dall'hotel</a></div></article>`;
 }
 function renderGrid(){
-  let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2));
+  let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2)&&(!S.ffav||a.fav));
   const order=Object.keys(CITY);
   list.sort((a,b)=>order.indexOf(a.city)-order.indexOf(b.city)||b.pri-a.pri);
   $("#grid").innerHTML=list.length?list.map(attCard).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
 }
-function renderAtt(){ renderBudget(); renderFilters(); renderGrid(); }
+function renderAtt(){ renderFavBox(); renderBudget(); renderFilters(); renderGrid(); }
+function renderFavBox(){
+  const F=ATT.filter(a=>a.fav).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:b.pri-a.pri);
+  const n=v=>F.filter(a=>a.v===v).length;
+  const days=F.map(a=>a.d).filter((d,k,arr)=>arr.indexOf(d)===k);
+  $("#favbox").innerHTML=`<h3><span class="heart" style="font-size:1.1rem">♥</span> I preferiti di Michela</h3>
+   <p class="muted" style="margin-top:4px">Dal suo Google Maps: 20 posti in Giappone. I quattro hotel e la stazione dei bus di Takayama erano già nel cruscotto; gli altri ${F.length} li ho messi nei giorni in cui ci passate. Il mio consiglio: <b>${n("si")} sì</b>, <b>${n("forse")} forse</b>, <b>${n("no")} da saltare</b>. Tocca un nome per aggiungerlo o toglierlo dal piano.</p>
+   ${days.map(d=>{ const dt=parseD(d); return `<div class="favday"><h4>${GGL[dt.getDay()]} ${dt.getDate()} ottobre</h4>`+F.filter(a=>a.d===d).map(a=>`<div class="favrow"><button class="pill chipbtn" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${esc(a.name)}</button><span>${verdictChip(a.v)}</span><span>${a.why} <a href="#" data-act="detail" data-kind="att" data-id="${a.id}" onclick="return false">Scheda</a></span></div>`).join("")+`</div>`; }).join("")}
+   <div class="acts"><button class="btn small" data-act="favday">Mostra solo i suoi preferiti</button></div>`;
+}
 function toggle(id){
   if(S.sel.has(id)) S.sel.delete(id); else S.sel.add(id);
   store.set("sel",Array.from(S.sel));
-  renderHead(); renderAtt(); renderDays(); renderPanel();
+  renderHead(); renderAtt(); renderDays(); renderPanel(); gmapMarkers();
 }
 function planText(){
   let t="Il nostro piano in Giappone, 19-30 ottobre 2026\n";
@@ -961,9 +1040,9 @@ function openModal(kind,id){
     const org=a.zone==="Okuhida"?HOT.okuhida.q:CITY[a.city].origin;
     const hrs=a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
     body=`<div class="meta" style="display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.88rem;color:var(--muted);margin:2px 0 8px"><span>${a.cat}</span><span>${CITY[a.city].n}, ${a.zone}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}</div>
-      <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.warn?`<div class="warn">${a.warn}</div>`:""}`;
+      ${a.fav?'<p class="heart" style="margin:0 0 4px">♥ Salvato da Michela</p>':""}<p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}`;
     acts=`<button class="btn small" id="mtoggle" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${S.sel.has(a.id)?"Nel piano":"Aggiungi al piano"}</button>
-      <a class="btn small" target="_blank" rel="noopener" href="${gsearch(a.q)}">Apri in Google Maps</a>
+      <a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Apri in Google Maps</a>
       <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Come arrivare dall'hotel</a>`;
   } else {
     const h=HOT[id]; name=h.n; q=h.q;
@@ -985,6 +1064,79 @@ function refreshModalBtn(){
   const on=S.sel.has(mCur.id); b.setAttribute("aria-pressed",String(on)); b.textContent=on?"Nel piano":"Aggiungi al piano";
 }
 
+/* ---------- Google Maps nella scheda Percorso ---------- */
+const LKC={ok:"#18A874",req:"#E8A100",todo:"#3F7BEA",risk:"#E5484D"};
+const REGLL={all:[33.9,134.9,37.1,140.2],tokyo:[35.62,139.68,35.73,139.83],alps:[35.95,136.55,36.65,137.65],kansai:[34.6,135.4,35.08,135.9]};
+const geoCache=store.get("geo",{});
+let GM=null, gmFail="";
+window.gm_authFailure=function(){ gmFail="Google ha rifiutato la chiave: controlla che il sito sia tra i referrer consentiti e che le API siano abilitate."; GM=null; const b=$("#gmapMain"); if(b) b.innerHTML=`<p class="gmerr">${gmFail}</p>`; };
+function renderMapMode(){
+  const g=S.mapmode==="google"&&!!GM_KEY;
+  const L=[["plan","Il mio piano","#18A874"],["fav","♥ Michela","#D6457A"],["hot","Hotel","#1B2A46"],["other","Altri luoghi","#8C97AD"]];
+  $("#mapmode").innerHTML=[["google","Google Maps"],["schema","Schematica"]].map(m=>`<button class="fbtn" data-act="mapmode" data-id="${m[0]}" aria-pressed="${(g?"google":"schema")===m[0]}"${m[0]==="google"&&!GM_KEY?' disabled title="Serve la chiave Google Maps"':""}>${m[1]}</button>`).join("")
+    +(g?`<span class="layers">${L.map(l=>`<label><input type="checkbox" data-act="lay" data-id="${l[0]}" ${S.lay[l[0]]?"checked":""}><i style="background:${l[2]}"></i>${l[1]}</label>`).join("")}</span>`:"");
+  $("#map").style.display=g?"none":""; $("#gmapMain").hidden=!g;
+  $("#mapcap").textContent=g?"Tocca un segnaposto per la scheda: verde = nel tuo piano, rosa = salvato da Michela, H = hotel. Le linee sono le tratte del viaggio.":"Mappa schematica, non in scala. Passa a Google Maps per la mappa vera.";
+  if(g&&!GM) gmapInit(); if(!g) applyBox();
+}
+async function gmapInit(){
+  const box=$("#gmapMain");
+  if(gmFail){ box.innerHTML=`<p class="gmerr">${gmFail}</p>`; return; }
+  try{
+    await loadGM();
+    const mp=await google.maps.importLibrary("maps"), mk=await google.maps.importLibrary("marker");
+    if(GM||gmFail) return;
+    GM={map:new mp.Map(box,{mapId:"DEMO_MAP_ID",center:{lat:35.6,lng:137.4},zoom:6,gestureHandling:"cooperative",mapTypeControl:false,streetViewControl:false,clickableIcons:false}),info:new mp.InfoWindow(),AM:mk.AdvancedMarkerElement,marks:[],infoKey:null};
+    GM.info.addListener("closeclick",()=>{ GM.infoKey=null; });
+    EDGES.forEach(e=>{
+      const A=NODES[e.a],B=NODES[e.b],st=TRM[e.leg].st,c=LKC[st],dash=st==="todo"||st==="risk";
+      const pl=new mp.Polyline({map:GM.map,path:[{lat:A.lat,lng:A.lon},{lat:B.lat,lng:B.lon}],strokeColor:c,strokeOpacity:dash?0:.85,strokeWeight:4,zIndex:1,
+        icons:dash?[{icon:{path:"M 0,-1 0,1",strokeOpacity:1,strokeColor:c,strokeWeight:4,scale:2},offset:"0",repeat:st==="risk"?"10px":"16px"}]:[]});
+      pl.addListener("click",()=>selLeg(e.leg));
+    });
+    gmapMarkers(); gmapFit(S.region);
+  }catch(e){ GM=null; box.innerHTML=`<p class="gmerr">${e&&e.message==="nokey"?"Manca la chiave Google Maps.":"Google Maps non è raggiungibile da questa pagina. Usa la mappa schematica e i pulsanti Google Maps nelle schede."}</p>`; }
+}
+function gmapFit(r){ if(!GM) return; const b=REGLL[r]||REGLL.all; GM.map.fitBounds({south:b[0],west:b[1],north:b[2],east:b[3]},24); }
+function pinEl(cls,txt){ const d=document.createElement("div"); d.className="gpin "+cls; d.textContent=txt; return d; }
+function gmapGeocode(it){
+  gmapGeocode.busy=gmapGeocode.busy||{}; if(gmapGeocode.busy[it.key]) return; gmapGeocode.busy[it.key]=1;
+  fetchPlace(it.q).then(p=>{ const l=p.location; geoCache[it.key]=[typeof l.lat==="function"?l.lat():l.lat,typeof l.lng==="function"?l.lng():l.lng]; store.set("geo",geoCache); gmapMarkers(); }).catch(()=>{});
+}
+function gmapMarkers(){
+  if(!GM) return;
+  GM.marks.forEach(m=>{ m.map=null; }); GM.marks=[];
+  const add=it=>{
+    const ll=it.ll||geoCache[it.key]; if(!ll){ gmapGeocode(it); return; }
+    const m=new GM.AM({map:GM.map,position:{lat:ll[0],lng:ll[1]},title:it.name,content:pinEl(it.cls,it.txt),zIndex:it.z});
+    m.addListener("click",()=>gmapOpen(it,m));
+    GM.marks.push(m);
+    if(GM.infoKey===it.key) gmapOpen(it,m);
+  };
+  if(S.lay.hot) Object.keys(HOT).forEach(k=>add({key:"hot:"+k,kind:"hot",id:k,name:HOT[k].n,ll:HOT[k].ll,q:HOT[k].q,cls:"hot",txt:"H",z:30}));
+  ATT.forEach(a=>{
+    const sel=S.sel.has(a.id);
+    if(!((a.fav&&S.lay.fav)||(sel&&S.lay.plan)||(!sel&&!a.fav&&S.lay.other))) return;
+    const key=a.id==="ta_onsen"?"hot:okuhida":a.id;
+    if(key!==a.id&&S.lay.hot) return;
+    add({key:key,kind:"att",id:a.id,name:a.name,ll:a.ll,q:a.q,cls:(a.fav?"fav":sel?"plan":"other")+(sel?" sel":""),txt:a.fav?"♥":sel?"✓":"",z:sel?20:a.fav?15:10});
+  });
+}
+function gmapOpen(it,m){
+  GM.infoKey=it.key;
+  const d=document.createElement("div"); d.className="ginfo";
+  if(it.kind==="hot"){
+    const h=HOT[it.id];
+    d.innerHTML=`<b>${esc(h.n)}</b><br><span style="color:var(--muted)">${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span><div class="acts" style="margin-top:8px"><button class="btn small primary" data-act="detail" data-kind="hot" data-id="${it.id}">Scheda hotel</button><a class="btn small" target="_blank" rel="noopener" href="${gsearch(h.q)}">Google Maps</a></div>`;
+  } else {
+    const a=ATTM[it.id], on=S.sel.has(a.id);
+    d.innerHTML=`<b>${esc(a.name)}</b>${a.fav?' <span class="heart">♥ Michela</span>':""}<br><span style="color:var(--muted)">${CITY[a.city].n}, ${esc(a.zone)}</span>
+      <p style="margin:6px 0 0">${a.v?verdictChip(a.v)+" "+a.why:"<b>Quando:</b> "+a.best+"."}</p>
+      <div class="acts" style="margin-top:8px"><button class="btn small" data-act="toggle" data-id="${a.id}" aria-pressed="${on}">${on?"Nel piano":"Aggiungi al piano"}</button><button class="btn small primary" data-act="detail" data-kind="att" data-id="${a.id}">Dettagli</button><a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Google Maps</a></div>`;
+  }
+  GM.info.setContent(d); GM.info.open({map:GM.map,anchor:m,shouldFocus:false});
+}
+
 /* ---------- esportazioni ---------- */
 function download(name,text,type){
   const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:type}));
@@ -992,9 +1144,9 @@ function download(name,text,type){
 }
 function downloadCSV(onlySel){
   const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
-  const rows=[["Nome","Indirizzo per la ricerca","Categoria","Città","Note"]];
-  Object.keys(HOT).forEach(k=>{ const h=HOT[k]; rows.push([h.n,h.q+", Japan","Hotel",k==="okuhida"?"Okuhida":NODES[k].n,`${h.dates}. ${h.room}`]); });
-  ATT.filter(a=>!onlySel||S.sel.has(a.id)).forEach(a=>rows.push([a.name,a.q+", Japan",a.cat,CITY[a.city].n,`${a.best}. ${a.note}`]));
+  const rows=[["Nome","Indirizzo per la ricerca","Categoria","Città","Latitudine","Longitudine","Note"]];
+  Object.keys(HOT).forEach(k=>{ const h=HOT[k]; rows.push([h.n,h.q+", Japan","Hotel",k==="okuhida"?"Okuhida":NODES[k].n,h.ll?h.ll[0]:"",h.ll?h.ll[1]:"",`${h.dates}. ${h.room}`]); });
+  ATT.filter(a=>!onlySel||S.sel.has(a.id)).forEach(a=>rows.push([a.name,a.q+", Japan",a.fav?"Preferiti di Michela":a.cat,CITY[a.city].n,a.ll?a.ll[0]:"",a.ll?a.ll[1]:"",`${a.best}. ${a.note}${a.why?" Consiglio: "+a.why:""}`]));
   download(onlySel?"giappone-mio-piano-mymaps.csv":"giappone-luoghi-google-mymaps.csv","\ufeff"+rows.map(r=>r.map(q).join(",")).join("\r\n"),"text/csv;charset=utf-8");
 }
 function snapshot(){ return {v:1,upd:store.get("upd",0),sel:Array.from(S.sel),chk:S.chk,pace:S.pace,child:S.child,fx:S.fx,town:S.town,notes:S.notes}; }
@@ -1011,7 +1163,7 @@ function applySnap(d){
   const keep=Sync.touch; Sync.touch=()=>{};
   ["chk","pace","child","fx","town","notes"].forEach(k=>store.set(k,S[k])); store.set("sel",Array.from(S.sel));
   Sync.touch=keep; store.set("upd",d.upd||Date.now());
-  renderHead(); renderStrip(); renderPanel(); renderDays(); renderAtt(); renderChk();
+  renderHead(); renderStrip(); renderPanel(); renderDays(); renderAtt(); renderChk(); gmapMarkers();
   $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
   return true;
 }
@@ -1104,6 +1256,9 @@ document.addEventListener("click",function(e){
   else if(act==="detail") openModal(b.dataset.kind,id);
   else if(act==="closemodal") closeModal();
   else if(act==="fcity"){ S.fcity=id; renderFilters(); renderGrid(); }
+  else if(act==="ffav"){ S.ffav=!S.ffav; renderFilters(); renderGrid(); }
+  else if(act==="mapmode"){ S.mapmode=id; store.set("mapmode",id); renderMapMode(); }
+  else if(act==="favday"){ S.ffav=true; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
   else if(act==="fkid"){ S.fkid=!S.fkid; renderFilters(); renderGrid(); }
   else if(act==="fpri"){ S.fpri=!S.fpri; renderFilters(); renderGrid(); }
   else if(act==="reset"){ S.sel=new Set(defSel()); store.set("sel",Array.from(S.sel)); renderHead(); renderAtt(); renderDays(); renderPanel(); }
@@ -1130,6 +1285,7 @@ document.addEventListener("change",function(e){
   else if(act==="pace"){ S.pace=+t.value; store.set("pace",S.pace); renderBudget(); }
   else if(act==="town"){ S.town=t.checked; store.set("town",S.town); renderBudget(); }
   else if(act==="fcat"){ S.fcat=t.value; renderGrid(); }
+  else if(act==="lay"){ S.lay[t.dataset.id]=t.checked; store.set("lay",S.lay); gmapMarkers(); }
   else if(act==="importfile") importJSON(t.files&&t.files[0]);
   else if(act==="child"){ S.child=t.value; store.set("child",S.child); renderCalc(); }
 });
@@ -1145,7 +1301,7 @@ setInterval(function(){ if(document.visibilityState==="visible") Sync.pull(); },
 renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect();
 renderDays(); renderLegs(); renderAtt(); renderChk();
 $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
-renderSettings(); Sync.badge(); Sync.pull();
+renderSettings(); Sync.badge(); Sync.pull(); renderMapMode();
 })();
 </script>
 </body>

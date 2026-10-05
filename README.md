@@ -25,6 +25,18 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
 
 Le chiavi si possono anche incollare direttamente nella pagina (sezione *Chiavi tecniche*): restano solo su quel dispositivo.
 
+## Google Maps nel cruscotto
+
+- **Percorso e mappa:** mappa Google interattiva con le tratte del viaggio e i segnaposto (piano, preferiti di Michela, hotel, altri luoghi).
+  Toccando un segnaposto si apre la scheda, da cui si aggiunge il luogo al piano. Resta disponibile la mappa schematica.
+- **Giorno per giorno:** per ogni giornata, il pulsante *Giro del giorno su Google Maps* apre il percorso con i luoghi scelti.
+- **Schede dei luoghi:** orari, valutazioni, foto e mini-mappa da Google Places.
+
+## Preferiti di Michela
+
+I 20 luoghi in Giappone salvati sul suo Google Maps sono nel cruscotto: hotel e stazione dei bus erano già presenti,
+gli altri 15 sono nei giorni giusti con un consiglio (sì / forse / da saltare). Riepilogo nella scheda *Attrazioni*.
+
 ## Google My Maps
 
 Nella scheda *Percorso e mappa* ci sono i pulsanti per scaricare il CSV dei luoghi (tutti o solo il piano),
