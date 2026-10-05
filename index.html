@@ -283,6 +283,7 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .tltime{font-weight:700;padding:5px 2px}
 .tlsub{font-size:.84rem}
 .tlmove{color:var(--muted);font-size:.84rem;margin:2px 0 2px 44px;padding:5px 0 5px 14px;border-left:2px dotted var(--line)}
+.tlreal{font-size:.7rem;font-weight:700;color:var(--ok);border:1px solid var(--ok);border-radius:4px;padding:0 4px;margin-left:4px;vertical-align:1px}
 .tlfree{color:var(--ok);font-weight:700}
 .tlend{font-size:.88rem;font-weight:700;color:var(--muted);padding:4px 10px}
 .tlwarn{font-size:.84rem;color:var(--risk);margin-top:3px}
@@ -1203,10 +1204,60 @@ function locOf(ref){
   return a.ll||geoCache[ref]||(a.zone==="Okuhida"&&a.id==="ta_onsen"?hotLL("okuhida"):null);
 }
 function nearestCity(ll){ let best="tokyo",bd=1e9; Object.keys(CITYLL).forEach(k=>{ const d=hav(ll,CITYLL[k]); if(d<bd){bd=d;best=k;} }); return {city:best,km:bd}; }
-function travel(a,b,city){
+/* tempi reali da Google Routes API, salvati sul dispositivo */
+const RT=store.get("routes",{}); let routesOff="";
+const VEH={SUBWAY:"metro",METRO_RAIL:"metro",RAIL:"treno",HEAVY_RAIL:"treno",COMMUTER_TRAIN:"treno",HIGH_SPEED_TRAIN:"Shinkansen",LONG_DISTANCE_TRAIN:"treno",BUS:"bus",INTERCITY_BUS:"bus",TROLLEYBUS:"bus",TRAM:"tram",LIGHT_RAIL:"tram",MONORAIL:"monorotaia",CABLE_CAR:"funivia",GONDOLA_LIFT:"funivia",FUNICULAR:"funicolare",FERRY:"traghetto"};
+const rkey=(m,a,b,date,dep)=>m+"|"+a[0].toFixed(4)+","+a[1].toFixed(4)+"|"+b[0].toFixed(4)+","+b[1].toFixed(4)+(m==="T"?"|"+date+"|"+Math.floor(dep/60):"");
+const taxiYen=km=>Math.round((500+Math.max(0,km-1.1)*420)/100)*100;
+function legModes(a,b){ const dd=hav(a,b)*1.35; return dd<=1.3?["W"]:hav(a,b)<=30?["T"].concat(dd<=3?["W"]:[],dd<=7?["D"]:[]):["T"]; }
+async function rtFetch(m,a,b,date,dep){
+  const k=rkey(m,a,b,date,dep); if(RT[k]!==undefined) return RT[k];
+  const body={origin:{location:{latLng:{latitude:a[0],longitude:a[1]}}},destination:{location:{latLng:{latitude:b[0],longitude:b[1]}}},travelMode:{W:"WALK",T:"TRANSIT",D:"DRIVE"}[m],languageCode:"it",units:"METRIC"};
+  if(m==="T") body.departureTime=`${date}T${fmtT(Math.min(dep,1439))}:00+09:00`;
+  const fm=m==="T"?"routes.duration,routes.distanceMeters,routes.travelAdvisory.transitFare,routes.legs.steps.transitDetails.transitLine.nameShort,routes.legs.steps.transitDetails.transitLine.name,routes.legs.steps.transitDetails.transitLine.vehicle.type,routes.legs.steps.transitDetails.stopDetails.departureStop.name,routes.legs.steps.transitDetails.stopDetails.arrivalStop.name":"routes.duration,routes.distanceMeters";
+  const r=await fetch("https://routes.googleapis.com/directions/v2:computeRoutes",{method:"POST",headers:{"Content-Type":"application/json","X-Goog-Api-Key":GM_KEY,"X-Goog-FieldMask":fm},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){ const msg=(j.error&&j.error.message)||("HTTP "+r.status); if(r.status===403||r.status===401||/API key|not been used|disabled|not authorized/i.test(msg)) routesOff=msg; throw new Error(msg); }
+  const ro=j.routes&&j.routes[0]; let v=null;
+  if(ro&&ro.duration){
+    v={min:Math.max(1,Math.round(parseInt(ro.duration,10)/60)),km:Math.round((ro.distanceMeters||0)/100)/10};
+    if(m==="T"){
+      const st=[].concat.apply([],(ro.legs||[]).map(l=>l.steps||[])).filter(x=>x.transitDetails);
+      v.lines=st.map(x=>{ const L=x.transitDetails.transitLine||{}; return ((VEH[(L.vehicle||{}).type]||"")+" "+(L.name||L.nameShort||"")).trim(); }).filter(Boolean);
+      const sd=x=>x&&x.transitDetails.stopDetails||{};
+      if(st.length){ v.from=(sd(st[0]).departureStop||{}).name||""; v.to=(sd(st[st.length-1]).arrivalStop||{}).name||""; }
+      const f=ro.travelAdvisory&&ro.travelAdvisory.transitFare; if(f&&(f.currencyCode||"JPY")==="JPY") v.fare=Math.round(+(f.units||0)+(f.nanos||0)/1e9);
+      if(!st.length) v.walkOnly=1;
+    }
+  }
+  RT[k]=v; return v;
+}
+async function dayRoutes(d,passes){
+  if(!GM_KEY||routesOff) return {n:0};
+  let n=0, err="";
+  for(let pass=0;pass<(passes||2);pass++){
+    const sim=simulate(d,allLists()[d]), legs=sim.rows.map(r=>({a:r.from,b:r.I.loc,dep:r.dep})).concat([{a:sim.back.from,b:sim.back.to,dep:sim.back.dep}]);
+    const jobs=[];
+    legs.forEach(L=>{ if(!L.a||!L.b||hav(L.a,L.b)<0.08) return; legModes(L.a,L.b).forEach(m=>{ if(RT[rkey(m,L.a,L.b,d,L.dep)]===undefined) jobs.push([m,L.a,L.b,L.dep]); }); });
+    if(!jobs.length) break;
+    await Promise.all(jobs.map(j=>rtFetch(j[0],j[1],j[2],d,j[3]).then(()=>{ n++; },e=>{ err=e.message; })));
+    if(routesOff) break;
+  }
+  store.set("routes",RT);
+  return {n:n,err:err};
+}
+function travel(a,b,city,date,dep){
   if(!a||!b) return {min:20,icon:"❔",txt:"spostamento da verificare (manca la posizione)",mode:"transit"};
   const d=hav(a,b); if(d<0.08) return {min:0,none:true};
   const dd=d*1.35;
+  const W=RT[rkey("W",a,b)], T=date?RT[rkey("T",a,b,date,dep)]:null, D=RT[rkey("D",a,b)];
+  if(W||(T&&!T.walkOnly)){
+    const taxi=D&&dd<=7?` · taxi ${D.min+3} min, circa ${fmt(taxiYen(D.km))} ¥`:"";
+    const tdesc=T&&!T.walkOnly?`${T.lines&&T.lines.length?T.lines.join(" → "):"mezzi pubblici"}${T.from?` da ${T.from}`:""}, ${T.min} min${T.fare?`, ${fmt(T.fare)} ¥ a persona`:""}`:"";
+    if(W&&(!tdesc||W.min<=15||W.min<=T.min+5))
+      return {min:W.min,icon:"🚶",txt:`a piedi, ${W.min} min (${String(W.km).replace(".",",")} km)${tdesc&&W.min>12?` · oppure ${tdesc}`:""}${taxi}`,mode:"walking",a:a,b:b,real:1};
+    return {min:T.min,icon:/Shinkansen|treno/.test(tdesc)&&d>30?"🚆":/^bus/.test(tdesc)?"🚌":"🚇",txt:`${tdesc}${W&&W.min<=35?` · a piedi ${W.min} min`:""}${taxi}`,mode:"transit",a:a,b:b,real:1};
+  }
   if(dd<=1.3){ const m=Math.round(dd/4.3*60)+2; return {min:m,icon:"🚶",txt:`a piedi, circa ${m} min`,mode:"walking",a:a,b:b}; }
   if(d<=30){
     const m=Math.round(10+dd/22*60); let t=`${TRANSIT[city]||"mezzi pubblici"}, circa ${m} min`;
@@ -1216,6 +1267,7 @@ function travel(a,b,city){
   }
   const m=Math.round(20+dd/70*60); return {min:m,icon:"🚆",txt:`treno o bus, circa ${durTxt(m)}`,mode:"transit",a:a,b:b};
 }
+function trLinkReal(tr){ return tr.real?' <span class="tlreal" title="Tempi calcolati da Google Maps">Google</span>':""; }
 function trLink(tr){ return tr.a&&tr.b?`https://www.google.com/maps/dir/?api=1&origin=${tr.a.join(",")}&destination=${tr.b.join(",")}&travelmode=${tr.mode}`:""; }
 /* fascia preferita, ricavata dal testo "Quando" e dal tipo di luogo */
 function prefWin(a){
@@ -1238,7 +1290,12 @@ function prefWin(a){
   if(a.cat==="Templi e storia"||a.cat==="Natura e panorami") return {s:480,e:1020,lbl:"prima delle 17, quando chiudono molti templi e giardini"};
   return {s:540,e:1200,lbl:"di giorno"};
 }
-function hoursOf(a){ return a.hrs||HRS[a.id]||undefined; }
+/* orari indicativi dei luoghi principali (ottobre), usati finché Google non dà quelli veri */
+const daily=(o,c,closed)=>[0,1,2,3,4,5,6].filter(d=>!(closed||[]).includes(d)).map(d=>[d,o,d,c]);
+const STATIC_HRS={ky_kinkaku:daily(540,1020),kz_kenroku:daily(480,1020),ky_kiyomizu:daily(360,1080),tk_teamlab:daily(540,1320),tk_shibuya:daily(600,1350),
+  ta_jinya:daily(525,1020),os_castle:daily(540,1020),kz_museum:daily(600,1080,[1]),tk_palace:daily(540,1020,[1,5]),tk_gyoen:daily(540,990,[1]),ta_folk:daily(510,1020),
+  tk_tsukiji:daily(360,840),kz_omicho:daily(540,1020),ky_nishiki:daily(600,1050),os_kuromon:daily(540,1050),ta_market:daily(420,720),os_kaiyukan:daily(600,1200),os_umeda:daily(570,1350),tk_skytree:daily(600,1260)};
+function hoursOf(a){ return HRS[a.id]||a.hrs||STATIC_HRS[a.id]||undefined; }
 function simpleHours(oh){
   if(!oh||!oh.periods||!oh.periods.length) return undefined;
   if(oh.periods.length===1&&!oh.periods[0].close) return "always";
@@ -1264,7 +1321,7 @@ function stepAt(I,arr,wd){
   let st=arr, wait=0; const out={warn:[],soft:[],pen:0};
   if(I.anchor){ st=Math.max(arr,I.t); if(arr>I.t+5){ out.warn.push(`Arrivi verso le ${fmtT(arr)}, dopo l'orario fissato (${fmtT(I.t)}).`); out.pen+=(arr-I.t)*20; } wait=st-arr; }
   else {
-    const w=I.win; if(w&&st<w.s&&(w.strong||w.s-st<=120)){ wait+=w.s-st; st=w.s; }
+    const w=I.win; if(w&&st<w.s){ wait+=w.s-st; st=w.s; }
     const oc=openCheck(I.hrs,wd,st,st+I.dur);
     if(oc){
       if(oc.closed){ out.warn.push("Secondo Google in questo giorno è chiuso."); out.pen+=400; }
@@ -1281,12 +1338,12 @@ function simulate(date,list){
   let time=toMin(cfg.start), loc=locOf(cfg.from), cost=0, travelTot=0; const rows=[];
   list.forEach((it,k)=>{
     const I=itemInfo(date,it); if(!I) return;
-    const tr=travel(loc,I.loc,I.city); travelTot+=tr.min; cost+=tr.min;
+    const tr=travel(loc,I.loc,I.city,date,time); travelTot+=tr.min; cost+=tr.min;
     const s=stepAt(I,time+tr.min,wd); cost+=s.pen;
-    rows.push({k:k,it:it,I:I,tr:tr,wait:s.wait,st:s.st,en:s.en,warn:s.warn,soft:s.soft});
+    rows.push({k:k,it:it,I:I,tr:tr,from:loc,dep:time,wait:s.wait,st:s.st,en:s.en,warn:s.warn,soft:s.soft});
     time=s.en; loc=I.to||I.loc;
   });
-  const back=travel(loc,locOf(cfg.to),cfg.city), fin=time+back.min, over=Math.max(0,fin-toMin(cfg.end));
+  const back=travel(loc,locOf(cfg.to),cfg.city,date,time); back.from=loc; back.to=locOf(cfg.to); back.dep=time; const fin=time+back.min, over=Math.max(0,fin-toMin(cfg.end));
   cost+=back.min+over*4; travelTot+=back.min;
   return {rows:rows,back:back,fin:fin,over:over,cost:cost,travelTot:travelTot};
 }
@@ -1295,12 +1352,12 @@ function buildSeq(date,flex,anchors){
   const cfg=DAYCFG[date], wd=parseD(date).getDay();
   flex=flex.slice(); anchors=anchors.slice().sort((x,y)=>itemInfo(date,x).t-itemInfo(date,y).t);
   const out=[]; let time=toMin(cfg.start), loc=locOf(cfg.from);
-  const take=it=>{ const I=itemInfo(date,it), tr=travel(loc,I.loc,I.city), s=stepAt(I,time+tr.min,wd); out.push(it); time=s.en; loc=I.to||I.loc; };
+  const take=it=>{ const I=itemInfo(date,it), tr=travel(loc,I.loc,I.city,date,time), s=stepAt(I,time+tr.min,wd); out.push(it); time=s.en; loc=I.to||I.loc; };
   while(flex.length||anchors.length){
     const F=flex[0], A=anchors[0];
     if(F&&A){
-      const I=itemInfo(date,F), tr=travel(loc,I.loc,I.city), s=stepAt(I,time+tr.min,wd);
-      const AI=itemInfo(date,A), tr2=travel(I.to||I.loc,AI.loc,AI.city);
+      const I=itemInfo(date,F), tr=travel(loc,I.loc,I.city,date,time), s=stepAt(I,time+tr.min,wd);
+      const AI=itemInfo(date,A), tr2=travel(I.to||I.loc,AI.loc,AI.city,date,s.en);
       if(s.en+tr2.min>AI.t+5){ take(anchors.shift()); continue; }
       take(flex.shift());
     } else if(F) take(flex.shift()); else take(anchors.shift());
@@ -1372,14 +1429,20 @@ async function fetchHoursFor(ids){
 async function dayOptimize(d){
   const L=allLists()[d], ids=L.filter(it=>it.id.indexOf("fx:")&&ATTM[it.id]&&!ATTM[it.id].custom&&HRS[it.id]===undefined).map(it=>it.id);
   if(ids.length&&GM_KEY){ S.dayMsg[d]={txt:"Controllo gli orari di apertura su Google…"}; renderDays(); await fetchHoursFor(ids); }
-  const before=simulate(d,allLists()[d]), best=optimizeDay(d);
+  const before=simulate(d,allLists()[d]); let best=optimizeDay(d);
   S.sched[d]=best.seq;
+  let rinfo="";
+  if(GM_KEY&&!routesOff){ S.dayMsg[d]={txt:"Calcolo i tempi reali di spostamento con Google…"}; renderDays();
+    const r=await dayRoutes(d); best={seq:S.sched[d],sim:simulate(d,S.sched[d])};
+    rinfo=routesOff?` Tempi stimati: Google Routes non risponde (${routesOff}). Per attivarlo: Google Cloud → abilita "Routes API" e aggiungila alle API consentite della chiave.`:r.n?" Spostamenti calcolati con Google Maps per l'orario di partenza.":""; }
   const s=best.sim, issues=s.rows.filter(r=>r.warn.length).length, softs=s.rows.filter(r=>!r.warn.length&&r.soft.length).length;
   let txt=`Ordine ottimizzato: ${durTxt(Math.round(s.travelTot))} di spostamenti${before.travelTot-s.travelTot>=5?` (${Math.round(before.travelTot-s.travelTot)} min in meno)`:""}, rientro verso le ${fmtT(s.fin)}.`;
   if(issues) txt+=` Restano ${issues} ${issues===1?"avviso":"avvisi"}: guarda le tappe segnate in rosso.`;
   if(s.over>20){ const cand=s.rows.filter(r=>!r.I.fx&&!r.I.anchor).sort((x,y)=>x.I.a.pri-y.I.a.pri||y.I.dur-x.I.dur)[0]; txt+=` La giornata sfora di ${durTxt(Math.round(s.over))}${cand?`: toglierei «${cand.I.name}»`:""}.`; }
   else if(!issues&&!softs) txt+=" Tutto rispetta orari di apertura e momenti migliori.";
-  if(softs) txt+=` ${softs===1?"Una tappa è":softs+" tappe sono"} fuori dal momento ideale: è il miglior compromesso con gli orari che hai fissato.`;
+  const locks=s.rows.some(r=>r.I.anchor&&!r.I.fx);
+  if(softs) txt+=` ${softs===1?"Una tappa è":softs+" tappe sono"} fuori dal momento ideale: è il miglior compromesso ${locks?"con gli orari che hai fissato":"possibile per questa giornata"}.`;
+  txt+=rinfo;
   S.dayMsg[d]={txt:txt,ok:!issues&&!softs&&s.over<=20};
   saveSched();
 }
@@ -1391,10 +1454,10 @@ function renderTL(D,lists){
   const endName=cfg.to.indexOf("hot:")===0?HOT[cfg.to.slice(4)].n:"";
   const mv=(tr,wait)=>{ const free=wait>=30?`<span class="tlfree">☕ ${durTxt(Math.round(wait))} di tempo libero</span>`:"";
     if(tr.none) return free?`<div class="tlmove">${free}</div>`:"";
-    return `<div class="tlmove"><span>${tr.icon} ${tr.txt}</span>${trLink(tr)?` · <a target="_blank" rel="noopener" href="${trLink(tr)}">percorso</a>`:""}${free?`<br>${free}`:""}</div>`; };
+    return `<div class="tlmove"><span>${tr.icon} ${tr.txt}</span>${trLinkReal(tr)}${trLink(tr)?` · <a target="_blank" rel="noopener" href="${trLink(tr)}">percorso</a>`:""}${free?`<br>${free}`:""}</div>`; };
   const durOpts=cur=>[15,20,30,45,60,75,90,120,150,180,240].concat(cur&&[15,20,30,45,60,75,90,120,150,180,240].indexOf(cur)<0?[cur]:[]).sort((x,y)=>x-y).map(m=>`<option value="${m}"${m===cur?" selected":""}>${durTxt(m)}</option>`).join("");
   let h=`<div class="tl" id="tl-${d}"><div class="tlhead"><div><b>Programma</b> <span class="muted" style="font-size:.86rem">dalle ${cfg.start}, ${esc(startName)}</span></div>
-    <div class="tlbtns"><button class="btn small primary" data-act="dayopt" data-id="${d}">Riorganizza giorno</button><button class="btn small" data-act="addplace" data-id="${d}">+ Aggiungi luogo</button>${S.sched[d]?`<button class="btn small" data-act="dayreset" data-id="${d}" title="Torna alla proposta iniziale">Ripristina</button>`:""}</div></div>`;
+    <div class="tlbtns"><button class="btn small primary" data-act="dayopt" data-id="${d}">Riorganizza giorno</button><button class="btn small" data-act="addplace" data-id="${d}">+ Aggiungi luogo</button>${GM_KEY?`<button class="btn small" data-act="dayroutes" data-id="${d}" title="Tempi reali di spostamento da Google Maps">Tempi Google</button>`:""}${S.sched[d]?`<button class="btn small" data-act="dayreset" data-id="${d}" title="Torna alla proposta iniziale">Ripristina</button>`:""}</div></div>`;
   if(msg) h+=`<p class="tlmsg${msg.ok?" ok":""}">${esc(msg.txt)}</p>`;
   if(!sim.rows.length) h+=`<p class="empty" style="margin:8px 0">Nessuna tappa: scegline una sopra o aggiungi un luogo.</p>`;
   sim.rows.forEach(r=>{
@@ -1611,6 +1674,8 @@ document.addEventListener("click",function(e){
   else if(act==="addback"){ addSearch(); }
   else if(act==="addconfirm") addConfirm();
   else if(act==="dayopt") dayOptimize(id);
+  else if(act==="dayroutes"){ S.dayMsg[id]={txt:"Calcolo i tempi reali di spostamento con Google…"}; renderDays();
+    dayRoutes(id).then(r=>{ const sim=simulate(id,allLists()[id]); S.dayMsg[id]={txt:routesOff?`Google Routes non risponde: ${routesOff}. Per attivarlo: Google Cloud → abilita "Routes API" e aggiungila alle API consentite della chiave.`:r.err&&!r.n?`Errore da Google Routes: ${r.err}`:`Tempi reali aggiornati${r.n?` (${r.n} percorsi)`:" (erano già calcolati)"}: ${durTxt(Math.round(sim.travelTot))} di spostamenti, rientro verso le ${fmtT(sim.fin)}.`,ok:!routesOff&&!r.err}; renderDays(); }); }
   else if(act==="dayreset"){ delete S.sched[id]; delete S.dayMsg[id]; saveSched(); }
   else if(act==="tlup"||act==="tldown"){ const d=b.dataset.day, k=+b.dataset.k, L=mat(d), j=act==="tlup"?k-1:k+1; if(j>=0&&j<L.length){ const x=L[k]; L[k]=L[j]; L[j]=x; delete S.dayMsg[d]; saveSched(); } }
   else if(act==="tlunlock"){ const d=b.dataset.day, L=mat(d); delete L[+b.dataset.k].t; saveSched(); }

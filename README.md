@@ -18,7 +18,7 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
    In *Project Settings → Data API → Exposed schemas* deve esserci `japan`.
    La tabella è chiusa: si legge e scrive solo con le due funzioni che richiedono il codice viaggio.
 3. **Google Maps (dati live nelle schede: orari, valutazioni, foto, mappa):** in Google Cloud Console abilita
-   *Maps JavaScript API* e *Places API (New)*, crea una chiave API con restrizione *Referrer HTTP*
+   *Maps JavaScript API*, *Places API (New)* e *Routes API*, crea una chiave API con restrizione *Referrer HTTP*
    sul dominio del sito (es. `https://loriscuba.github.io/*`) e mettila in `config.js`.
 4. Apri il sito, vai su *Prima di partire → Salvataggio e Google Maps*, premi *Genera un codice* e *Salva e sincronizza*.
    Inserisci lo stesso codice sul telefono di Michela.
@@ -44,6 +44,11 @@ Sotto ogni giorno c'è un programma con orari e spostamenti, dalla partenza (hot
 - **Riorganizza giorno:** prova tutti gli ordini possibili (euristica 2-opt oltre le 8 tappe) e sceglie quello che riduce gli spostamenti
   rispettando orari fissati, trasporti fissi, orari di apertura da Google e il momento migliore di ogni luogo (alba, pranzo, tramonto, cena).
   Avvisa se la giornata non ci sta e suggerisce cosa togliere.
+
+- **Tempi reali (Google Routes API):** con «Riorganizza giorno» o «Tempi Google» gli spostamenti scelti vengono calcolati da Google
+  per l'orario di partenza: a piedi, mezzi con nomi delle linee e prezzo, taxi. I risultati restano salvati sul dispositivo, così
+  ogni tratta si chiede una volta sola. Se Routes non risponde si usano le stime.
+  Serve: Google Cloud → abilitare **Routes API** e aggiungerla alle API consentite della chiave.
 
 Programmi e luoghi aggiunti si sincronizzano con il cloud come il resto.
 

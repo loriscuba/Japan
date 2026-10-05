@@ -2,7 +2,7 @@
    Queste chiavi finiscono comunque nel browser di chi apre la pagina: non sono segreti,
    ma vanno limitate.
 
-   googleMapsKey: chiave Google Cloud con "Maps JavaScript API" e "Places API (New)" attive,
+   googleMapsKey: chiave Google Cloud con "Maps JavaScript API", "Places API (New)" e "Routes API" attive,
      limitata con una restrizione "Referrer HTTP" al dominio del sito
      (es. https://loriscuba.github.io/*).
    supabaseUrl / supabaseAnonKey: progetto Supabase dove gira supabase/schema.sql.
