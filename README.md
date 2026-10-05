@@ -14,8 +14,8 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
 
 1. **GitHub Pages:** *Settings → Pages → Source: GitHub Actions*. Ogni push su `main` pubblica il sito
    (su repository privati GitHub Pages richiede un piano a pagamento).
-2. **Supabase (salvataggio condiviso):** in un progetto Supabase apri *SQL Editor* ed esegui `supabase/schema.sql`.
-   Poi copia *Project URL* e la chiave *anon / publishable* in `config.js`.
+2. **Supabase (salvataggio condiviso):** progetto *Demo IPA*, schema `japan` (già creato con `supabase/schema.sql`).
+   In *Project Settings → Data API → Exposed schemas* deve esserci `japan`.
    La tabella è chiusa: si legge e scrive solo con le due funzioni che richiedono il codice viaggio.
 3. **Google Maps (dati live nelle schede: orari, valutazioni, foto, mappa):** in Google Cloud Console abilita
    *Maps JavaScript API* e *Places API (New)*, crea una chiave API con restrizione *Referrer HTTP*
