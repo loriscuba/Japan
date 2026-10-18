@@ -10,6 +10,13 @@ Cruscotto del viaggio di nozze (19–30 ottobre 2026): percorso, giorno per gior
   Sincronizza da solo a ogni modifica, quando riapri la pagina e ogni minuto.
 - **Backup:** scheda *Prima di partire → Salvataggio* → *Scarica backup* / *Carica backup* (file JSON).
 
+## Offline (in aereo)
+
+Il sito ha un service worker (`sw.js`): dopo la prima apertura con la rete, il telefono tiene una copia della pagina
+e la riapre anche senza connessione. Le modifiche fatte offline restano sul dispositivo e vanno nel database
+appena torna la rete. Senza rete non funzionano Google Maps (si vede la mappa schematica), la ricerca dei luoghi e i tempi Google.
+Si può anche aggiungere alla schermata Home (`manifest.webmanifest`).
+
 ## Attivazione
 
 1. **GitHub Pages:** *Settings → Pages → Source: GitHub Actions*. Ogni push su `main` pubblica il sito
