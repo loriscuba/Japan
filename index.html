@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Giappone 2026, il cruscotto del viaggio di nozze</title>
 <script src="config.js"></script>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icona-192.png">
+<link rel="apple-touch-icon" href="icona-180.png">
+<meta name="theme-color" content="#1B2A46">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Giappone 2026">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
@@ -242,7 +249,7 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .hours{margin:0;padding-left:1.1em;font-size:.88rem}
 .syncbadge{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:.84rem;color:var(--muted)}
 .syncbadge i{width:9px;height:9px;border-radius:50%;background:var(--line);display:inline-block}
-.syncbadge.on i{background:var(--lk-ok)} .syncbadge.err i{background:var(--lk-risk)} .syncbadge.busy i{background:var(--lk-req)}
+.syncbadge.on i{background:var(--lk-ok)} .syncbadge.err i{background:var(--lk-risk)} .syncbadge.busy i{background:var(--lk-req)} .syncbadge.off i{background:var(--muted)}
 .setbox{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;max-width:760px}
 .setbox label{display:flex;flex-direction:column;gap:3px;font-size:.88rem;font-weight:700;margin:10px 0}
 .setbox input[type=text],.setbox input[type=password]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--paper);color:var(--ink);width:100%}
@@ -1161,12 +1168,12 @@ const geoCache=store.get("geo",{});
 let GM=null, gmFail="";
 window.gm_authFailure=function(){ gmFail="Google ha rifiutato la chiave: controlla che il sito sia tra i referrer consentiti e che le API siano abilitate."; GM=null; const b=$("#gmapMain"); if(b) b.innerHTML=`<p class="gmerr">${gmFail}</p>`; };
 function renderMapMode(){
-  const g=S.mapmode==="google"&&!!GM_KEY;
+  const g=S.mapmode==="google"&&!!GM_KEY&&navigator.onLine!==false;
   const L=[["plan","Il mio piano","#18A874"],["fav","♥ Michela","#D6457A"],["hot","Hotel","#1B2A46"],["other","Altri luoghi","#8C97AD"]];
   $("#mapmode").innerHTML=[["google","Google Maps"],["schema","Schematica"]].map(m=>`<button class="fbtn" data-act="mapmode" data-id="${m[0]}" aria-pressed="${(g?"google":"schema")===m[0]}"${m[0]==="google"&&!GM_KEY?' disabled title="Serve la chiave Google Maps"':""}>${m[1]}</button>`).join("")
     +(g?`<span class="layers">${L.map(l=>`<label><input type="checkbox" data-act="lay" data-id="${l[0]}" ${S.lay[l[0]]?"checked":""}><i style="background:${l[2]}"></i>${l[1]}</label>`).join("")}</span>`:"");
   $("#map").style.display=g?"none":""; $("#gmapMain").hidden=!g;
-  $("#mapcap").textContent=g?"Tocca un segnaposto per la scheda: verde = nel tuo piano, rosa = salvato da Michela, H = hotel. Le linee sono le tratte del viaggio.":"Mappa schematica, non in scala. Passa a Google Maps per la mappa vera.";
+  $("#mapcap").textContent=navigator.onLine===false?"Sei offline: mappa schematica. Google Maps torna quando c'è rete.":g?"Tocca un segnaposto per la scheda: verde = nel tuo piano, rosa = salvato da Michela, H = hotel. Le linee sono le tratte del viaggio.":"Mappa schematica, non in scala. Passa a Google Maps per la mappa vera.";
   if(g&&!GM) gmapInit(); if(!g) applyBox();
 }
 async function gmapInit(){
@@ -1666,6 +1673,7 @@ const Sync={
   touch(){
     store.set("upd",Date.now());
     if(!Sync.on()) return;
+    if(navigator.onLine===false){ Sync.badge("off"); return; }
     clearTimeout(Sync.timer); Sync.badge("busy"); Sync.timer=setTimeout(()=>Sync.push(),900);
   },
   push(){
@@ -1675,7 +1683,7 @@ const Sync={
       .then(()=>this.badge("on"),e=>{ this.badge("err"); console.warn(e); });
   },
   pull(manual){
-    if(!this.on()){ this.badge(); return Promise.resolve(); }
+    if(!this.on()||navigator.onLine===false){ this.badge(); return Promise.resolve(); }
     if(this.busy) return Promise.resolve(); this.busy=true; this.badge("busy");
     return this.rpc("get_trip_state",{p_code:this.code}).then(d=>{
       const loc=store.get("upd",0);
@@ -1686,10 +1694,10 @@ const Sync={
       .then(()=>{ this.busy=false; });
   },
   badge(st){
-    this.state=st||(this.on()?"on":"local");
+    this.state=st||(!this.on()?"local":navigator.onLine===false?"off":"on");
     const b=$("#syncbadge"); if(!b) return;
     b.className="syncbadge btn small "+(this.state==="local"?"":this.state);
-    b.lastElementChild.textContent={local:"Salvato solo su questo dispositivo",on:"Salvato sul cloud, condiviso",busy:"Salvataggio in corso…",err:"Cloud non raggiungibile, salvato sul dispositivo"}[this.state];
+    b.lastElementChild.textContent={local:"Salvato solo su questo dispositivo",on:"Salvato sul cloud, condiviso",busy:"Salvataggio in corso…",err:"Cloud non raggiungibile, salvato sul dispositivo",off:"Offline: salvato sul dispositivo, si allinea quando torna la rete"}[this.state];
   }
 };
 function renderSettings(){
@@ -1772,6 +1780,9 @@ document.addEventListener("input",function(e){
 window.addEventListener("resize",function(){ applyBox(); setTabsH(); });
 document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") Sync.pull(); });
 setInterval(function(){ if(document.visibilityState==="visible") Sync.pull(); },60000);
+window.addEventListener("online",function(){ Sync.pull(); if(!GM&&!(window.google&&google.maps)) gmPromise=null; if(!document.body.classList.contains("locked")) renderMapMode(); });
+window.addEventListener("offline",function(){ Sync.badge(); if(!document.body.classList.contains("locked")) renderMapMode(); });
+if("serviceWorker" in navigator&&location.protocol!=="file:") navigator.serviceWorker.register("sw.js").catch(e=>console.warn(e));
 
 /* ---------- avvio ---------- */
 renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect(); renderBookings();
