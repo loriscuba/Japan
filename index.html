@@ -305,6 +305,17 @@ select.mini{min-width:0;width:auto;padding:4px 6px;font-size:.82rem;border-width
 .addform label{display:flex;flex-direction:column;gap:3px;font-size:.86rem;font-weight:700}
 .addform input[type=text]{font:inherit;font-weight:400;padding:7px 9px;border:1.5px solid var(--ink);border-radius:6px;background:var(--card);color:var(--ink)}
 .addform select{min-width:0}
+.daynav{position:sticky;top:var(--tabs-h,49px);z-index:25;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:12px -16px 0;padding:8px 16px;background:var(--paper);border-bottom:1px solid var(--line)}
+.daynav::-webkit-scrollbar{display:none}
+.dchip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:54px;padding:5px 8px 6px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;line-height:1.1;cursor:pointer}
+.dchip small{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.dchip b{font-family:var(--fd);font-size:1.2rem}
+.dchip span{font-size:.68rem;color:var(--muted);max-width:7.5em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dchip:hover{border-color:var(--ink)}
+.dchip.today{box-shadow:inset 0 -3px 0 var(--seal)}
+.dchip[aria-current="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.dchip[aria-current="true"] small,.dchip[aria-current="true"] span{color:var(--paper);opacity:.85}
+.day{scroll-margin-top:calc(var(--tabs-h,49px) + 84px)}
 .daypick{display:inline-flex;gap:6px;align-items:center;font-size:.84rem;color:var(--muted)}
 body.locked>header,body.locked>nav,body.locked>main{display:none}
 .gate{display:none;min-height:100vh;place-items:center;padding:24px 16px}
@@ -346,7 +357,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 <section class="view" id="v-percorso" role="tabpanel">
   <div class="sec" style="margin-top:0">
     <h2>Da sistemare per primi</h2>
-    <p class="muted">Ho letto il preventivo come farebbe un tour operator. Queste sono le cose che possono rovinarti una giornata se non le chiarisci prima della partenza.</p>
+    <p class="muted">Ho confrontato il programma aggiornato dell'agenzia (prenotazione 2182416) con quanto già pianificato. Queste sono le cose che possono rovinarti una giornata se non le chiarisci prima della partenza.</p>
     <div id="alerts"></div>
     <button class="btn small" data-act="tab" data-id="checklist">Apri tutta la lista</button>
   </div>
@@ -359,7 +370,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
   <div class="sec">
     <h2>La mappa del viaggio</h2>
-    <p class="muted">Tocca una tratta, una città o un segnaposto. Le linee tratteggiate sono i treni che il preventivo non include e che devi comprare tu. Il cuore ♥ indica i posti salvati da Michela.</p>
+    <p class="muted">Tocca una tratta, una città o un segnaposto. Le linee tratteggiate sono le tratte non incluse nel programma, da comprare voi (resta solo Kyoto → Osaka). Il cuore ♥ indica i posti salvati da Michela.</p>
     <div class="maprow">
       <div>
         <div class="mapmode" id="mapmode"></div>
@@ -401,15 +412,16 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
 <section class="view" id="v-giorni" role="tabpanel">
   <h2>Giorno per giorno</h2>
-  <p class="muted">I riquadri con l'orario sono dati del preventivo. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Sotto ogni giorno c'è il programma con orari e spostamenti: cambia un orario per fissarlo, sposta le tappe, aggiungi luoghi da Google Maps e premi «Riorganizza giorno» per l'ordine migliore. Il tramonto è verso le 17, alle 18 è già buio.</p>
+  <p class="muted">I riquadri con l'orario sono dati del programma dell'agenzia. Tocca una data nel menu per andare a quel giorno. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Sotto ogni giorno c'è il programma con orari e spostamenti: cambia un orario per fissarlo, sposta le tappe, aggiungi luoghi da Google Maps e premi «Riorganizza giorno» per l'ordine migliore. Il tramonto è verso le 17, alle 18 è già buio.</p>
+  <nav class="daynav" id="daynav" aria-label="Vai al giorno"></nav>
   <div id="days" style="margin-top:14px"></div>
 </section>
 
 <section class="view" id="v-treni" role="tabpanel">
   <h2>Treni e bus tra le città</h2>
-  <p class="muted">Il preventivo include solo il bus Nohi del 25 ottobre e i trasferimenti dall'aeroporto. Tutto il resto lo compri tu. Prezzi e durate sono indicativi: verificali prima di acquistare.</p>
+  <p class="muted">Il programma aggiornato include i treni del 24 (Tokyo → Takayama) e del 26 (Kanazawa → Kyoto), il bus Nohi del 25 e i trasferimenti privati da Narita e per KIX. Resta da comprare solo Kyoto → Osaka, più i mezzi in città.</p>
   <div class="verdict" style="margin-top:12px">
-    <h3>Conviene il Japan Rail Pass? No.</h3>
+    <h3>Serve il Japan Rail Pass? No.</h3>
     <div id="verdict"></div>
     <div class="calc-in">
       <label>Età di Umberto
@@ -429,9 +441,9 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
   <div class="sec">
     <h2>Come si prenota</h2>
     <ol class="steps">
-      <li>Shinkansen e Hida: una sola prenotazione su SmartEX o in biglietteria JR, da un mese prima della partenza.</li>
-      <li>Kanazawa → Kyoto: in stazione a Kanazawa, con il passaporto, chiedendo il biglietto per turisti stranieri.</li>
-      <li>Bus Nohi del 25 ottobre: voucher stampato su carta, quello digitale non vale.</li>
+      <li>Treni del 24 e del 26: già prenotati dall'agenzia. I biglietti sono alla reception del the b Akasaka; treni e orari non si possono cambiare.</li>
+      <li>Bus Nohi del 25 ottobre: voucher stampato su carta, quello digitale non vale. Fermata 3 del Nohi Bus Center, 15 minuti prima.</li>
+      <li>Kyoto → Osaka del 29: treno Keihan, si paga con la carta IC.</li>
       <li>Metro e treni locali: carta IC (Suica o ICOCA). Google Maps mostra orari, binari e prezzi in tempo reale.</li>
     </ol>
   </div>
@@ -455,9 +467,19 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
   <div class="sec">
     <h3>Contatti utili</h3>
     <div class="contact">
-      <p><b>Agenzia:</b> Ivaldi Viaggi (FM Viaggi), Piazza del Popolo 22 R, Savona. Preventivo n. 2182416 del 24 giugno 2026.</p>
-      <p><b>Operatore:</b> Alidays, telefono +39 02 87238400, info@alidays.it.</p>
-      <p style="margin:0"><b>In Giappone:</b> assistenza telefonica dalle 20:00 alle 08:00 e chat di giorno (numero e link sui voucher). Non prenota ristoranti né attrazioni.</p>
+      <p><b>Agenzia:</b> Ivaldi Viaggi (FM Viaggi), Piazza del Popolo 22 R, Savona. Prenotazione n. 2182416.</p>
+      <p><b>Operatore:</b> Alidays, assistenza 24 ore su 24 <a href="tel:+390287238400">+39 02 87238400</a> (anche WhatsApp), info@alidays.it.</p>
+      <p><b>In Giappone (MTJ):</b> chat di giorno, telefono <a href="tel:+81345604160">+81 3-4560-4160</a> dalle 20:00 alle 08:00. Non prenota ristoranti né attrazioni.</p>
+      <p><b>Transfer Green Tomato:</b> urgenze <a href="tel:+815030960911">+81 50-3096-0911</a>, emergenze <a href="tel:+815032050700">+81 50-3205-0700</a>.</p>
+      <p><b>Bus Nohi e ryokan (NTA):</b> emergenze <a href="tel:+815036469371">+81 50-3646-9371</a>. <b>Router WiFi (Vision Inc):</b> <a href="tel:+815058938021">+81 50-5893-8021</a>.</p>
+      <p><b>Assicurazione Allianz:</b> <a href="tel:+390226609539">+39 02 26609539</a>.</p>
+      <p><b>Ambasciata d'Italia a Tokyo:</b> <a href="tel:+81334535291">+81 3-3453-5291</a>, emergenze fuori orario <a href="tel:+819039081006">+81 90-3908-1006</a>.</p>
+      <p style="margin:0"><b>Emergenze in Giappone:</b> polizia <a href="tel:110">110</a>, ambulanza e vigili del fuoco <a href="tel:119">119</a>, Japan Helpline <a href="tel:0120461997">0120-461-997</a>.</p>
+    </div>
+  </div>
+  <div class="sec">
+    <h3>Prenotazioni</h3>
+    <div class="contact" id="bookings">
     </div>
   </div>
   <div class="sec" id="settings">
@@ -529,11 +551,11 @@ const GGL=["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","s
 
 /* ---------- dati del viaggio ---------- */
 const HOT = {
-  tokyo:{ll:[35.6714763,139.7330338],n:"the b Akasaka",q:"the b akasaka-mitsuke, Tokyo",stars:3,room:"Family 4 per 3 persone, non fumatori, solo pernottamento",dates:"20 → 24 ottobre",nights:4,st:"ok",note:"Nelle camere Family il bambino può non avere un letto proprio e la colazione dei bambini si paga sul posto."},
-  takayama:{ll:[36.1402406,137.262593],n:"Futarishizuka Hakuun",q:"Futarishizuka Hakuun, 67 Horibatamachi, Takayama, Gifu",stars:3,room:"Camera giapponese con futon (verifica tipo di camera e mezza pensione)",dates:"24 → 25 ottobre",nights:1,st:"req",note:"Ryokan sulla collina sopra il centro di Takayama, a piedi dal centro storico. Sostituisce il Ryokan Yakenoyu di Okuhida: fatti confermare il cambio dall'agenzia."},
-  kanazawa:{ll:[36.5682402,136.6535862],n:"Hotel Intergate Kanazawa",q:"Hotel Intergate Kanazawa",stars:4,room:"Standard Double con letto Queen, FUMATORI, solo pernottamento",dates:"25 → 26 ottobre",nights:1,st:"ok",note:"Con un bambino chiedi una camera non fumatori."},
-  kyoto:{ll:[35.0078272,135.7670939],n:"Hotel Gracery Kyoto Sanjo",q:"Hotel Gracery Kyoto Sanjo",stars:4,room:"Standard Double per 3 persone, non fumatori, solo pernottamento",dates:"26 → 29 ottobre",nights:3,st:"ok",note:"Conferma come sono sistemati i tre letti."},
-  osaka:{ll:[34.6909208,135.5069232],n:"The Royal Park Canvas Osaka Kitahama",q:"The Royal Park Canvas Osaka Kitahama",stars:4,room:"Deluxe Twin con 3 letti, non fumatori, solo pernottamento",dates:"29 → 30 ottobre",nights:1,st:"ok",note:"Una sola notte: lascia i bagagli e vai a Nakanoshima."}
+  tokyo:{ll:[35.6714763,139.7330338],n:"the b Akasaka",q:"the b akasaka-mitsuke, Tokyo",stars:3,room:"Family 4 per 3 persone (TPL Family 4), non fumatori, solo pernottamento",dates:"20 → 24 ottobre",nights:4,st:"ok",addr:"7-6-13 Akasaka, Minato-ku, Tokyo",tel:"+81 3-3586-0811",ref:"284-7032170 (Hotelbeds)",note:"Alla reception trovate i biglietti dei treni del 24 e del 26. Nelle camere Family il bambino può non avere un letto proprio e la colazione dei bambini si paga sul posto."},
+  takayama:{ll:[36.1402406,137.262593],n:"Futarishizuka Hakuun",q:"Futarishizuka Hakuun, 67 Horibatamachi, Takayama, Gifu",stars:3,room:"Camera giapponese DBL-Family, mezza pensione (cena e colazione)",dates:"24 → 25 ottobre",nights:1,st:"ok",addr:"67 Horibatamachi, Takayama, Gifu 506-0837",tel:"+81 577-32-7666",ref:"NTA000000044368 (NTA)",note:"Ryokan sulla collina sopra il centro di Takayama, a piedi dal centro storico. Arrivate entro le 17:00: la cena si serve tra le 18:00 e le 19:30."},
+  kanazawa:{ll:[36.5682402,136.6535862],n:"Hotel Intergate Kanazawa",q:"Hotel Intergate Kanazawa",stars:4,room:"Standard Double per 3 persone, un letto Queen, non fumatori, solo pernottamento",dates:"25 → 26 ottobre",nights:1,st:"ok",addr:"2-5 Takaokamachi, Kanazawa 920-0864",tel:"+81 76-260-7200",ref:"9095885663998 (Travelscape)",note:"Ora è non fumatori. Il letto è un solo Queen per tre: chiedete al check-in un letto aggiunto o un futon per Umberto."},
+  kyoto:{ll:[35.0078272,135.7670939],n:"Hotel Gracery Kyoto Sanjo",q:"Hotel Gracery Kyoto Sanjo",stars:4,room:"Tripla (TPL Triple Room), non fumatori, solo pernottamento",dates:"26 → 29 ottobre",nights:3,st:"ok",addr:"406 Shinkyogoku-dori Sanjo-sagaru, Sakurano-cho, Nakagyo-ku, Kyoto",tel:"+81 75-222-1111",ref:"284-7032178 (Hotelbeds)",note:"Camera tripla, tre letti. Nel programma il telefono è scritto «+39075-222-111»: è un refuso, il numero giapponese è 075-222-1111."},
+  osaka:{ll:[34.6909208,135.5069232],n:"The Royal Park Canvas Osaka Kitahama",q:"The Royal Park Canvas Osaka Kitahama",stars:4,room:"Deluxe Twin con 3 letti, non fumatori, solo pernottamento",dates:"29 → 30 ottobre",nights:1,st:"ok",addr:"1-9-8 Kitahama, Chuo-ku, Osaka 541-0041",tel:"+81 6-6220-1111",ref:"9020880327646 (Travelscape)",note:"Una sola notte: lascia i bagagli e vai a Nakanoshima. Il 30 il transfer per KIX passa alle 5:15."}
 };
 const CITY = {
   tokyo:{n:"Tokyo",cap:21,ovh:1.3,origin:HOT.tokyo.q},
@@ -545,14 +567,14 @@ const CITY = {
 };
 const NODES = {
   tokyo:{n:"Tokyo",lat:35.68,lon:139.76,sleep:1,pos:"r",city:"tokyo",hot:"tokyo"},
-  nagoya:{n:"Nagoya",lat:35.18,lon:136.91,pos:"b",minor:1,info:"Qui cambi tra lo Shinkansen e il treno Hida per Takayama. Il cambio richiede da 5 a 25 minuti."},
+  nagoya:{n:"Nagoya",lat:35.18,lon:136.91,pos:"b",minor:1,info:"Cambio di 9 minuti: il Nozomi 135 arriva alle 10:39, il treno Hida 7 per Takayama parte alle 10:48."},
   takayama:{n:"Takayama",lat:36.14,lon:137.26,sleep:1,pos:"r",city:"takayama",hot:"takayama"},
   shirakawago:{n:"Shirakawa-go",lat:36.26,lon:136.91,pos:"l",city:"shirakawago",info:"Sosta di circa due ore dal bus Nohi del 25 ottobre."},
   kanazawa:{n:"Kanazawa",lat:36.56,lon:136.66,sleep:1,pos:"l",city:"kanazawa",hot:"kanazawa"},
-  tsuruga:{n:"Tsuruga",lat:35.65,lon:136.06,pos:"l",minor:1,info:"Qui cambi tra lo Shinkansen Hokuriku e il Thunderbird per Kyoto. Il cambio richiede circa 10 minuti."},
+  tsuruga:{n:"Tsuruga",lat:35.65,lon:136.06,pos:"l",minor:1,info:"Cambio di 12 minuti: lo Shinkansen Tsurugi 23 arriva alle 14:02, il Thunderbird 24 per Kyoto parte alle 14:14."},
   kyoto:{n:"Kyoto",lat:35.01,lon:135.77,sleep:1,pos:"r",city:"kyoto",hot:"kyoto"},
   osaka:{n:"Osaka",lat:34.69,lon:135.50,sleep:1,pos:"l",city:"osaka",hot:"osaka"},
-  kix:{n:"Aeroporto KIX",lat:34.43,lon:135.24,pos:"l",minor:1,info:"Aeroporto del rientro. Il volo parte alle 9:00 del 30 ottobre."}
+  kix:{n:"Aeroporto KIX",lat:34.43,lon:135.24,pos:"l",minor:1,info:"Aeroporto del rientro. Il transfer privato passa in hotel alle 5:15, il volo parte alle 9:00 del 30 ottobre."}
 };
 const EDGES = [
   {leg:"t1",a:"tokyo",b:"nagoya"},{leg:"t1",a:"nagoya",b:"takayama"},
@@ -562,97 +584,87 @@ const EDGES = [
   {leg:"t6",a:"osaka",b:"kix"}
 ];
 const TR = [
- {id:"t1",date:"24 ottobre",st:"todo",title:"Tokyo → Takayama",
-  sum:"Nel preventivo non c'è: va comprato a parte. La via di Nagoya è la più semplice.",
+ {id:"t1",date:"24 ottobre",st:"ok",title:"Tokyo → Takayama",
+  sum:"Nel programma aggiornato è incluso e confermato: Shinkansen Nozomi fino a Nagoya e treno Hida fino a Takayama, seconda classe. I biglietti sono alla reception del the b Akasaka. Treno e orario non si possono cambiare.",
   opts:[
-   {n:"Shinkansen fino a Nagoya e treno Hida fino a Takayama",t:"4h30–5h, un cambio a Nagoya",c:"circa 16.500 JPY adulto, posti riservati",nt:"Il Hida è solo a posti riservati: prenota i due tratti insieme in biglietteria JR o su SmartEX.",pick:1},
-   {n:"Shinkansen Hokuriku fino a Toyama e Hida fino a Takayama",t:"circa 5h, un cambio a Toyama",c:"simile alla via di Nagoya",nt:"Ha senso solo se la linea Hida tra Toyama e Takayama è regolare: verifica prima di scegliere."},
-   {n:"Bus diretto Shinjuku → Hirayu e Takayama (Keio e Nohi)",t:"Hirayu in circa 4h30, Takayama in circa 5h55",c:"5.300–6.200 JPY a Hirayu, adulto",nt:"Prenotazione obbligatoria, valigie in stiva. Più lento del treno e con valigie in stiva: tienilo come piano B."}
+   {n:"Nozomi 135 + Hida 7 (prenotati)",t:"09:00 Tokyo → 10:39 Nagoya · 10:48 Nagoya → 13:12 Takayama (4h12)",c:"incluso",nt:"A Nagoya hai 9 minuti per il cambio: bastano, ma niente soste. Carrozza e posto di entrambi i treni sono sul biglietto.",pick:1,pl:"Prenotato"}
   ],
-  tips:["Parti da Tokyo entro le 9:30: arrivi a Takayama prima delle 15 e hai tempo per il centro storico.","I biglietti si prenotano da un mese prima, quindi puoi farlo già ora.","Bambini da 6 a 11 anni: metà tariffa. Sotto i 6 anni gratis se non occupano un posto."],
+  tips:["Dal the b Akasaka a Tokyo Station servono circa 20–25 minuti (metro Marunouchi da Akasaka-mitsuke, o taxi): uscite dall'hotel verso le 8:15.","A Nagoya scendete e seguite i cartelli «在来線 / JR Lines» e «Hida / Takayama»: si passa dal tornello di cambio inserendo i biglietti.","Sui Shinkansen Tokaido le valigie oltre 160 cm (somma dei lati) richiedono un posto apposito prenotato: se non spedite le valigie, verificate."],
   dir:["Tokyo Station","JR Takayama Station"]},
- {id:"t2",date:"25 ottobre",st:"req",title:"Takayama → Shirakawa-go → Kanazawa",
-  sum:"Il bus Nohi da Takayama a Kanazawa è nel preventivo, su richiesta. Il voucher va stampato su carta.",
+ {id:"t2",date:"25 ottobre",st:"ok",title:"Takayama → Shirakawa-go → Kanazawa",
+  sum:"Bus Nohi incluso, prenotazione R26087903 (NTA). Partenza dalla fermata numero 3 del Takayama Nohi Bus Center, arrivo a Kanazawa Ekimae. Il voucher va stampato su carta.",
   opts:[
-   {n:"Bus delle 8:50",t:"Shirakawa-go 9:40, ripartenza 12:20, Kanazawa 13:35",c:"incluso",nt:"Fattibile dormendo in centro, ma rinunci al mercato del mattino e a Shirakawa-go resti a lungo."},
-   {n:"Bus delle 10:50, prenotato di default",t:"Shirakawa-go 11:40, ripartenza 13:50, Kanazawa 15:05",c:"incluso",nt:"Dal ryokan al Nohi Bus Center si va a piedi o in taxi: prima c'è tempo per il mercato Miyagawa e il Jinya. Arrivi a Kanazawa con la luce.",pick:1,pl:"Consigliata"},
-   {n:"Bus delle 11:50",t:"Shirakawa-go 12:57, ripartenza 15:10, Kanazawa 16:35",c:"incluso",nt:"Mattina più lunga a Takayama, ma arrivi a Kanazawa quando sta per far buio."}
+   {n:"Bus delle 10:50 (orario da verificare sul voucher)",t:"Shirakawa-go 11:40, ripartenza 13:50, Kanazawa 15:05",c:"incluso",nt:"Il programma non riporta l'orario: vale quello scritto sul voucher. Dal ryokan al Nohi Bus Center si va a piedi o in taxi; prima c'è tempo per il mercato Miyagawa e il Jinya.",pick:1,pl:"Prenotato"}
   ],
-  tips:["Il voucher cartaceo è obbligatorio: senza carta non sali e non c'è rimborso.","A Shirakawa-go hai circa due ore. Il villaggio di Ogimachi basta; il belvedere solo se avanza tempo.","Domenica è il giorno più affollato: vai subito verso il fondo del villaggio."],
+  tips:["Siate alla fermata 3 almeno 15 minuti prima della partenza.","Il voucher cartaceo è obbligatorio: senza carta non sali e non c'è rimborso.","A Shirakawa-go hai circa due ore. Il villaggio di Ogimachi basta; il belvedere solo se avanza tempo. Restate sui percorsi segnalati: in zona ci sono orsi.","Domenica è il giorno più affollato: vai subito verso il fondo del villaggio."],
   dir:["Takayama Nohi Bus Center","Kanazawa Station"]},
- {id:"t3",date:"26 ottobre",st:"req",title:"Kanazawa → Kyoto",
-  sum:"Proposto dall'agenzia: Shinkansen Tsurugi fino a Tsuruga e Thunderbird fino a Kyoto, con 12 minuti per il cambio. Dal 2024 il treno diretto non esiste più.",
+ {id:"t3",date:"26 ottobre",st:"ok",title:"Kanazawa → Kyoto",
+  sum:"Incluso e confermato nel programma: Shinkansen Tsurugi fino a Tsuruga e Thunderbird fino a Kyoto, seconda classe. I biglietti sono alla reception del the b Akasaka, insieme a quelli del 24.",
   opts:[
-   {n:"Tsurugi 23 + Thunderbird 24 (proposta dell'agenzia)",t:"13:05 Kanazawa → 14:02 Tsuruga · 14:14 Tsuruga → 15:09 Kyoto (2h04)",c:"da confermare con l'agenzia",nt:"A Tsuruga il cambio è progettato per stare in circa 8–10 minuti: 12 minuti bastano, anche con Umberto, perché le valigie grandi viaggiano a parte.",pick:1,pl:"Proposta dell'agenzia"},
-   {n:"Bus JR West Kanazawa → Kyoto",t:"circa 4h50 (10:20 → 15:08)",c:"2.500–5.700 JPY secondo il periodo",nt:"Più economico ma molto più lento: con un bambino non conviene."}
+   {n:"Tsurugi 23 + Thunderbird 24 (prenotati)",t:"13:05 Kanazawa → 14:02 Tsuruga · 14:14 Tsuruga → 15:09 Kyoto (2h04)",c:"incluso",nt:"A Tsuruga il cambio è progettato per stare in circa 8–10 minuti: 12 minuti bastano. Treno e orario non si possono cambiare.",pick:1,pl:"Prenotato"}
   ],
   tips:["A Tsuruga scendi dallo Shinkansen e segui i cartelli gialli «在来線 / Conventional Lines» e «Thunderbird»: si scende di piano e si passa dal tornello di cambio inserendo entrambi i biglietti.","Preparate zaini e giacche qualche minuto prima di Tsuruga: è il capolinea, scendono tutti.","Se lo Shinkansen arriva in ritardo e perdi la coincidenza, il personale JR ti mette sul Thunderbird successivo: chiedi allo sportello o al capotreno.","Alla stazione di Kanazawa conviene arrivare per le 12:45. Dall'Omicho sono circa 10 minuti a piedi."],
   dir:["Kanazawa Station","Kyoto Station"]},
  {id:"t5",date:"29 ottobre",st:"todo",title:"Kyoto → Osaka (Kitahama)",
-  sum:"Non è nel preventivo. Il treno Keihan ti porta quasi davanti all'hotel di Osaka.",
+  sum:"Non è nel programma: è l'unico treno da comprare. Il treno Keihan ti porta quasi davanti all'hotel di Osaka.",
   opts:[
    {n:"Treno Keihan da Sanjo a Kitahama",t:"circa 50 minuti",c:"circa 430 JPY adulto",nt:"Niente passaggio da Kyoto Station e nessun cambio con le valigie. Verifica la stazione più vicina all'hotel di Kyoto.",pick:1},
    {n:"JR Shinkaisoku da Kyoto a Osaka, poi metro",t:"30 minuti più circa 15",c:"circa 580 JPY più la metro",nt:"Più veloce sul treno ma con un cambio."}
   ],
   tips:["Il check-in a Osaka di solito è dalle 15: lascia i bagagli in hotel e vai a Nakanoshima.","Usa la carta IC per pagare: niente biglietti singoli."],
   dir:["Sanjo Station Kyoto","Kitahama Station Osaka"]},
- {id:"t6",date:"30 ottobre",st:"req",title:"Hotel di Osaka → aeroporto KIX",
-  sum:"Il trasferimento collettivo è nel preventivo, su richiesta.",
+ {id:"t6",date:"30 ottobre",st:"ok",title:"Hotel di Osaka → aeroporto KIX",
+  sum:"Nel programma aggiornato è un trasferimento privato Green Tomato (prenotazione 2603C15), con ritiro in hotel alle 5:15.",
   opts:[
-   {n:"Navetta collettiva dall'hotel",t:"circa 1h–1h15, da verificare",c:"incluso",nt:"È prevista per voli dalle 8:30 in poi: il tuo è alle 9:00, al limite. Chiedi l'orario di ritiro.",pick:1}
+   {n:"Trasferimento privato dall'hotel",t:"pick-up 05:15, circa 1 ora fino a KIX",c:"incluso",nt:"Fatevi trovare davanti alla lobby alle 5:00. L'autista aspetta 20 minuti, poi il servizio è perso senza rimborso. Massimo 2 colli a persona.",pick:1,pl:"Prenotato"}
   ],
-  tips:["Il volo è alle 9:00: conta di essere in aeroporto alle 6:30, quindi parti dall'hotel prima delle 5:30.","Prepara tutto la sera prima: la colazione dell'hotel sarà ancora chiusa.","Chiedi dove e come riconsegnare il router WiFi."],
+  tips:["Urgenze sul transfer: +81 50-3096-0911 (numero sul voucher); se non risponde, Alidays +39 02 87238400.","Prepara tutto la sera prima: la colazione dell'hotel sarà ancora chiusa. Chiedi alla reception un sacchetto per la colazione.","Il banco del router WiFi a KIX apre alle 8:00: conviene riconsegnarlo la sera del 29 con la busta (reception o konbini)."],
   dir:["The Royal Park Canvas Osaka Kitahama","Kansai International Airport"]}
 ];
 const TRM = {}; TR.forEach(t=>TRM[t.id]=t);
 const FARES = [
- {l:"Tokyo → Takayama, Shinkansen e Hida",a:16500,k:"train"},
- {l:"Kanazawa → Kyoto, biglietto per stranieri",a:6500,k:"train"},
  {l:"Kyoto → Osaka, Keihan",a:430,k:"train"}
 ];
-const PASS = {adult:50000, jrSingles:16500+7440+580};
 
 const DAYS = [
- {d:"2026-10-19",c:"Milano",title:"Partenza",fx:[{t:"22:00",x:"Volo KE 928 Milano Malpensa → Seoul Incheon, arrivo alle 16:35 del 20",s:"ok"}],pl:[],w:[],tip:"Volo notturno di circa 11 ore: fai il check-in online e cerca di dormire. Un collo a testa."},
- {d:"2026-10-20",c:"Seoul e Tokyo",title:"Scalo a Seoul e arrivo a Tokyo",fx:[{t:"16:35",x:"Arrivo a Seoul Incheon",s:"ok"},{t:"18:35",x:"Volo KE 705 Seoul → Tokyo Narita",s:"ok"},{t:"21:05",x:"Arrivo a Narita e trasferimento privato in hotel, solo autista",s:"req"},{t:"in serata",x:"Check-in al the b Akasaka, camera Family 4",s:"ok"}],pl:[],w:["Lo scalo è di due ore: resta nell'area transiti e vai subito al gate."],tip:"Arriverai in hotel verso le 23: cena leggera in aeroporto o in un konbini vicino all'hotel. Mostra i codici di Visit Japan Web per far prima all'arrivo."},
- {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Pranzo e merenda",ids:["mf_jangara","mf_marion","mf_sweetpalace","mf_flippers"],t:"Ramen da Jangara, poi una crêpe su Takeshita Street: delle due salvate da Michela basta Marion. Flipper's solo se rinunciate alla crêpe."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:["mf_misawa"],t:"Cena a Shibuya: soba e udon in piedi da Misawa, a circa 15 minuti a piedi dall'incrocio. Poi a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
- {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","mf_uniqlo","mf_sushiro","mf_minoru","mf_fujiya","mf_royalhost","tk_shinjuku"],t:"Ginza, dove Michela ha salvato cinque posti: Uniqlo, poi cena da Sushiro (sushi sul nastro, perfetto con Umberto) oppure da Minoru Shokudo. Shinjuku diventa l'alternativa: non tutte e due."}],w:[],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
- {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto (1 collo a persona, consegna in 36–48 ore)",s:"req"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:[],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Dopo il ritiro hai solo il bagaglio piccolo fino al 26: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere."},
- {d:"2026-10-24",c:"Tokyo → Takayama",title:"Dalla metropoli alle montagne",fx:[{t:"mattina",x:"Check-out dall'hotel di Tokyo",s:"ok"},{t:"15:00–18:00",x:"Check-in al Futarishizuka Hakuun, ryokan a Takayama",s:"req"}],pl:[{w:"Mattina",ids:[],t:"Treno Tokyo → Nagoya → Takayama, con partenza entro le 9:30 (circa 4h30–5h)."},{w:"Pomeriggio",ids:["ta_sanmachi","ta_folk"],t:"Centro storico con calma, con pranzo o spiedini di manzo Hida. Hida no Sato solo se vi avanza tempo."},{w:"Sera",ids:["ta_onsen","mf_hakuun"],t:"Al ryokan sulla collina: onsen e cena."}],w:["Il preventivo non comprende il treno da Tokyo."],tip:"Dormendo a Takayama non serve più il bus per Okuhida: il pomeriggio è tutto per il centro storico."},
- {d:"2026-10-25",c:"Takayama → Kanazawa",title:"Mercato del mattino, Shirakawa-go e Kanazawa",fx:[{t:"10:50",x:"Bus Nohi Takayama → Shirakawa-go → Kanazawa, con voucher cartaceo",s:"req"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa (nel preventivo è una camera fumatori)",s:"ok"}],pl:[{w:"Mattina presto",ids:["ta_market","ta_jinya"],t:"Mercato Miyagawa lungo il fiume (dalle 7) e, se vi va, il Jinya. Poi al Nohi Bus Center per le 10:30."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi","mf_tamura","mf_busaku","mf_shamaron"],t:"Higashi Chaya all'imbrunire, poi cena a pochi passi: Tamura (izakaya di pesce) oppure Busaku (kaiseki da 8 posti, da prenotare). Scegline uno."}],w:["Domenica: Shirakawa-go è affollata."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
- {d:"2026-10-26",c:"Kanazawa → Kyoto",title:"Il giardino al mattino e il treno per Kyoto",fx:[{t:"13:05",x:"Tsurugi 23 Kanazawa → Tsuruga (14:02), Thunderbird 24 Tsuruga 14:14 → Kyoto 15:09",s:"req"},{t:"dalle 15:00",x:"Check-in all'Hotel Gracery Kyoto Sanjo, 3 notti",s:"ok"}],pl:[{w:"Mattina",ids:["kz_kenroku","kz_castle"],t:"Kenroku-en all'apertura (8:00), poi il parco del castello di fronte."},{w:"Pranzo",ids:["kz_omicho"],t:"Ciotola di pesce al mercato Omicho."},{w:"Primo pomeriggio",ids:[],t:"Treno delle 13:05: Tsurugi fino a Tsuruga, cambio di 12 minuti, Thunderbird fino a Kyoto (arrivo alle 15:09)."},{w:"Sera",ids:["ky_nishiki","ky_pontocho"],t:"Nishiki chiude presto; più tardi Pontocho per cena."}],w:["Il Museo del XXI secolo di Kanazawa è chiuso il lunedì.","Le valigie spedite da Tokyo devono essere già in hotel: conferma all'arrivo."],tip:"Il Kenroku-en da metà ottobre chiude presto: l'apertura delle 8:00 è il momento migliore."},
- {d:"2026-10-27",c:"Kyoto",title:"Fushimi Inari all'alba e Kyoto con calma",fx:[],pl:[{w:"Mattina presto",ids:["ky_fushimi"],t:"Fushimi Inari verso le 7:30, prima dei gruppi: da Sanjo il treno Keihan ci arriva in pochi minuti. Salite fin dove ve la sentite: fino in cima servono 2–3 ore."},{w:"Tarda mattina",ids:["ky_kimono"],t:"Giornata libera: è il momento ideale per la passeggiata in kimono a Gion e Higashiyama, prenotata."},{w:"Pomeriggio",ids:["ky_philosopher"],t:"Sentiero del Filosofo e Nanzen-ji, con calma."},{w:"Sera",ids:["ky_pontocho"],t:"Cena di coppia a Pontocho, vicino all'hotel."}],w:["L'escursione Nara e Fushimi Inari è ancora nel preventivo: va tolta con l'agenzia entro l'11 ottobre, dal 12 la penale è del 100%."],tip:"Senza escursione, il 27 è l'unica giornata davvero libera del viaggio: non riempitela troppo."},
+ {d:"2026-10-19",c:"Milano",title:"Partenza",fx:[{t:"22:00",x:"Volo KE 928 Milano Malpensa → Seoul Incheon, arrivo alle 16:35 del 20",s:"ok"}],pl:[],w:[],tip:"Volo notturno di circa 11 ore: fai il check-in online e cerca di dormire. Un collo a testa. In aeroporto 3 ore prima, con passaporti e documenti di viaggio."},
+ {d:"2026-10-20",c:"Seoul e Tokyo",title:"Scalo a Seoul e arrivo a Tokyo",fx:[{t:"16:35",x:"Arrivo a Seoul Incheon",s:"ok"},{t:"18:35",x:"Volo KE 705 Seoul → Tokyo Narita",s:"ok"},{t:"21:05",x:"Arrivo a Narita: ritiro del router WiFi al banco Ninja WiFi (Terminal 1) con il voucher",s:"ok"},{t:"21:05",x:"Trasferimento privato Green Tomato (2603BC1): autista con cartello col vostro nome dopo la dogana, aspetta 90 minuti dall'atterraggio",s:"ok"},{t:"in serata",x:"Check-in al the b Akasaka, camera Family 4 (conferma 284-7032170)",s:"ok"}],pl:[],w:["Lo scalo è di due ore: resta nell'area transiti e vai subito al gate.","Transfer: massimo 2 colli a persona. Se non trovate l'autista: +81 50-3096-0911, poi Alidays +39 02 87238400."],tip:"Arriverai in hotel verso le 23: cena leggera in aeroporto o in un konbini vicino all'hotel. Mostra i codici di Visit Japan Web per far prima all'arrivo. Dal 20 è attiva l'assistenza MTJ: chat di giorno, telefono +81 3-4560-4160 dalle 20 alle 8."},
+ {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[{t:"in hotel",x:"Alla reception: ritira i biglietti dei treni del 24 (Tokyo → Takayama) e del 26 (Kanazawa → Kyoto)",s:"ok"}],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Pranzo e merenda",ids:["mf_jangara","mf_marion","mf_sweetpalace","mf_flippers"],t:"Ramen da Jangara, poi una crêpe su Takeshita Street: delle due salvate da Michela basta Marion. Flipper's solo se rinunciate alla crêpe."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:["mf_misawa"],t:"Cena a Shibuya: soba e udon in piedi da Misawa, a circa 15 minuti a piedi dall'incrocio. Poi a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
+ {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","mf_uniqlo","mf_sushiro","mf_minoru","mf_fujiya","mf_royalhost","tk_shinjuku"],t:"Ginza, dove Michela ha salvato cinque posti: Uniqlo, poi cena da Sushiro (sushi sul nastro, perfetto con Umberto) oppure da Minoru Shokudo. Shinjuku diventa l'alternativa: non tutte e due."}],w:["Se volete spedire le valigie a Kyoto, oggi è l'ultimo giorno per prenotare il ritiro alla reception (serve almeno 24 ore di anticipo)."],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
+ {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto: non è nel programma aggiornato, va prenotato alla reception (consegna in 36–48 ore)",s:"risk"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:[],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Se spedite le valigie, fino al 26 avete solo il bagaglio piccolo: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere e quanto costa a collo."},
+ {d:"2026-10-24",c:"Tokyo → Takayama",title:"Dalla metropoli alle montagne",fx:[{t:"08:15",x:"Check-out dal the b Akasaka e metro per Tokyo Station",s:"ok"},{t:"09:00",x:"Shinkansen Nozomi 135 Tokyo → Nagoya, arrivo alle 10:39",s:"ok"},{t:"10:48",x:"Treno Hida 7 Nagoya → Takayama, arrivo alle 13:12",s:"ok"},{t:"entro le 17:00",x:"Check-in al Futarishizuka Hakuun (NTA000000044368), mezza pensione: cena tra le 18:00 e le 19:30",s:"ok"}],pl:[{w:"Mattina",ids:[],t:"In treno: il Hida sale lungo la valle tra le montagne. Pranzo al sacco (ekiben) comprato a Tokyo Station."},{w:"Pomeriggio",ids:["ta_sanmachi","ta_folk"],t:"Dalle 13:15 centro storico con calma, con spiedini di manzo Hida. Hida no Sato solo se vi avanza tempo. Al ryokan entro le 17."},{w:"Sera",ids:["ta_onsen","mf_hakuun"],t:"Al ryokan sulla collina: cena e onsen."}],w:["A Nagoya il cambio è di 9 minuti: preparatevi a scendere prima dell'arrivo."],tip:"Treni già prenotati e non modificabili: arrivate a Tokyo Station con 20 minuti di margine."},
+ {d:"2026-10-25",c:"Takayama → Kanazawa",title:"Mercato del mattino, Shirakawa-go e Kanazawa",fx:[{t:"10:50",x:"Bus Nohi (R26087903) dalla fermata 3 del Takayama Nohi Bus Center, via Shirakawa-go, a Kanazawa Ekimae. Voucher cartaceo, orario da verificare sul voucher",s:"ok"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa, camera non fumatori con letto Queen (9095885663998)",s:"ok"}],pl:[{w:"Mattina presto",ids:["ta_market","ta_jinya"],t:"Mercato Miyagawa lungo il fiume (dalle 7) e, se vi va, il Jinya. Poi al Nohi Bus Center per le 10:30, almeno 15 minuti prima della partenza."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi","mf_tamura","mf_busaku","mf_shamaron"],t:"Higashi Chaya all'imbrunire, poi cena a pochi passi: Tamura (izakaya di pesce) oppure Busaku (kaiseki da 8 posti, da prenotare). Scegline uno."}],w:["Domenica: Shirakawa-go è affollata.","A Shirakawa-go restate sui percorsi segnalati: in zona sono stati avvistati orsi."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
+ {d:"2026-10-26",c:"Kanazawa → Kyoto",title:"Il giardino al mattino e il treno per Kyoto",fx:[{t:"13:05",x:"Tsurugi 23 Kanazawa → Tsuruga (14:02), Thunderbird 24 Tsuruga 14:14 → Kyoto 15:09, prenotati",s:"ok"},{t:"dalle 15:00",x:"Check-in all'Hotel Gracery Kyoto Sanjo, camera tripla, 3 notti (284-7032178)",s:"ok"}],pl:[{w:"Mattina",ids:["kz_kenroku","kz_castle"],t:"Kenroku-en all'apertura (8:00), poi il parco del castello di fronte."},{w:"Pranzo",ids:["kz_omicho"],t:"Ciotola di pesce al mercato Omicho."},{w:"Primo pomeriggio",ids:[],t:"Treno delle 13:05: Tsurugi fino a Tsuruga, cambio di 12 minuti, Thunderbird fino a Kyoto (arrivo alle 15:09)."},{w:"Sera",ids:["ky_nishiki","ky_pontocho"],t:"Nishiki chiude presto; più tardi Pontocho per cena."}],w:["Il Museo del XXI secolo di Kanazawa è chiuso il lunedì.","Se avete spedito le valigie da Tokyo, devono essere già in hotel: conferma all'arrivo."],tip:"Il Kenroku-en da metà ottobre chiude presto: l'apertura delle 8:00 è il momento migliore."},
+ {d:"2026-10-27",c:"Kyoto",title:"Fushimi Inari all'alba e Kyoto con calma",fx:[],pl:[{w:"Mattina presto",ids:["ky_fushimi"],t:"Fushimi Inari verso le 7:30, prima dei gruppi: da Sanjo il treno Keihan ci arriva in pochi minuti. Salite fin dove ve la sentite: fino in cima servono 2–3 ore."},{w:"Tarda mattina",ids:["ky_kimono"],t:"Giornata libera: è il momento ideale per la passeggiata in kimono a Gion e Higashiyama, prenotata."},{w:"Pomeriggio",ids:["ky_philosopher"],t:"Sentiero del Filosofo e Nanzen-ji, con calma."},{w:"Sera",ids:["ky_pontocho"],t:"Cena di coppia a Pontocho, vicino all'hotel."}],w:[],tip:"L'escursione Nara e Fushimi Inari non è più nel programma: il 27 è l'unica giornata davvero libera del viaggio, non riempitela troppo."},
  {d:"2026-10-28",c:"Kyoto",title:"Kyoto ovest: Arashiyama e Kinkaku-ji",fx:[],pl:[{w:"Mattina presto",ids:["ky_arashiyama"],t:"Alle 7:30 il bosco di bambù è ancora tuo."},{w:"Pomeriggio",ids:["ky_kinkaku"],t:"Il Padiglione d'Oro, sullo stesso lato della città."},{w:"Tramonto",ids:["ky_gion"],t:"Gion con calma, all'ora in cui si accendono le lanterne."}],w:[],tip:"Dal centro ad Arashiyama servono 30–40 minuti: parti presto e torna per cena."},
- {d:"2026-10-29",c:"Kyoto → Osaka",title:"Kiyomizu all'alba e trasferimento a Osaka",fx:[{t:"11:00",x:"Check-out dall'hotel di Kyoto",s:"ok"},{t:"dalle 15:00",x:"Check-in al Royal Park Canvas Osaka Kitahama",s:"ok"}],pl:[{w:"Mattina presto",ids:["ky_kiyomizu"],t:"Kiyomizu-dera dalle 6:00 alle 8:30, poi Sannenzaka e Ninenzaka con calma."},{w:"Tarda mattina",ids:[],t:"Torna in hotel per i bagagli e prendi la Keihan da Sanjo a Kitahama (circa 50 minuti)."},{w:"Pomeriggio",ids:["os_nakanoshima","os_castle"],t:"Lascia i bagagli in hotel, poi Nakanoshima e, se ti avanza tempo, il castello."},{w:"Sera",ids:["os_dotonbori"],t:"Dotonbori per cena."}],w:["È l'unica notte a Osaka: massimo due attività."],tip:"Prepara le valigie la sera prima: domani si parte all'alba."},
- {d:"2026-10-30",c:"Osaka → Milano",title:"Rientro",fx:[{t:"prima delle 5:30",x:"Navetta collettiva hotel → aeroporto KIX (chiedi l'orario di ritiro)",s:"req"},{t:"09:00",x:"Volo KE 722 Osaka KIX → Seoul, arrivo alle 11:05",s:"ok"},{t:"12:25",x:"Volo KE 927 Seoul → Milano Malpensa, arrivo alle 18:05",s:"ok"}],pl:[],w:["Lo scalo a Seoul è di 1h20: bagagli etichettati fino a Milano e subito al gate.","Il router WiFi va restituito: 10 € per ogni giorno di ritardo, circa 300 € se lo smarrisci."],tip:"Spendi gli ultimi yen prima di partire: il cambio in aeroporto è sfavorevole."}
+ {d:"2026-10-29",c:"Kyoto → Osaka",title:"Kiyomizu all'alba e trasferimento a Osaka",fx:[{t:"11:00",x:"Check-out dall'hotel di Kyoto (tassa di soggiorno da pagare qui)",s:"ok"},{t:"dalle 15:00",x:"Check-in al Royal Park Canvas Osaka Kitahama (9020880327646)",s:"ok"}],pl:[{w:"Mattina presto",ids:["ky_kiyomizu"],t:"Kiyomizu-dera dalle 6:00 alle 8:30, poi Sannenzaka e Ninenzaka con calma."},{w:"Tarda mattina",ids:[],t:"Torna in hotel per i bagagli e prendi la Keihan da Sanjo a Kitahama (circa 50 minuti)."},{w:"Pomeriggio",ids:["os_nakanoshima","os_castle"],t:"Lascia i bagagli in hotel, poi Nakanoshima e, se ti avanza tempo, il castello."},{w:"Sera",ids:["os_dotonbori"],t:"Dotonbori per cena."}],w:["È l'unica notte a Osaka: massimo due attività.","Stasera riconsegna il router WiFi con la busta e il modulo compilato (reception, 7-Eleven o FamilyMart): domattina il banco di KIX è ancora chiuso."],tip:"Prepara le valigie la sera prima: domani il transfer passa alle 5:15."},
+ {d:"2026-10-30",c:"Osaka → Milano",title:"Rientro",fx:[{t:"05:00",x:"Davanti alla lobby: trasferimento privato Green Tomato (2603C15) per KIX, pick-up alle 5:15. L'autista aspetta 20 minuti",s:"ok"},{t:"09:00",x:"Volo KE 722 Osaka KIX → Seoul, arrivo alle 11:05",s:"ok"},{t:"12:25",x:"Volo KE 927 Seoul → Milano Malpensa, arrivo alle 18:05",s:"ok"}],pl:[],w:["Lo scalo a Seoul è di 1h20: bagagli etichettati fino a Milano e subito al gate.","Il router WiFi va restituito: 10 € per ogni giorno di ritardo, circa 300 € se lo smarrisci. Il banco Ninja WiFi di KIX (Terminal 1) apre alle 8:00."],tip:"Spendi gli ultimi yen prima di partire: il cambio in aeroporto è sfavorevole."}
 ];
 
 const CHK = [
- {g:"agenzia",id:"c1",sev:"alta",t:"Ryokan del 24: conferma del cambio a Takayama",x:"La notte del 24 passa dal Ryokan Yakenoyu (Okuhida) al Futarishizuka Hakuun (67 Horibatamachi, Takayama). Fatti confermare dall'agenzia la nuova prenotazione, il tipo di camera, la mezza pensione e l'orario della cena, e che il Yakenoyu sia cancellato senza penali."},
- {g:"agenzia",id:"c2",sev:"alta",t:"Voucher del bus Nohi stampati su carta",x:"I voucher digitali non sono accettati: senza carta non sali e non c'è rimborso. Fatti inviare i voucher definitivi, stampali e conferma l'orario (di default 10:50)."},
- {g:"agenzia",id:"c3",sev:"alta",t:"Togliere l'escursione Nara e Fushimi Inari del 27",x:"Avete deciso di non andare a Nara, ma l'escursione è nel preventivo. Dal 12 ottobre la penale è del 100%: scrivi all'agenzia entro l'11 ottobre per cancellarla e chiedi lo storno della quota. Fushimi Inari lo fate da soli la mattina del 27."},
- {g:"agenzia",id:"c4",sev:"alta",t:"Kanazawa: camera non fumatori",x:"All'Hotel Intergate la camera nel preventivo è una Standard Double fumatori. Con un bambino chiedi il cambio."},
- {g:"agenzia",id:"c5",sev:"media",t:"Kyoto: tre persone in una Standard Double",x:"Chiedi com'è composta la camera (letto Queen più un letto aggiunto o un futon). Gli hotel giapponesi non garantiscono il letto matrimoniale: segnala il viaggio di nozze."},
- {g:"agenzia",id:"c6",sev:"media",t:"Orario del transfer per KIX",x:"Il volo del 30 ottobre è alle 9:00 e la navetta collettiva è prevista per voli dalle 8:30. Chiedi l'orario di ritiro in hotel e se esiste un'alternativa privata."},
- {g:"agenzia",id:"c7",sev:"media",t:"Router WiFi: dove si ritira e dove si riconsegna",x:"Noleggio dal 20 al 30 ottobre. Se non lo restituisci paghi 10 € al giorno, circa 300 € se lo smarrisci."},
- {g:"agenzia",id:"c8",sev:"media",t:"Ritiro dei bagagli a Tokyo il 23 ottobre",x:"Un solo collo a persona: gli extra si pagano anche dopo il rientro. Chiedi l'orario di ritiro. Le valigie arrivano a Kyoto in 36–48 ore."},
- {g:"online",id:"o1",sev:"alta",t:"Biglietti Tokyo → Takayama del 24 ottobre",x:"Shinkansen e Hida in un'unica prenotazione su SmartEX o in biglietteria JR. Le vendite si aprono un mese prima, quindi puoi farlo già ora. Il Hida è solo a posti riservati.",l:[["SmartEX","https://smart-ex.jp/en/"]]},
+ {g:"agenzia",id:"n1",sev:"alta",t:"Spedizione delle valigie a Kyoto: non è nel programma",x:"Nel programma aggiornato il ritiro dei bagagli del 23 ottobre non c'è più. Chiedi all'agenzia se è stato tolto o dimenticato. Altrimenti prenotalo tu alla reception del the b Akasaka almeno 24 ore prima (entro il 22) indicando l'Hotel Gracery Kyoto Sanjo. Senza spedizione, sui Shinkansen del 24 le valigie oltre 160 cm (somma dei lati) richiedono un posto bagagli prenotato, pena 1.000 JPY a collo."},
+ {g:"agenzia",id:"c2",sev:"alta",t:"Voucher del bus Nohi stampati su carta",x:"Prenotazione R26087903 (NTA). I voucher digitali non sono accettati: senza carta non sali e non c'è rimborso. Stampali e controlla l'orario sul voucher (di default 10:50). Fermata numero 3 del Takayama Nohi Bus Center, almeno 15 minuti prima."},
+ {g:"agenzia",id:"n2",sev:"alta",t:"Biglietti dei treni alla reception del the b Akasaka",x:"I biglietti del 24 (Nozomi 135 + Hida 7) e del 26 (Tsurugi 23 + Thunderbird 24) vi aspettano alla reception del primo hotel. Ritirateli all'arrivo e controllate date, orari e numero di biglietti (due adulti e Umberto). Treni e orari non si possono cambiare."},
+ {g:"agenzia",id:"n3",sev:"alta",t:"Router WiFi: ritiro a Narita, riconsegna la sera del 29",x:"Noleggio Vision Inc (Ninja WiFi), prenotazione in541542. Si ritira a Narita al banco del Terminal 1 con il voucher. Il 30 il banco di KIX apre alle 8:00 e voi arrivate verso le 6:15: riconsegnatelo la sera del 29 con la busta e il modulo compilato (reception dell'hotel di Osaka, 7-Eleven o FamilyMart). Se non lo restituisci paghi 10 € al giorno, circa 300 € se lo smarrisci."},
+ {g:"agenzia",id:"n4",sev:"media",t:"Kanazawa: un letto Queen per tre",x:"All'Hotel Intergate ora la camera è non fumatori, ma con un solo letto Queen. Chiedi all'agenzia o al check-in un letto aggiunto o un futon per Umberto."},
+ {g:"agenzia",id:"n5",sev:"media",t:"Transfer per KIX alle 5:15 del 30",x:"Trasferimento privato Green Tomato (2603C15). Fatevi trovare davanti alla lobby alle 5:00: l'autista aspetta 20 minuti, poi il servizio è perso senza rimborso. Chiedi alla reception un sacchetto per la colazione."},
+ {g:"agenzia",id:"n6",sev:"bassa",t:"Ryokan del 24: confermato",x:"Futarishizuka Hakuun (NTA000000044368), camera giapponese DBL-Family con mezza pensione. Arrivate entro le 17:00: la cena si serve tra le 18:00 e le 19:30. Con il treno che arriva alle 13:12 c'è tutto il tempo."},
  {g:"online",id:"o2",sev:"alta",t:"teamLab Planets con slot orario",x:"L'ingresso è a orario e si esaurisce. Punta al pomeriggio del 22 ottobre.",l:[["Sito ufficiale","https://www.teamlab.art/e/planets/"]]},
  {g:"online",id:"o3",sev:"media",t:"Shibuya Sky al tramonto",x:"Prenota lo slot verso le 16:30 del 21 ottobre: il tramonto è verso le 17.",l:[["Sito ufficiale","https://www.shibuya-scramble-square.com/sky/"]]},
  {g:"online",id:"o4",sev:"media",t:"Cena di coppia a Kyoto",x:"Il 27 o il 28 ottobre: un kaiseki o un tavolo a Pontocho. I posti migliori vanno prenotati con anticipo."},
  {g:"online",id:"o7",sev:"media",t:"Cena a Kanazawa del 25 ottobre (preferiti di Michela)",x:"È domenica sera: prenotate. Tamura, izakaya di pesce, tel. +81 76-222-0517 (o fatevi aiutare dall'hotel). Busaku, kaiseki al bancone da 8 posti, tel. +81 76-255-2034: solo su prenotazione, chiedete se accettano bambini."},
  {g:"online",id:"o5",sev:"bassa",t:"Kimono a Kyoto (facoltativo)",x:"Noleggio con vestizione e foto: prenota online per il 27 ottobre, la giornata libera a Kyoto. Richiede 2–3 ore."},
- {g:"agenzia",id:"o6",sev:"media",t:"Treno Kanazawa → Kyoto del 26: conferma all'agenzia",x:"Proposta: Tsurugi 23 alle 13:05 da Kanazawa (14:02 a Tsuruga), poi Thunderbird 24 alle 14:14 (15:09 a Kyoto). Il cambio di 12 minuti va bene. Rispondi all'agenzia che la soluzione va bene e chiedi posti riservati vicini per tre persone e i biglietti o i codici di prenotazione."},
  {g:"doc",id:"d1",sev:"alta",t:"Visit Japan Web",x:"Registra passaporti, immigrazione e dogana prima di partire e salva i codici QR: a Narita risparmi la fila.",l:[["Visit Japan Web","https://www.vjw.digital.go.jp/"]]},
- {g:"doc",id:"d2",sev:"media",t:"Passaporti e assicurazioni",x:"Passaporto valido per tutto il viaggio (per la Corea almeno 3 mesi oltre l'uscita). Porta i documenti delle polizze ALI TOP 24 e ALI Health 3 mln. Controlla i requisiti d'ingresso sul sito ufficiale.",l:[["Viaggiare Sicuri","https://www.viaggiaresicuri.it/"]]},
+ {g:"doc",id:"d7",sev:"alta",t:"Documenti di viaggio sempre con voi",x:"Stampate il programma (prenotazione 2182416) e i voucher: la compagnia aerea può chiedere la prova che il volo fa parte di un pacchetto. In hotel basta un documento e il numero di conferma della camera; alcuni chiedono una carta di credito a garanzia."},
+ {g:"doc",id:"d2",sev:"media",t:"Passaporti e assicurazioni",x:"Passaporto valido per tutto il viaggio (per la Corea almeno 3 mesi oltre l'uscita). Porta i documenti delle polizze Allianz (ALI TOP 24 e ALI Health 3 mln, tel. +39 02 26609539). Controlla i requisiti d'ingresso sul sito ufficiale.",l:[["Viaggiare Sicuri","https://www.viaggiaresicuri.it/"]]},
  {g:"doc",id:"d3",sev:"media",t:"Scalo a Seoul, solo in transito",x:"Se non esci dall'area transiti non entri in Corea: in teoria non servono né la K-ETA né l'Arrival Card (gli italiani sono comunque esenti dalla K-ETA fino al 31 dicembre 2026). Verifica su Viaggiare Sicuri."},
  {g:"doc",id:"d4",sev:"media",t:"Carta IC (Suica o ICOCA)",x:"Metro, treni locali e konbini si pagano con la carta IC. Verifica se puoi aggiungerla al telefono (iPhone) o se serve quella fisica."},
  {g:"doc",id:"d5",sev:"bassa",t:"Mappe offline e traduttore",x:"Scarica le mappe offline di Google Maps per Tokyo, Takayama, Kanazawa, Kyoto e Osaka, e il giapponese in Google Traduttore (funziona anche con la fotocamera)."},
- {g:"doc",id:"d6",sev:"media",t:"Yen in contanti",x:"Templi, mercati, ryokan e bus locali spesso accettano solo contanti. Ritira ai bancomat dei konbini (7-Eleven) e tieni banconote per i bus di Takayama e Shirakawa-go."},
- {g:"valigia",id:"v1",sev:"media",t:"Borsa piccola per tre giorni",x:"Dal 23 ottobre le valigie viaggiano da sole verso Kyoto. Nella borsa piccola: ricambi per il 24, 25 e 26 ottobre, beauty case, caricabatterie, documenti, voucher stampati."},
+ {g:"doc",id:"d6",sev:"media",t:"Yen in contanti",x:"Templi, mercati, ryokan e bus locali spesso accettano solo contanti. Ritira ai bancomat dei konbini (7-Eleven) e tieni banconote per i bus di Takayama e Shirakawa-go e per le tasse di soggiorno, da pagare al check-out."},
+ {g:"valigia",id:"v1",sev:"media",t:"Borsa piccola per tre giorni",x:"Se le valigie viaggiano da sole verso Kyoto dal 23 ottobre, nella borsa piccola: ricambi per il 24, 25 e 26 ottobre, beauty case, caricabatterie, documenti, voucher stampati."},
  {g:"valigia",id:"v2",sev:"media",t:"Strati e freddo in quota",x:"Tokyo e Kyoto sono miti, ma a Takayama e a Shirakawa-go la sera fa freddo, anche sotto i 10 °C. Kanazawa è spesso piovosa: porta un k-way."},
  {g:"valigia",id:"v3",sev:"bassa",t:"Calzini senza buchi",x:"Ryokan, templi e molti ristoranti si visitano senza scarpe."},
- {g:"valigia",id:"v4",sev:"bassa",t:"Adattatore e power bank",x:"Le prese giapponesi sono a due lamelle piatte. Il router consente fino a 5 dispositivi e 10 GB al giorno."},
+ {g:"valigia",id:"v4",sev:"bassa",t:"Adattatore e power bank",x:"Le prese giapponesi sono a due lamelle piatte (tipo A e B), a 100 V. Il router consente fino a 5 dispositivi e 10 GB al giorno: niente streaming video."},
  {g:"regole",id:"r1",sev:"bassa",t:"Onsen",x:"Ci si lava prima di entrare, niente costume, l'asciugamano resta fuori dall'acqua. Se hai tatuaggi, chiedi al ryokan."},
  {g:"regole",id:"r2",sev:"bassa",t:"Mance e cibo",x:"Non si lasciano mance. Nelle zone turistiche non si mangia camminando: fermati accanto al banco."},
  {g:"regole",id:"r3",sev:"bassa",t:"Treni silenziosi",x:"Niente telefonate su treni e bus, e con Umberto voce bassa."},
@@ -661,10 +673,11 @@ const CHK = [
 const GRP = {agenzia:"Da chiarire subito con l'agenzia",online:"Da prenotare online",doc:"Documenti e app",valigia:"Valigia e logistica",regole:"Buone regole in Giappone"};
 
 const EXPECT = [
- {t:"Colori delle foglie",x:"Più sali di quota, prima arrivano: Okuhida è la zona più avanti, Takayama e Shirakawa-go sono a metà. A Tokyo, Kyoto e Osaka il picco è previsto tra fine novembre e dicembre, quindi in città troverai soprattutto verde."},
+ {t:"Colori delle foglie",x:"Più sali di quota, prima arrivano: Takayama e Shirakawa-go sono a metà. A Tokyo, Kyoto e Osaka il picco è previsto tra fine novembre e dicembre, quindi in città troverai soprattutto verde."},
  {t:"Clima",x:"Fresco e spesso limpido. In città da 12 a 22 gradi circa, in montagna la notte scende sotto i 10. Kanazawa è la tappa più piovosa."},
  {t:"Luce",x:"Il tramonto è verso le 17 e alle 18 è buio. Programma le visite all'aperto la mattina e tieni la sera per mercati, quartieri e cene."},
- {t:"Giorni da ricordare",x:"24 e 25 ottobre sono sabato e domenica: Takayama e Shirakawa-go sono affollate. Lunedì 26 è chiuso il museo di Kanazawa, venerdì 23 i giardini del Palazzo Imperiale."}
+ {t:"Giorni da ricordare",x:"24 e 25 ottobre sono sabato e domenica: Takayama e Shirakawa-go sono affollate. Lunedì 26 è chiuso il museo di Kanazawa, venerdì 23 i giardini del Palazzo Imperiale."},
+ {t:"Tasse di soggiorno",x:"Si pagano in contanti o carta al check-out, a persona e a notte: a Takayama 100–300 JPY, a Kanazawa e Osaka 200–500 JPY, a Kyoto 200–1.000 JPY secondo il prezzo della camera."}
 ];
 
 /* ---------- stato ---------- */
@@ -707,7 +720,7 @@ function renderHead(){
   $("#lede").textContent=line+" Loris, Michela e Umberto: cinque città, dieci notti in hotel.";
   const todo=TR.filter(t=>t.st==="todo"||t.st==="risk").length;
   const tiles=[];
-  tiles.push(ti<0?[String(-ti),"giorni alla partenza"]:ti<=11?[`${ti+1}/12`,"giorno del viaggio"]:["12","giorni di viaggio"]);
+  tiles.push(ti<0?[String(-ti),ti===-1?"giorno alla partenza":"giorni alla partenza"]:ti<=11?[`${ti+1}/12`,"giorno del viaggio"]:["12","giorni di viaggio"]);
   tiles.push(["10","notti in hotel, in 5 città"]);
   tiles.push([String(todo),"spostamenti da sistemare"]);
   tiles.push([String(S.sel.size),"luoghi nel tuo piano"]);
@@ -718,11 +731,12 @@ function renderTabs(){
   $("#tabs").innerHTML=T.map(t=>`<button class="tab" role="tab" data-act="tab" data-id="${t[0]}" aria-selected="${S.view===t[0]}">${t[1]}</button>`).join("");
   $$(".view").forEach(v=>v.classList.toggle("on",v.id==="v-"+S.view));
 }
-function go(v){ S.view=v; store.set("view",v); renderTabs(); window.scrollTo({top:0}); }
+function go(v){ S.view=v; store.set("view",v); renderTabs(); window.scrollTo({top:0}); setTabsH();
+  if(v==="giorni"){ const ti=todayIdx(); if(ti>=0&&ti<DAYS.length) setTimeout(()=>goDay(DAYS[ti].d),30); else markDay(DAYS[0].d); } }
 
 /* ---------- percorso ---------- */
 function renderAlerts(){
-  const ids=["c1","c2","c3","c4","o1","o2"];
+  const ids=["n1","n2","c2","n3","n5","o2"];
   $("#alerts").innerHTML=ids.map(id=>{ const c=CHK.find(x=>x.id===id); return `<div class="alert ${c.sev}"><strong>${c.t}</strong><p>${c.x}</p></div>`; }).join("");
 }
 function renderStrip(){
@@ -848,6 +862,17 @@ function itemsFor(nodeKey){
     return true;
   });
 }
+const telHref=t=>"tel:"+String(t).replace(/[^+\d]/g,"");
+function hotInfo(h){ return `<span class="muted">${esc(h.addr)}</span><br>Tel. <a href="${telHref(h.tel)}">${esc(h.tel)}</a> · conferma <b>${esc(h.ref)}</b><br>`; }
+function renderBookings(){
+  const el=$("#bookings"); if(!el) return;
+  const H=["tokyo","takayama","kanazawa","kyoto","osaka"].map(k=>{ const h=HOT[k]; return `<p><b>${esc(h.n)}</b>, ${h.dates}: conferma <b>${esc(h.ref)}</b>, tel. <a href="${telHref(h.tel)}">${esc(h.tel)}</a></p>`; }).join("");
+  el.innerHTML=H+`<p><b>Treni del 24 e del 26</b> (MTJ): confermati, biglietti alla reception del the b Akasaka.</p>
+    <p><b>Bus Nohi del 25</b> (NTA): R26087903, voucher cartaceo.</p>
+    <p><b>Transfer Narita → hotel del 20</b> (Green Tomato): 2603BC1.</p>
+    <p><b>Transfer hotel → KIX del 30</b> (Green Tomato): 2603C15, pick-up 05:15.</p>
+    <p style="margin:0"><b>Router WiFi</b> (Vision Inc): in541542.</p>`;
+}
 function renderPanel(){
   const p=$("#panel");
   if(S.leg){
@@ -866,7 +891,7 @@ function renderPanel(){
   const n=NODES[k], h=n.hot?HOT[n.hot]:null, its=itemsFor(k).filter(a=>S.sel.has(a.id));
   let html=`<h3>${n.n}</h3>`;
   if(h){
-    html+=`<div class="hotel"><b>${h.n}</b> ${chip(h.st)}<br><span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span><br>${h.room}<br><span class="muted">${h.note}</span>
+    html+=`<div class="hotel"><b>${h.n}</b> ${chip(h.st)}<br><span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span><br>${h.room}<br>${hotInfo(h)}<span class="muted">${h.note}</span>
       <div class="acts"><button class="btn small primary" data-act="detail" data-kind="hot" data-id="${n.hot}">Scheda hotel</button><a class="btn small" target="_blank" rel="noopener" href="${gsearch(h.q)}">Hotel su Google Maps</a></div></div>`;
   } else if(n.info){ html+=`<p>${n.info}</p>`; }
   if(n.city){
@@ -896,13 +921,42 @@ function renderDays(){
     const pt=a=>a.ll?a.ll.join(","):a.q;
     const route=rp.length>=2?`<a class="btn small" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pt(rp[0]))}&destination=${encodeURIComponent(pt(rp[rp.length-1]))}${rp.length>2?"&waypoints="+encodeURIComponent(rp.slice(1,-1).map(pt).join("|")):""}">Giro del giorno su Google Maps (${rp.length} tappe)</a>`
       :rp.length===1?`<a class="btn small" target="_blank" rel="noopener" href="${placeUrl(rp[0])}">${esc(rp[0].name)} su Google Maps</a>`:"";
-    return `<article class="day${ti===i?" today":""}">
+    return `<article class="day${ti===i?" today":""}" id="day-${D.d}">
       <div class="stub"><div class="gg">${GG[dt.getDay()]}</div><div class="nn">${dt.getDate()}</div><div class="mm">${MESI[dt.getMonth()]}</div></div>
       <div class="daybody"><div class="dayhead"><h3>${D.title}</h3><span class="chip todo" style="background:var(--paper);color:var(--muted)">${D.c}</span>${ti===i?'<span class="seal">Oggi</span>':""}</div>
       ${fx}${pl}${w}${D.tip?`<p class="tip">${D.tip}</p>`:""}${renderTL(D,lists)}${route?`<div class="acts" style="margin-top:8px">${route}</div>`:""}
       <textarea class="note" data-act="note" data-id="${D.d}" aria-label="Note del ${dt.getDate()} ${MESI[dt.getMonth()]}" placeholder="Note vostre: ristoranti, orari, prenotazioni…">${esc(S.notes[D.d]||"")}</textarea></div></article>`;
   }).join("");
 }
+
+/* menu delle date: tocchi un giorno e ci vai, mentre scorri si accende quello che stai leggendo */
+let navDay=null, navLock=0;
+function renderDayNav(){
+  const ti=todayIdx();
+  $("#daynav").innerHTML=DAYS.map((D,i)=>{ const dt=parseD(D.d);
+    return `<button class="dchip${ti===i?" today":""}" data-act="goday" data-id="${D.d}" aria-current="${navDay===D.d}" title="${esc(GGL[dt.getDay()]+" "+dt.getDate()+" "+MESI[dt.getMonth()]+": "+D.title)}"><small>${GG[dt.getDay()]}</small><b>${dt.getDate()}</b><span>${esc(D.c)}</span></button>`; }).join("");
+  if(navDay) markDay(navDay);
+}
+function markDay(d){
+  navDay=d; const nav=$("#daynav"); if(!nav) return;
+  $$(".dchip",nav).forEach(c=>{ const on=c.dataset.id===d; c.setAttribute("aria-current",on); if(on){ const x=c.offsetLeft-(nav.clientWidth-c.offsetWidth)/2; nav.scrollTo({left:Math.max(0,x),behavior:"smooth"}); } });
+}
+function goDay(d){
+  const el=$("#day-"+d); if(!el) return;
+  navLock=Date.now()+900; markDay(d);
+  const calm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({behavior:calm?"auto":"smooth",block:"start"});
+}
+function spyDay(){
+  if(S.view!=="giorni"||Date.now()<navLock) return;
+  const nav=$("#daynav"); if(!nav) return;
+  const lim=nav.getBoundingClientRect().bottom+24; let cur=DAYS[0].d;
+  DAYS.forEach(D=>{ const el=$("#day-"+D.d); if(el&&el.getBoundingClientRect().top<=lim) cur=D.d; });
+  if(cur!==navDay) markDay(cur);
+}
+function setTabsH(){ const t=$(".tabs"); if(t) document.documentElement.style.setProperty("--tabs-h",t.offsetHeight+"px"); }
+let spyQ=false;
+window.addEventListener("scroll",function(){ if(spyQ) return; spyQ=true; requestAnimationFrame(()=>{ spyQ=false; spyDay(); }); },{passive:true});
 
 /* ---------- treni ---------- */
 function factor(kind){ if(S.child==="12+") return 1; if(S.child==="6-11") return .5; return 0; }
@@ -911,12 +965,10 @@ function renderCalc(){
   let tA=0,tC=0;
   const rows=FARES.map(r=>{ const ad=r.a*2, ch=r.a*f; tA+=ad; tC+=ch; return `<tr><td>${r.l}</td><td>${fmt(ad)}</td><td>${fmt(ch)}</td><td>${fmt(ad+ch)}</td></tr>`; }).join("");
   const tot=tA+tC;
-  const jrAd=PASS.jrSingles*2, jrCh=PASS.jrSingles*f;
-  const passTot=PASS.adult*2 + PASS.adult*f + 500*(2+f) + 4000*(2+f);
   $("#calcOut").innerHTML=`<table class="fare"><thead><tr><th>Tratta</th><th>2 adulti</th><th>Umberto</th><th>Totale JPY</th></tr></thead><tbody>${rows}</tbody>
    <tfoot><tr><td>Totale biglietti da comprare</td><td>${fmt(tA)}</td><td>${fmt(tC)}</td><td>${fmt(tot)}</td></tr><tr><td>In euro, al cambio indicato</td><td></td><td></td><td>circa ${fmt(tot/fx)} €</td></tr></tfoot></table>
-   <p class="muted" style="margin-top:8px">Con il Japan Rail Pass da 7 giorni (circa ${fmt(PASS.adult)} JPY a adulto, metà prezzo per i bambini da 6 a 11 anni) spenderesti circa ${fmt(passTot)} JPY, contando anche i bus che il pass non copre. Gli stessi tratti JR in biglietti singoli costano circa ${fmt(jrAd+jrCh)} JPY.</p>`;
-  $("#verdict").innerHTML=`<p>I tratti in treno sono tre e non arrivano a 25.000 JPY a persona: i biglietti singoli costano meno della metà del pass. Compra i singoli.</p>`;
+`;
+  $("#verdict").innerHTML=`<p>I treni lunghi del 24 e del 26 sono già pagati nel pacchetto: il pass non serve. Resta solo il Keihan da Kyoto a Osaka.</p>`;
 }
 function renderLegs(){
   $("#legs").innerHTML=TR.map(t=>`<article class="leg-card" id="tr-${t.id}">
@@ -1084,7 +1136,7 @@ function openModal(kind,id){
       <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Come arrivare dall'hotel</a>`;
   } else {
     const h=HOT[id]; name=h.n; q=h.q;
-    body=`<p>${chip(h.st)} <span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span></p><p>${h.room}</p><p class="muted">${h.note}</p>`;
+    body=`<p>${chip(h.st)} <span class="muted">${"★".repeat(h.stars)} ${h.dates}, ${h.nights} ${h.nights===1?"notte":"notti"}</span></p><p>${h.room}</p><p>${hotInfo(h)}</p><p class="muted">${h.note}</p>`;
     acts=`<a class="btn small" target="_blank" rel="noopener" href="${gsearch(h.q)}">Apri in Google Maps</a>`;
   }
   d.innerHTML=`<div class="mhead"><div><h3 id="mtitle">${name}</h3>${jp?`<div class="jp" lang="ja">${jp}</div>`:""}</div><button class="btn small" data-act="closemodal" aria-label="Chiudi la scheda">Chiudi</button></div>
@@ -1183,7 +1235,7 @@ const DAYCFG={
  "2026-10-21":{city:"tokyo",start:"08:30",end:"21:30",from:"hot:tokyo",to:"hot:tokyo"},
  "2026-10-22":{city:"tokyo",start:"08:00",end:"21:30",from:"hot:tokyo",to:"hot:tokyo"},
  "2026-10-23":{city:"tokyo",start:"08:00",end:"21:00",from:"hot:tokyo",to:"hot:tokyo"},
- "2026-10-24":{city:"takayama",start:"14:00",end:"21:00",from:"pt:takayamaSt",startLabel:"arrivo a Takayama in treno",to:"hot:takayama"},
+ "2026-10-24":{city:"takayama",start:"13:15",end:"21:00",from:"pt:takayamaSt",startLabel:"arrivo a Takayama alle 13:12 con il treno Hida 7",to:"hot:takayama"},
  "2026-10-25":{city:"kanazawa",start:"07:00",end:"21:30",from:"hot:takayama",to:"hot:kanazawa",fixed:[{t:"10:50",min:50,label:"Bus Nohi Takayama → Shirakawa-go",at:"pt:nohiBus",to:"pt:shirakawaBus"},{t:"13:50",min:75,label:"Bus Nohi Shirakawa-go → Kanazawa",at:"pt:shirakawaBus",to:"pt:kanazawaSt"}]},
  "2026-10-26":{city:"kanazawa",start:"08:00",end:"21:30",from:"hot:kanazawa",to:"hot:kyoto",fixed:[{t:"13:05",min:124,label:"Tsurugi 23 → Tsuruga (14:02), Thunderbird 24 → Kyoto (15:09)",at:"pt:kanazawaSt",to:"pt:kyotoSt"}]},
  "2026-10-27":{city:"kyoto",start:"07:00",end:"21:30",from:"hot:kyoto",to:"hot:kyoto"},
@@ -1667,6 +1719,7 @@ document.addEventListener("click",function(e){
   else if(act==="addback"){ addSearch(); }
   else if(act==="addconfirm") addConfirm();
   else if(act==="dayopt") dayOptimize(id);
+  else if(act==="goday") goDay(id);
   else if(act==="logout"){ if(confirm("Esci dal cruscotto su questo dispositivo? Per rientrare servirà di nuovo la password.")){ try{ Object.keys(localStorage).filter(k=>k.indexOf("jp26")===0).forEach(k=>localStorage.removeItem(k)); }catch(x){} location.reload(); } }
   else if(act==="dayroutes"){ S.dayMsg[id]={txt:"Calcolo i tempi reali di spostamento con Google…"}; renderDays();
     dayRoutes(id).then(r=>{ const sim=simulate(id,allLists()[id]); S.dayMsg[id]={txt:routesOff?`Google Routes non risponde: ${routesOff}. Per attivarlo: Google Cloud → abilita "Routes API" e aggiungila alle API consentite della chiave.`:r.err&&!r.n?`Errore da Google Routes: ${r.err}`:`Tempi reali aggiornati${r.n?` (${r.n} percorsi)`:" (erano già calcolati)"}: ${durTxt(Math.round(sim.travelTot))} di spostamenti, rientro verso le ${fmtT(sim.fin)}.`,ok:!routesOff&&!r.err}; renderDays(); }); }
@@ -1716,16 +1769,16 @@ document.addEventListener("input",function(e){
   const t=e.target; if(t.dataset&&t.dataset.act==="fx"){ S.fx=+t.value||175; store.set("fx",S.fx); renderCalc(); }
   else if(t.dataset&&t.dataset.act==="note"){ const v=t.value.trim(); if(v) S.notes[t.dataset.id]=t.value; else delete S.notes[t.dataset.id]; store.set("notes",S.notes); }
 });
-window.addEventListener("resize",function(){ applyBox(); });
+window.addEventListener("resize",function(){ applyBox(); setTabsH(); });
 document.addEventListener("visibilitychange",function(){ if(document.visibilityState==="visible") Sync.pull(); });
 setInterval(function(){ if(document.visibilityState==="visible") Sync.pull(); },60000);
 
 /* ---------- avvio ---------- */
-renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect();
-renderDays(); renderLegs(); renderAtt(); renderChk();
+renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect(); renderBookings();
+renderDayNav(); renderDays(); renderLegs(); renderAtt(); renderChk();
 $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
 renderSettings(); Sync.badge();
-function unlock(){ document.body.classList.remove("locked"); renderMapMode(); applyBox(); Sync.pull(); }
+function unlock(){ document.body.classList.remove("locked"); renderMapMode(); applyBox(); setTabsH(); Sync.pull(); }
 if(Sync.code){ unlock(); }
 else {
   try{ localStorage.removeItem("jp26_code"); }catch(e){}

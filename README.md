@@ -28,7 +28,7 @@ Le chiavi stanno solo in `config.js`: per cambiarle si modifica quel file.
 
 - **Percorso e mappa:** mappa Google interattiva con le tratte del viaggio e i segnaposto (piano, preferiti di Michela, hotel, altri luoghi).
   Toccando un segnaposto si apre la scheda, da cui si aggiunge il luogo al piano. Resta disponibile la mappa schematica.
-- **Giorno per giorno:** per ogni giornata, il pulsante *Giro del giorno su Google Maps* apre il percorso con i luoghi scelti.
+- **Giorno per giorno:** il menu delle date in alto (resta fisso mentre scorri) porta al giorno scelto e si accende sul giorno che stai leggendo; durante il viaggio la scheda si apre sul giorno di oggi. Per ogni giornata, il pulsante *Giro del giorno su Google Maps* apre il percorso con i luoghi scelti.
 - **Schede dei luoghi:** orari, valutazioni, foto e mini-mappa da Google Places.
 
 ## Programma della giornata
