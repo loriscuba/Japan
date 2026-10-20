@@ -267,15 +267,14 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .pill.chipbtn.prop{border:1.5px dashed var(--prop);color:var(--prop);background:var(--propbg)}
 .pill.chipbtn.prop[aria-pressed="true"]{border-style:solid;background:var(--ok);border-color:var(--ok);color:#fff}
 .propbox{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--prop);border-radius:10px;padding:16px;margin-bottom:14px}
-.propbox .favrow .pill{white-space:normal;max-width:100%}
-@media (max-width:620px){.propbox .favrow{grid-template-columns:minmax(0,1fr) auto}}
 .advice{border-left:4px solid var(--ink);background:var(--paper);border-radius:0 6px 6px 0;padding:6px 10px;font-size:.9rem}
 .favbox{background:var(--card);border:1px solid var(--line);border-top:4px solid #D6457A;border-radius:10px;padding:16px;margin-bottom:14px}
 .favday{margin-top:12px}
 .favday h4{margin:0 0 4px;font-family:var(--fd);font-size:1rem}
 .favrow{display:grid;grid-template-columns:minmax(150px,220px) auto minmax(0,1fr);gap:4px 10px;align-items:start;padding:6px 0;border-top:1px dashed var(--line);font-size:.9rem}
 .favrow .pill{text-align:left}
-@media (max-width:620px){.favrow{grid-template-columns:auto minmax(0,1fr)}.favrow>span:last-child{grid-column:1 / -1}}
+.favrow .pill{white-space:normal;max-width:100%}
+@media (max-width:620px){.favrow{grid-template-columns:minmax(0,1fr) auto}.favrow>span:last-child{grid-column:1 / -1}}
 .mapmode{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
 .layers{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.86rem;margin-left:4px}
 .layers label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
@@ -348,6 +347,17 @@ body.locked .gate{display:grid}
 .gatemsg{min-height:1.4em;margin:10px 0 0;font-size:.9rem;color:var(--risk)}
 textarea.note{font:inherit;font-size:.93rem;width:100%;min-height:58px;padding:7px 9px;border:1px dashed var(--line);border-radius:6px;background:var(--paper);color:var(--ink);resize:vertical;margin-top:8px}
 textarea.note:focus{border-style:solid;border-color:var(--ink)}
+/* telefono: campi a 16px (iPhone non fa zoom quando li tocchi) e pulsanti alti almeno 40px per il dito */
+@media (pointer:coarse){
+  input,select,textarea,select.mini,.tlrow input.tin,textarea.note,.setbox input[type=text],.setbox input[type=password]{font-size:16px}
+  .btn.small,.fbtn,select.mini{min-height:40px}
+  .btn.small{padding:8px 12px}
+  .pill.chipbtn{min-height:36px;padding:6px 12px}
+  .ib{min-width:40px;height:40px}
+  .chk input{width:24px;height:24px}
+  .zoom button{min-height:36px}
+  .dchip small,.dchip span{font-size:.75rem}
+}
 @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
