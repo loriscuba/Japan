@@ -22,6 +22,7 @@
   --ok:#0C7A55; --okbg:#DCF2E8; --req:#8F5A00; --reqbg:#FFEDC2; --todo:#2054B8; --todobg:#E1EAFB; --risk:#B73030; --riskbg:#FBE0E0;
   --seal:#C0332B; --focus:#2054B8;
   --lk-ok:#18A874; --lk-req:#E8A100; --lk-todo:#3F7BEA; --lk-risk:#E5484D;
+  --prop:#6B3FC4; --propbg:#ECE4FB;
   --fd:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
   --fb:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   box-sizing:border-box;
@@ -35,6 +36,7 @@
     --ok:#4FD8A6; --okbg:#10382C; --req:#F2BC4B; --reqbg:#3A2D0E; --todo:#7FAAFF; --todobg:#14295A; --risk:#FF8585; --riskbg:#471A1A;
     --seal:#E0483E; --focus:#7FAAFF;
     --lk-ok:#34D399; --lk-req:#F5B93A; --lk-todo:#6EA2FF; --lk-risk:#FF7B7B;
+    --prop:#B9A0FF; --propbg:#2A1F4D;
   }
 }
 :root[data-theme="dark"]{
@@ -43,6 +45,7 @@
   --ok:#4FD8A6; --okbg:#10382C; --req:#F2BC4B; --reqbg:#3A2D0E; --todo:#7FAAFF; --todobg:#14295A; --risk:#FF8585; --riskbg:#471A1A;
   --seal:#E0483E; --focus:#7FAAFF;
   --lk-ok:#34D399; --lk-req:#F5B93A; --lk-todo:#6EA2FF; --lk-risk:#FF7B7B;
+  --prop:#B9A0FF; --propbg:#2A1F4D;
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);-webkit-text-size-adjust:100%}
@@ -87,6 +90,7 @@ button{font-family:inherit}
 .chip.req{color:var(--req);background:var(--reqbg)}
 .chip.todo{color:var(--todo);background:var(--todobg)}
 .chip.risk{color:var(--risk);background:var(--riskbg)}
+.chip.prop{color:var(--prop);background:var(--propbg)}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font-weight:700;font-size:.88rem;text-decoration:none;cursor:pointer;line-height:1.2}
 .btn.primary{background:var(--ink);color:var(--paper)}
 .btn.small{padding:5px 10px;font-size:.8rem;border-radius:6px}
@@ -257,6 +261,14 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .heart{color:#FF8FB8}}
 :root[data-theme="dark"] .heart{color:#FF8FB8}
 .att.is-fav{border-top:4px solid #D6457A}
+/* proposte da validare: viola */
+.att.is-prop{border-top:4px solid var(--prop);background:linear-gradient(var(--propbg),var(--card) 90px)}
+.tag.prop{border-color:var(--prop);color:var(--prop)}
+.pill.chipbtn.prop{border:1.5px dashed var(--prop);color:var(--prop);background:var(--propbg)}
+.pill.chipbtn.prop[aria-pressed="true"]{border-style:solid;background:var(--ok);border-color:var(--ok);color:#fff}
+.propbox{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--prop);border-radius:10px;padding:16px;margin-bottom:14px}
+.propbox .favrow .pill{white-space:normal;max-width:100%}
+@media (max-width:620px){.propbox .favrow{grid-template-columns:minmax(0,1fr) auto}}
 .advice{border-left:4px solid var(--ink);background:var(--paper);border-radius:0 6px 6px 0;padding:6px 10px;font-size:.9rem}
 .favbox{background:var(--card);border:1px solid var(--line);border-top:4px solid #D6457A;border-radius:10px;padding:16px;margin-bottom:14px}
 .favday{margin-top:12px}
@@ -275,6 +287,8 @@ dialog.modal::backdrop{background:rgba(10,19,37,.62)}
 .gpin.plan{background:#18A874}
 .gpin.fav{background:#D6457A}
 .gpin.fav.sel{box-shadow:0 0 0 3px #18A874,0 1px 4px rgba(0,0,0,.45)}
+.gpin.prop{background:#6B3FC4}
+.gpin.prop.sel{box-shadow:0 0 0 3px #18A874,0 1px 4px rgba(0,0,0,.45)}
 .gpin.hot{background:#1B2A46;border-radius:6px;width:26px;height:26px}
 .ginfo{--ink:#1B2A46;--paper:#F3F5F8;--card:#fff;--muted:#58647E;--line:#D5DCE7;--ok:#0C7A55;--okbg:#DCF2E8;--req:#8F5A00;--reqbg:#FFEDC2;--todo:#2054B8;--todobg:#E1EAFB;--risk:#B73030;--riskbg:#FBE0E0;color:#1B2A46;max-width:280px;font-family:var(--fb);font-size:.88rem;line-height:1.45}
 .ginfo .heart{color:#C2366B}
@@ -459,6 +473,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 <section class="view" id="v-attrazioni" role="tabpanel">
   <h2>Cosa vedere</h2>
   <p class="muted">Ho già selezionato gli imperdibili. Togli e aggiungi: la barra delle ore ti dice quando stai esagerando.</p>
+  <div class="propbox" id="propbox"></div>
   <div class="favbox" id="favbox"></div>
   <div class="budget" id="budget"></div>
   <div class="filters" id="filters"></div>
@@ -534,6 +549,18 @@ const FAV=[
  {id:"mf_shamaron",d:"2026-10-25",city:"kanazawa",zone:"Higashi Chaya",name:"Shamaron (syamaron.)",cat:"Cibo",min:60,meal:1,kid:true,book:"no",v:"forse",best:"Pranzo, se l'orario lo permette",note:"Trattoria in una casetta gialla a 5 minuti da Higashi Chaya: piatti con le verdure del proprio orto e di Kaga, mini parfait.",why:"È soprattutto un posto da pranzo ed è chiuso il lunedì, mentre voi siete a Kanazawa domenica pomeriggio e lunedì mattina. Ha senso solo se domenica è aperto anche la sera: verificate su Google.",warn:"Chiuso il lunedì: il 26 ottobre non va bene.",ll:[36.574327,136.6653872],cid:"15627795294611083855",addr:"3-4-15 Higashiyama, Kanazawa, Ishikawa"}
 ];
 FAV.forEach(f=>ATT.push(Object.assign({jp:"",pri:f.v==="si"?3:f.v==="forse"?2:1,inc:false,warn:"",fav:true,q:f.name.split(",")[0].replace(/ \(.*\)/,"")+", "+f.addr},f)));
+/* attrazioni di Tokyo che mancavano (ottobre 2026): proposte da validare, in viola. Non entrano nel piano finché non le aggiungete. */
+const PROP=[
+ {id:"tp_hie",d:"2026-10-21",city:"tokyo",zone:"Akasaka",name:"Hie Jinja, il santuario dei torii rossi",jp:"日枝神社",cat:"Templi e storia",min:40,kid:true,book:"no",best:"Mattina presto del 21, prima di Meiji Jingu (il cancello apre alle 6)",note:"Santuario sulla collina di Akasaka con una scalinata coperta da un tunnel di torii rossi, una piccola Fushimi Inari in centro città. Le scimmie di pietra sono le guardiane del santuario.",why:"È a circa 15 minuti a piedi dal the b Akasaka: si vede in mezz'ora uscendo dall'hotel, poi metro Ginza da Tameike-Sanno a Omotesando per Meiji Jingu.",ll:[35.6747,139.7396],q:"Hie Shrine, 2-10-5 Nagatacho, Chiyoda, Tokyo"},
+ {id:"tp_pokemon",d:"2026-10-21",city:"tokyo",zone:"Shibuya",name:"Pokémon Center e Nintendo Tokyo, Shibuya Parco",jp:"渋谷パルコ",cat:"Esperienze",min:60,kid:true,book:"no",best:"Pomeriggio del 21, tra Harajuku e Shibuya Sky (10–21)",note:"Al 6° piano di Shibuya Parco: Pokémon Center, Nintendo Tokyo e il negozio Capcom uno accanto all'altro. Tax-free con il passaporto. Sotto c'è anche la statua di Hachiko, all'uscita della stazione.",why:"Per Umberto probabilmente il momento più atteso di Tokyo, ed è sulla strada a piedi da Harajuku all'incrocio di Shibuya.",ll:[35.6618,139.6985],q:"Pokemon Center Shibuya, Shibuya PARCO 6F, 15-1 Udagawacho, Tokyo"},
+ {id:"tp_hamarikyu",d:"2026-10-22",city:"tokyo",zone:"Shiodome",name:"Giardino Hama-rikyu",jp:"浜離宮恩賜庭園",cat:"Natura e panorami",min:60,kid:true,book:"no",best:"Tarda mattina del 22, dopo Tsukiji (9–17)",note:"Giardino dei signori di Edo sul mare, con lo stagno d'acqua salata, la casa da tè sull'acqua (tè matcha e dolcetto) e i grattacieli di Shiodome sullo sfondo.",why:"È a 10 minuti a piedi dal mercato di Tsukiji: una pausa verde prima di teamLab, senza spostamenti in più.",ll:[35.6600,139.7633],q:"Hama-rikyu Gardens, Tokyo"},
+ {id:"tp_nijubashi",d:"2026-10-22",city:"tokyo",zone:"Marunouchi",name:"Piazza del Palazzo Imperiale e ponte Nijubashi",jp:"二重橋",cat:"Templi e storia",min:40,kid:true,book:"no",best:"Fine pomeriggio del 22, prima di Ginza",note:"Il grande prato davanti al Palazzo Imperiale con il ponte di pietra Nijubashi e la torre Fushimi-yagura. È all'aperto e sempre accessibile, a differenza dei Giardini Est.",why:"I Giardini Est sono chiusi il venerdì 23: così il Palazzo lo vedete comunque, a 10 minuti a piedi da Ginza.",ll:[35.6800,139.7536],q:"Nijubashi Bridge, Kokyo Gaien, Tokyo"},
+ {id:"tp_edotokyo",d:"2026-10-23",city:"tokyo",zone:"Ryogoku",name:"Museo Edo-Tokyo",jp:"江戸東京博物館",cat:"Templi e storia",min:90,kid:true,book:"no",best:"Pomeriggio del 23, in alternativa ad Akihabara (chiuso il lunedì)",note:"Riaperto a marzo 2026 dopo quattro anni di lavori: la storia di Tokyo con il ponte Nihonbashi a grandezza naturale, case, botteghe e plastici. Accanto c'è il Kokugikan, lo stadio del sumo.",why:"È proprio il tema del 23, la Tokyo antica, ed è a una fermata di JR da Akihabara. Con Umberto i plastici funzionano molto bene. Scegliete questo o Akihabara.",ll:[35.6966,139.7958],q:"Edo-Tokyo Museum, Ryogoku, Tokyo"},
+ {id:"tp_yanaka",d:"2026-10-23",city:"tokyo",zone:"Yanaka",name:"Yanaka e Yanaka Ginza",jp:"谷中銀座",cat:"Quartieri",min:75,kid:true,book:"no",best:"Pomeriggio del 23, dopo Ueno",note:"Il quartiere sopravvissuto a terremoti e guerre: vicoli, templi di legno, case basse, gatti e la scalinata Yuyake Dandan al tramonto.",why:"È la Tokyo antica che Senso-ji non mostra più, a 15 minuti a piedi dal parco di Ueno. Prendetelo al posto di una delle altre tappe del pomeriggio, non in più.",ll:[35.7277,139.7660],q:"Yanaka Ginza, Taito, Tokyo"},
+ {id:"tp_tower",d:"2026-10-23",city:"tokyo",zone:"Shiba",name:"Tokyo Tower di sera",jp:"東京タワー",cat:"Natura e panorami",min:75,kid:true,book:"no",best:"Sera del 23 (aperta fino alle 23, ultimo ingresso 22:30)",note:"La torre rossa e bianca illuminata, con il tempio Zojo-ji ai suoi piedi. Bella anche solo da sotto; il ponte panoramico a 150 m si sale anche senza prenotare.",why:"È a circa 10 minuti di taxi dall'hotel: l'ultima sera a Tokyo senza fare tardi, prima di preparare la borsa.",ll:[35.6586,139.7454],q:"Tokyo Tower"},
+ {id:"tp_ghibli",city:"tokyo",zone:"Mitaka",name:"Museo Ghibli",jp:"三鷹の森ジブリ美術館",cat:"Esperienze",min:150,kid:true,book:"obbligatoria",best:"Solo se trovate biglietti",note:"Il museo dello Studio Ghibli nel parco di Inokashira: l'autobus-gatto, il robot del Castello nel cielo e un cortometraggio che si vede solo lì.",why:"Per Umberto sarebbe magnifico, ma richiede mezza giornata e i biglietti di ottobre sono stati venduti il 10 settembre su Lawson Ticket. Controllate se si libera un posto; altrimenti lasciate perdere.",warn:"Biglietti a orario, quasi sempre esauriti: senza biglietto non si entra.",ll:[35.6962,139.5704],q:"Ghibli Museum, Mitaka"}
+];
+PROP.forEach(p=>ATT.push(Object.assign({pri:2,inc:false,warn:"",prop:true,v:"prop"},p)));
 Object.assign(ATT.find(a=>a.id==="tk_senso"),{fav:true,v:"si",d:"2026-10-23",cid:"7785923974874169613",why:"Era già tra gli imperdibili, mattina presto del 23."});
 
 /* ---------- utilità ---------- */
@@ -550,7 +577,7 @@ const ST = {ok:"Disponibile", req:"Su richiesta", todo:"Da organizzare", risk:"D
 const chip = (s,t)=> `<span class="chip ${s}">${t||ST[s]}</span>`;
 const gsearch = q => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
 const placeUrl = a => a.cid ? "https://maps.google.com/?cid="+a.cid : a.gurl ? a.gurl : gsearch(a.q);
-const verdictChip = v => v==="si"?chip("ok","Consigliato"):v==="forse"?chip("req","Forse"):chip("todo","Salterei");
+const verdictChip = v => v==="prop"?chip("prop","Da validare"):v==="si"?chip("ok","Consigliato"):v==="forse"?chip("req","Forse"):chip("todo","Salterei");
 const gdir = (o,d,m)=> "https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+"&travelmode="+(m||"transit");
 const MESI=["gen","feb","mar","apr","mag","giu","lug","ago","set","ott","nov","dic"];
 const GG=["dom","lun","mar","mer","gio","ven","sab"];
@@ -636,9 +663,9 @@ const FARES = [
 const DAYS = [
  {d:"2026-10-19",c:"Milano",title:"Partenza",fx:[{t:"22:00",x:"Volo KE 928 Milano Malpensa → Seoul Incheon, arrivo alle 16:35 del 20",s:"ok"}],pl:[],w:[],tip:"Volo notturno di circa 11 ore: fai il check-in online e cerca di dormire. Un collo a testa. In aeroporto 3 ore prima, con passaporti e documenti di viaggio."},
  {d:"2026-10-20",c:"Seoul e Tokyo",title:"Scalo a Seoul e arrivo a Tokyo",fx:[{t:"16:35",x:"Arrivo a Seoul Incheon",s:"ok"},{t:"18:35",x:"Volo KE 705 Seoul → Tokyo Narita",s:"ok"},{t:"21:05",x:"Arrivo a Narita: ritiro del router WiFi al banco Ninja WiFi (Terminal 1) con il voucher",s:"ok"},{t:"21:05",x:"Trasferimento privato Green Tomato (2603BC1): autista con cartello col vostro nome dopo la dogana, aspetta 90 minuti dall'atterraggio",s:"ok"},{t:"in serata",x:"Check-in al the b Akasaka, camera Family 4 (conferma 284-7032170)",s:"ok"}],pl:[],w:["Lo scalo è di due ore: resta nell'area transiti e vai subito al gate.","Transfer: massimo 2 colli a persona. Se non trovate l'autista: +81 50-3096-0911, poi Alidays +39 02 87238400."],tip:"Arriverai in hotel verso le 23: cena leggera in aeroporto o in un konbini vicino all'hotel. Mostra i codici di Visit Japan Web per far prima all'arrivo. Dal 20 è attiva l'assistenza MTJ: chat di giorno, telefono +81 3-4560-4160 dalle 20 alle 8."},
- {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[{t:"in hotel",x:"Alla reception: ritira i biglietti dei treni del 24 (Tokyo → Takayama) e del 26 (Kanazawa → Kyoto)",s:"ok"}],pl:[{w:"Mattina",ids:["tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Pranzo e merenda",ids:["mf_jangara","mf_marion","mf_sweetpalace","mf_flippers"],t:"Ramen da Jangara, poi una crêpe su Takeshita Street: delle due salvate da Michela basta Marion. Flipper's solo se rinunciate alla crêpe."},{w:"Tardo pomeriggio",ids:["tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:["mf_misawa"],t:"Cena a Shibuya: soba e udon in piedi da Misawa, a circa 15 minuti a piedi dall'incrocio. Poi a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
- {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tk_ginza","mf_uniqlo","mf_sushiro","mf_minoru","mf_fujiya","mf_royalhost","tk_shinjuku"],t:"Ginza, dove Michela ha salvato cinque posti: Uniqlo, poi cena da Sushiro (sushi sul nastro, perfetto con Umberto) oppure da Minoru Shokudo. Shinjuku diventa l'alternativa: non tutte e due."}],w:["Se volete spedire le valigie a Kyoto, oggi è l'ultimo giorno per prenotare il ritiro alla reception (serve almeno 24 ore di anticipo)."],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
- {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto: non è nel programma aggiornato, va prenotato alla reception (consegna in 36–48 ore)",s:"risk"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:[],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Se spedite le valigie, fino al 26 avete solo il bagaglio piccolo: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere e quanto costa a collo."},
+ {d:"2026-10-21",c:"Tokyo",title:"Primo giorno, ritmo morbido",fx:[{t:"in hotel",x:"Alla reception: ritira i biglietti dei treni del 24 (Tokyo → Takayama) e del 26 (Kanazawa → Kyoto)",s:"ok"}],pl:[{w:"Mattina",ids:["tp_hie","tk_meiji","tk_harajuku"],t:"Meiji Jingu appena apre, poi Harajuku a piedi."},{w:"Pranzo e merenda",ids:["mf_jangara","mf_marion","mf_sweetpalace","mf_flippers"],t:"Ramen da Jangara, poi una crêpe su Takeshita Street: delle due salvate da Michela basta Marion. Flipper's solo se rinunciate alla crêpe."},{w:"Tardo pomeriggio",ids:["tp_pokemon","tk_shibuya"],t:"Slot di Shibuya Sky verso le 16:30: il tramonto è intorno alle 17."},{w:"Sera",ids:["mf_misawa"],t:"Cena a Shibuya: soba e udon in piedi da Misawa, a circa 15 minuti a piedi dall'incrocio. Poi a letto presto: il jet lag colpisce il secondo giorno."}],w:[],tip:"Il primo giorno poche tappe e una pausa a metà giornata."},
+ {d:"2026-10-22",c:"Tokyo",title:"Mercato, arte immersiva e sera in città",fx:[],pl:[{w:"Mattina",ids:["tk_tsukiji","tp_hamarikyu"],t:"Colazione di sushi al mercato esterno."},{w:"Pomeriggio",ids:["tk_teamlab"],t:"teamLab Planets a Toyosu, a circa 20 minuti da Tsukiji. Slot prenotato."},{w:"Sera",ids:["tp_nijubashi","tk_ginza","mf_uniqlo","mf_sushiro","mf_minoru","mf_fujiya","mf_royalhost","tk_shinjuku"],t:"Ginza, dove Michela ha salvato cinque posti: Uniqlo, poi cena da Sushiro (sushi sul nastro, perfetto con Umberto) oppure da Minoru Shokudo. Shinjuku diventa l'alternativa: non tutte e due."}],w:["Se volete spedire le valigie a Kyoto, oggi è l'ultimo giorno per prenotare il ritiro alla reception (serve almeno 24 ore di anticipo)."],tip:"Pantaloni arrotolabili e niente calze spesse: a teamLab si cammina nell'acqua."},
+ {d:"2026-10-23",c:"Tokyo",title:"La Tokyo antica e la borsa da preparare",fx:[{t:"mattina",x:"Ritiro dei bagagli in hotel per Kyoto: non è nel programma aggiornato, va prenotato alla reception (consegna in 36–48 ore)",s:"risk"}],pl:[{w:"Mattina",ids:["tk_senso"],t:"Senso-ji presto, prima dei gruppi."},{w:"Pomeriggio",ids:["tk_ueno","tk_akiba","tp_yanaka","tp_edotokyo"],t:"Ueno per una passeggiata, Akihabara per i souvenir."},{w:"Sera",ids:["tp_tower"],t:"Cena tranquilla e controllo finale della borsa piccola."}],w:["Se spedite le valigie, fino al 26 avete solo il bagaglio piccolo: prepara prima di uscire la borsa per Takayama e Kanazawa.","I Giardini Est del Palazzo Imperiale sono chiusi il venerdì, e oggi è venerdì."],tip:"Chiedi alla reception a che ora passa il corriere e quanto costa a collo."},
  {d:"2026-10-24",c:"Tokyo → Takayama",title:"Dalla metropoli alle montagne",fx:[{t:"08:15",x:"Check-out dal the b Akasaka e metro per Tokyo Station",s:"ok"},{t:"09:00",x:"Shinkansen Nozomi 135 Tokyo → Nagoya, arrivo alle 10:39",s:"ok"},{t:"10:48",x:"Treno Hida 7 Nagoya → Takayama, arrivo alle 13:12",s:"ok"},{t:"entro le 17:00",x:"Check-in al Futarishizuka Hakuun (NTA000000044368), mezza pensione: cena tra le 18:00 e le 19:30",s:"ok"}],pl:[{w:"Mattina",ids:[],t:"In treno: il Hida sale lungo la valle tra le montagne. Pranzo al sacco (ekiben) comprato a Tokyo Station."},{w:"Pomeriggio",ids:["ta_sanmachi","ta_folk"],t:"Dalle 13:15 centro storico con calma, con spiedini di manzo Hida. Hida no Sato solo se vi avanza tempo. Al ryokan entro le 17."},{w:"Sera",ids:["ta_onsen","mf_hakuun"],t:"Al ryokan sulla collina: cena e onsen."}],w:["A Nagoya il cambio è di 9 minuti: preparatevi a scendere prima dell'arrivo."],tip:"Treni già prenotati e non modificabili: arrivate a Tokyo Station con 20 minuti di margine."},
  {d:"2026-10-25",c:"Takayama → Kanazawa",title:"Mercato del mattino, Shirakawa-go e Kanazawa",fx:[{t:"10:50",x:"Bus Nohi (R26087903) dalla fermata 3 del Takayama Nohi Bus Center, via Shirakawa-go, a Kanazawa Ekimae. Voucher cartaceo, orario da verificare sul voucher",s:"ok"},{t:"pomeriggio",x:"Check-in all'Hotel Intergate Kanazawa, camera non fumatori con letto Queen (9095885663998)",s:"ok"}],pl:[{w:"Mattina presto",ids:["ta_market","ta_jinya"],t:"Mercato Miyagawa lungo il fiume (dalle 7) e, se vi va, il Jinya. Poi al Nohi Bus Center per le 10:30, almeno 15 minuti prima della partenza."},{w:"Primo pomeriggio",ids:["sg_ogimachi"],t:"Circa due ore a Shirakawa-go."},{w:"Sera",ids:["kz_higashi","mf_tamura","mf_busaku","mf_shamaron"],t:"Higashi Chaya all'imbrunire, poi cena a pochi passi: Tamura (izakaya di pesce) oppure Busaku (kaiseki da 8 posti, da prenotare). Scegline uno."}],w:["Domenica: Shirakawa-go è affollata.","A Shirakawa-go restate sui percorsi segnalati: in zona sono stati avvistati orsi."],tip:"Domenica sera molti ristoranti di Kanazawa chiudono presto: scegli dove cenare prima di arrivare."},
  {d:"2026-10-26",c:"Kanazawa → Kyoto",title:"Il giardino al mattino e il treno per Kyoto",fx:[{t:"13:05",x:"Tsurugi 23 Kanazawa → Tsuruga (14:02), Thunderbird 24 Tsuruga 14:14 → Kyoto 15:09, prenotati",s:"ok"},{t:"dalle 15:00",x:"Check-in all'Hotel Gracery Kyoto Sanjo, camera tripla, 3 notti (284-7032178)",s:"ok"}],pl:[{w:"Mattina",ids:["kz_kenroku","kz_castle"],t:"Kenroku-en all'apertura (8:00), poi il parco del castello di fronte."},{w:"Pranzo",ids:["kz_omicho"],t:"Ciotola di pesce al mercato Omicho."},{w:"Primo pomeriggio",ids:[],t:"Treno delle 13:05: Tsurugi fino a Tsuruga, cambio di 12 minuti, Thunderbird fino a Kyoto (arrivo alle 15:09)."},{w:"Sera",ids:["ky_nishiki","ky_pontocho"],t:"Nishiki chiude presto; più tardi Pontocho per cena."}],w:["Il Museo del XXI secolo di Kanazawa è chiuso il lunedì.","Se avete spedito le valigie da Tokyo, devono essere già in hotel: conferma all'arrivo."],tip:"Il Kenroku-en da metà ottobre chiude presto: l'apertura delle 8:00 è il momento migliore."},
@@ -704,9 +731,9 @@ const S = {
 const ATTM = {}; ATT.forEach(a=>ATTM[a.id]=a);
 S.custom=store.get("custom",[]); S.custom.forEach(c=>{ ATT.push(c); ATTM[c.id]=c; });
 S.sel=new Set(Array.from(S.sel).filter(id=>ATTM[id]));
-S.ffav=false;
+S.ffav=false; S.fprop=false;
 S.mapmode=GM_KEY?store.get("mapmode","google"):"schema";
-S.lay=Object.assign({plan:true,other:false,fav:true,hot:true},store.get("lay",{}));
+S.lay=Object.assign({plan:true,other:false,fav:true,prop:true,hot:true},store.get("lay",{}));
 if(!store.get("favinit",false)){
   ATT.filter(a=>a.fav&&a.v==="si"&&a.cat!=="Dormire").forEach(a=>S.sel.add(a.id));
   try{ localStorage.setItem("jp26_sel",JSON.stringify(Array.from(S.sel))); localStorage.setItem("jp26_favinit","true"); }catch(e){}
@@ -922,7 +949,7 @@ function renderDays(){
   $("#days").innerHTML=DAYS.map((D,i)=>{
     const dt=parseD(D.d);
     const fx=D.fx.map(f=>`<div class="fx"><span class="t">${f.t}</span><span>${f.x}</span>${chip(f.s)}</div>`).join("");
-    const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}">${a.fav?"♥ ":""}${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
+    const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn${a.prop?" prop":""}" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}"${a.prop?' title="Proposta da validare"':""}>${a.fav?"♥ ":a.prop?"? ":""}${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
     const w=D.w.map(x=>`<div class="warn">${x}</div>`).join("");
     const rp=(lists[D.d]||[]).filter(it=>ATTM[it.id]).map(it=>ATTM[it.id]);
     const pt=a=>a.ll?a.ll.join(","):a.q;
@@ -1012,6 +1039,7 @@ function renderFilters(){
    cities.map(c=>`<button class="fbtn" data-act="fcity" data-id="${c}" aria-pressed="${S.fcity===c}">${CITY[c].n} (${ATT.filter(a=>a.city===c&&S.sel.has(a.id)).length})</button>`).join("")+
    `<span style="flex-basis:100%"></span><label class="muted" for="fcat">Tipo</label><select id="fcat" data-act="fcat"><option value="all">Tutti</option>${cats.map(c=>`<option ${S.fcat===c?"selected":""}>${c}</option>`).join("")}</select>
     <button class="fbtn" data-act="ffav" aria-pressed="${S.ffav}">♥ Preferiti di Michela</button>
+    <button class="fbtn" data-act="fprop" aria-pressed="${S.fprop}">Da validare</button>
     <button class="fbtn" data-act="fkid" aria-pressed="${S.fkid}">Adatte a un bambino</button>
     <button class="fbtn" data-act="fpri" aria-pressed="${S.fpri}">Solo imperdibili e consigliate</button>`;
 }
@@ -1020,8 +1048,8 @@ function attCard(a,dmap){
   const pri=a.pri===3?'<span class="seal" title="Imperdibile">必見</span>':a.pri===2?'<span class="tag">Consigliata</span>':'<span class="tag dim">Se hai tempo</span>';
   const org=CITY[a.city].origin;
   const hrs=a.cat==="Dormire"?"alternativa per la notte":a.meal?"pasto, non pesa sul tempo":a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
-  return `<article class="att${on?" is-sel":""}${a.fav?" is-fav":""}">
-   <div class="row1">${a.custom?'<span class="tag">Aggiunto da te</span>':a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
+  return `<article class="att${on?" is-sel":""}${a.fav?" is-fav":""}${a.prop?" is-prop":""}">
+   <div class="row1">${a.custom?'<span class="tag">Aggiunto da te</span>':a.prop?'<span class="tag prop">Da validare</span>':a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
    <h3>${a.name}</h3><div class="jp" lang="ja">${a.jp}</div>
    <div class="meta"><span>${a.cat}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}${a.inc?'<span class="chip ok">Già nel preventivo</span>':""}</div>
    <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}
@@ -1032,13 +1060,22 @@ function attCard(a,dmap){
    ${on&&a.cat!=="Dormire"&&dmap?`<label class="daypick">Giorno <select class="mini" data-act="setday" data-id="${a.id}"><option value="">${dmap[a.id]?"—":"non ancora in un giorno"}</option>${dayOpts(dmap[a.id]||"")}</select></label>`:""}</article>`;
 }
 function renderGrid(){
-  let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2)&&(!S.ffav||a.fav));
+  let list=ATT.filter(a=>(S.fcity==="all"||a.city===S.fcity)&&(S.fcat==="all"||a.cat===S.fcat)&&(!S.fkid||a.kid)&&(!S.fpri||a.pri>=2)&&(!S.ffav||a.fav)&&(!S.fprop||a.prop));
   const order=Object.keys(CITY);
   list.sort((a,b)=>order.indexOf(a.city)-order.indexOf(b.city)||b.pri-a.pri);
   const dmap=dayOfMap();
   $("#grid").innerHTML=list.length?list.map(a=>attCard(a,dmap)).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
 }
-function renderAtt(){ renderFavBox(); renderBudget(); renderFilters(); renderGrid(); }
+function renderAtt(){ renderPropBox(); renderFavBox(); renderBudget(); renderFilters(); renderGrid(); }
+function renderPropBox(){
+  const P=ATT.filter(a=>a.prop), ok=P.filter(a=>S.sel.has(a.id)).length;
+  const days=P.map(a=>a.d||"").filter((d,k,arr)=>arr.indexOf(d)===k);
+  const row=a=>`<div class="favrow"><button class="pill chipbtn prop" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${esc(a.name)}</button><span>${S.sel.has(a.id)?chip("ok","Validata"):chip("prop","Da validare")}</span><span>${a.why} <a href="#" data-act="detail" data-kind="att" data-id="${a.id}" onclick="return false">Scheda</a></span></div>`;
+  $("#propbox").innerHTML=`<h3 style="color:var(--prop)">Tokyo: cosa mancava</h3>
+   <p class="muted" style="margin-top:4px">Ho controllato le attrazioni di Tokyo (cibo escluso) sui quattro giorni. Il piano resta com'è; queste ${P.length} sono proposte in viola, inserite nei giorni dove stanno meglio. Tocca un nome per validarla: entra nel piano e diventa verde. Validate: <b>${ok} di ${P.length}</b>.</p>
+   ${days.map(d=>{ if(!d) return `<div class="favday"><h4>Senza giorno</h4>`+P.filter(a=>!a.d).map(row).join("")+`</div>`; const dt=parseD(d); return `<div class="favday"><h4>${GGL[dt.getDay()]} ${dt.getDate()} ottobre</h4>`+P.filter(a=>a.d===d).map(row).join("")+`</div>`; }).join("")}
+   <div class="acts"><button class="btn small" data-act="propday">Mostra solo le proposte</button></div>`;
+}
 function renderFavBox(){
   const F=ATT.filter(a=>a.fav).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:b.pri-a.pri);
   const n=v=>F.filter(a=>a.v===v).length;
@@ -1169,11 +1206,11 @@ let GM=null, gmFail="";
 window.gm_authFailure=function(){ gmFail="Google ha rifiutato la chiave: controlla che il sito sia tra i referrer consentiti e che le API siano abilitate."; GM=null; const b=$("#gmapMain"); if(b) b.innerHTML=`<p class="gmerr">${gmFail}</p>`; };
 function renderMapMode(){
   const g=S.mapmode==="google"&&!!GM_KEY&&navigator.onLine!==false;
-  const L=[["plan","Il mio piano","#18A874"],["fav","♥ Michela","#D6457A"],["hot","Hotel","#1B2A46"],["other","Altri luoghi","#8C97AD"]];
+  const L=[["plan","Il mio piano","#18A874"],["fav","♥ Michela","#D6457A"],["prop","Da validare","#6B3FC4"],["hot","Hotel","#1B2A46"],["other","Altri luoghi","#8C97AD"]];
   $("#mapmode").innerHTML=[["google","Google Maps"],["schema","Schematica"]].map(m=>`<button class="fbtn" data-act="mapmode" data-id="${m[0]}" aria-pressed="${(g?"google":"schema")===m[0]}"${m[0]==="google"&&!GM_KEY?' disabled title="Serve la chiave Google Maps"':""}>${m[1]}</button>`).join("")
     +(g?`<span class="layers">${L.map(l=>`<label><input type="checkbox" data-act="lay" data-id="${l[0]}" ${S.lay[l[0]]?"checked":""}><i style="background:${l[2]}"></i>${l[1]}</label>`).join("")}</span>`:"");
   $("#map").style.display=g?"none":""; $("#gmapMain").hidden=!g;
-  $("#mapcap").textContent=navigator.onLine===false?"Sei offline: mappa schematica. Google Maps torna quando c'è rete.":g?"Tocca un segnaposto per la scheda: verde = nel tuo piano, rosa = salvato da Michela, H = hotel. Le linee sono le tratte del viaggio.":"Mappa schematica, non in scala. Passa a Google Maps per la mappa vera.";
+  $("#mapcap").textContent=navigator.onLine===false?"Sei offline: mappa schematica. Google Maps torna quando c'è rete.":g?"Tocca un segnaposto per la scheda: verde = nel tuo piano, rosa = salvato da Michela, viola = proposta da validare, H = hotel. Le linee sono le tratte del viaggio.":"Mappa schematica, non in scala. Passa a Google Maps per la mappa vera.";
   if(g&&!GM) gmapInit(); if(!g) applyBox();
 }
 async function gmapInit(){
@@ -1213,10 +1250,10 @@ function gmapMarkers(){
   if(S.lay.hot) Object.keys(HOT).forEach(k=>add({key:"hot:"+k,kind:"hot",id:k,name:HOT[k].n,ll:HOT[k].ll,q:HOT[k].q,cls:"hot",txt:"H",z:30}));
   ATT.forEach(a=>{
     const sel=S.sel.has(a.id);
-    if(!((a.fav&&S.lay.fav)||(sel&&S.lay.plan)||(!sel&&!a.fav&&S.lay.other))) return;
+    if(!((a.fav&&S.lay.fav)||(a.prop&&S.lay.prop)||(sel&&S.lay.plan)||(!sel&&!a.fav&&!a.prop&&S.lay.other))) return;
     const key=a.id==="ta_onsen"?"hot:takayama":a.id;
     if(key!==a.id&&S.lay.hot) return;
-    add({key:key,kind:"att",id:a.id,name:a.name,ll:a.ll,q:a.q,cls:(a.fav?"fav":sel?"plan":"other")+(sel?" sel":""),txt:a.fav?"♥":sel?"✓":"",z:sel?20:a.fav?15:10});
+    add({key:key,kind:"att",id:a.id,name:a.name,ll:a.ll,q:a.q,cls:(a.fav?"fav":a.prop?"prop":sel?"plan":"other")+(sel?" sel":""),txt:a.fav?"♥":a.prop?(sel?"✓":"?"):sel?"✓":"",z:sel?20:a.fav||a.prop?15:10});
   });
 }
 function gmapOpen(it,m){
@@ -1737,6 +1774,8 @@ document.addEventListener("click",function(e){
   else if(act==="tldel"){ const d=b.dataset.day, L=mat(d), it=L[+b.dataset.k]; if(it){ S.sel.delete(it.id); unschedule(it.id); refreshAll(); } }
   else if(act==="delcustom"){ S.custom=S.custom.filter(c=>c.id!==id); store.set("custom",S.custom); rebuildCustom(); S.sel.delete(id); unschedule(id); refreshAll(); }
   else if(act==="ffav"){ S.ffav=!S.ffav; renderFilters(); renderGrid(); }
+  else if(act==="fprop"){ S.fprop=!S.fprop; renderFilters(); renderGrid(); }
+  else if(act==="propday"){ S.fprop=true; S.ffav=false; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
   else if(act==="mapmode"){ S.mapmode=id; store.set("mapmode",id); renderMapMode(); }
   else if(act==="favday"){ S.ffav=true; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
   else if(act==="fkid"){ S.fkid=!S.fkid; renderFilters(); renderGrid(); }
