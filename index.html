@@ -168,6 +168,20 @@ button{font-family:inherit}
 .stub .nn{font-family:var(--fd);font-size:2.3rem;font-weight:800;line-height:1}
 .stub .mm{font-size:.86rem;color:var(--muted)}
 .daybody{padding:13px 16px}
+/* giorni chiusi: una riga, si aprono toccandoli */
+.day .dayopen{appearance:none;background:none;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer;width:100%;display:block}
+.day .dayopen .dayhead{margin-bottom:2px}
+.day .dayopen .more{font-size:.86rem;color:var(--muted)}
+.day .dayopen .more b{color:var(--todo)}
+.day.shut .stub .nn{font-size:1.7rem}
+.dayall{display:flex;justify-content:flex-end;margin-bottom:10px}
+/* riquadri a scomparsa della scheda Attrazioni */
+details.box>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::after{content:"Apri ▾";margin-left:auto;font-size:.84rem;font-weight:700;color:var(--muted)}
+details.box[open]>summary::after{content:"Chiudi ▴"}
+details.box>summary h3{margin:0}
+details.box>summary .muted{font-size:.88rem}
 .dayhead{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:6px}
 .dayhead h3{font-size:1.15rem}
 .fx{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:4px 10px;align-items:baseline;font-size:.93rem;margin:6px 0}
@@ -220,7 +234,8 @@ table.fare tfoot td{font-weight:800;border-bottom:0}
 .att{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px}
 .att.is-sel{border-color:var(--ok)}
 .att h3{font-size:1.08rem}
-.att .jp{font-family:var(--fd);color:var(--muted);font-size:.95rem}
+.att .jp{font-family:var(--fd);color:var(--muted);font-size:.85rem;font-weight:500}
+@media (max-width:620px){.att{padding:12px;gap:4px}.att .advice{font-size:.86rem}}
 .att .meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.84rem;color:var(--muted)}
 .att .row1{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .att p{margin:0;font-size:.93rem}
@@ -443,7 +458,7 @@ textarea.note:focus{border-style:solid;border-color:var(--ink)}
 
 <section class="view" id="v-giorni" role="tabpanel">
   <h2>Giorno per giorno</h2>
-  <p class="muted">I riquadri con l'orario sono dati del programma dell'agenzia. Tocca una data nel menu per andare a quel giorno. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Sotto ogni giorno c'è il programma con orari e spostamenti: cambia un orario per fissarlo, sposta le tappe, aggiungi luoghi da Google Maps e premi «Riorganizza giorno» per l'ordine migliore. Il tramonto è verso le 17, alle 18 è già buio.</p>
+  <p class="muted">I riquadri con l'orario sono dati del programma dell'agenzia. Si apre il giorno di oggi: tocca una data nel menu o un giorno chiuso per aprirlo. Le proposte sono mie: tocca un luogo per aggiungerlo o toglierlo dal tuo piano. Sotto ogni giorno c'è il programma con orari e spostamenti: cambia un orario per fissarlo, sposta le tappe, aggiungi luoghi da Google Maps e premi «Riorganizza giorno» per l'ordine migliore. Il tramonto è verso le 17, alle 18 è già buio.</p>
   <nav class="daynav" id="daynav" aria-label="Vai al giorno"></nav>
   <div id="days" style="margin-top:14px"></div>
 </section>
@@ -742,6 +757,7 @@ const ATTM = {}; ATT.forEach(a=>ATTM[a.id]=a);
 S.custom=store.get("custom",[]); S.custom.forEach(c=>{ ATT.push(c); ATTM[c.id]=c; });
 S.sel=new Set(Array.from(S.sel).filter(id=>ATTM[id]));
 S.ffav=false; S.fprop=false;
+S.dayAll=false; S.box={prop:false,fav:false};
 S.mapmode=GM_KEY?store.get("mapmode","google"):"schema";
 S.lay=Object.assign({plan:true,other:false,fav:true,prop:true,hot:true},store.get("lay",{}));
 if(!store.get("favinit",false)){
@@ -956,8 +972,16 @@ function renderExpect(){ $("#expect").innerHTML=EXPECT.map(e=>`<div><b>${e.t}</b
 function renderDays(){
   const ti=todayIdx();
   const lists=allLists();
-  $("#days").innerHTML=DAYS.map((D,i)=>{
+  $("#days").innerHTML=`<div class="dayall"><button class="btn small" data-act="dayall">${S.dayAll?"Un giorno alla volta":"Apri tutti i giorni"}</button></div>`+DAYS.map((D,i)=>{
     const dt=parseD(D.d);
+    if(!S.dayAll&&D.d!==S.dayOpen){
+      const n=(lists[D.d]||[]).filter(it=>ATTM[it.id]).length, nf=D.fx.length;
+      const sum=[nf?`${nf} ${nf===1?"appuntamento fisso":"appuntamenti fissi"}`:"",n?`${n} ${n===1?"luogo":"luoghi"} nel piano`:""].filter(Boolean).join(" · ");
+      return `<article class="day shut${ti===i?" today":""}" id="day-${D.d}">
+      <div class="stub"><div class="gg">${GG[dt.getDay()]}</div><div class="nn">${dt.getDate()}</div><div class="mm">${MESI[dt.getMonth()]}</div></div>
+      <button class="daybody dayopen" data-act="openday" data-id="${D.d}" aria-expanded="false"><div class="dayhead"><h3>${D.title}</h3><span class="chip todo" style="background:var(--paper);color:var(--muted)">${D.c}</span>${ti===i?'<span class="seal">Oggi</span>':""}</div>
+      <span class="more">${sum?sum+" · ":""}<b>Apri</b></span></button></article>`;
+    }
     const fx=D.fx.map(f=>`<div class="fx"><span class="t">${f.t}</span><span>${f.x}</span>${chip(f.s)}</div>`).join("");
     const pl=D.pl.map(b=>`<div class="blk"><b>${b.w}.</b> ${b.t}${b.ids.length?`<div class="pills">${b.ids.map(id=>{const a=ATTM[id]; return a?`<button class="pill chipbtn${a.prop?" prop":""}" data-act="toggle" data-id="${id}" aria-pressed="${S.sel.has(id)}"${a.prop?' title="Proposta da validare"':""}>${a.fav?"♥ ":a.prop?"? ":""}${a.name}</button>`:"";}).join("")}</div>`:""}</div>`).join("");
     const w=D.w.map(x=>`<div class="warn">${x}</div>`).join("");
@@ -985,7 +1009,9 @@ function markDay(d){
   navDay=d; const nav=$("#daynav"); if(!nav) return;
   $$(".dchip",nav).forEach(c=>{ const on=c.dataset.id===d; c.setAttribute("aria-current",on); if(on){ const x=c.offsetLeft-(nav.clientWidth-c.offsetWidth)/2; nav.scrollTo({left:Math.max(0,x),behavior:"smooth"}); } });
 }
+function defOpenDay(){ const ti=todayIdx(); return DAYS[Math.max(0,Math.min(DAYS.length-1,ti))].d; }
 function goDay(d){
+  if(!S.dayAll&&S.dayOpen!==d){ S.dayOpen=d; renderDays(); }
   const el=$("#day-"+d); if(!el) return;
   navLock=Date.now()+900; markDay(d);
   const calm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1056,17 +1082,15 @@ function renderFilters(){
 function attCard(a,dmap){
   const on=S.sel.has(a.id);
   const pri=a.pri===3?'<span class="seal" title="Imperdibile">必見</span>':a.pri===2?'<span class="tag">Consigliata</span>':'<span class="tag dim">Se hai tempo</span>';
-  const org=CITY[a.city].origin;
   const hrs=a.cat==="Dormire"?"alternativa per la notte":a.meal?"pasto, non pesa sul tempo":a.min>=60?`${Math.floor(a.min/60)} h${a.min%60?" "+a.min%60+" min":""}`:`${a.min} min`;
   return `<article class="att${on?" is-sel":""}${a.fav?" is-fav":""}${a.prop?" is-prop":""}">
    <div class="row1">${a.custom?'<span class="tag">Aggiunto da te</span>':a.prop?'<span class="tag prop">Da validare</span>':a.fav?'<span class="heart">♥ Michela</span>':pri}<span class="muted" style="font-size:.84rem">${CITY[a.city].n}, ${a.zone}</span></div>
-   <h3>${a.name}</h3><div class="jp" lang="ja">${a.jp}</div>
+   <h3>${a.name}${a.jp?` <span class="jp" lang="ja">${a.jp}</span>`:""}</h3>
    <div class="meta"><span>${a.cat}</span><span>${hrs}</span>${a.book==="obbligatoria"?'<span class="chip risk">Prenotazione obbligatoria</span>':a.book==="consigliata"?'<span class="chip req">Prenotazione consigliata</span>':""}${a.kid?"<span>Va bene con un bambino</span>":""}${a.inc?'<span class="chip ok">Già nel preventivo</span>':""}</div>
-   <p><b>Quando:</b> ${a.best}.</p><p>${a.note}</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}
+   <p><b>Quando:</b> ${a.best}.</p>${a.why?`<div class="advice">${verdictChip(a.v)} ${a.why}</div>`:""}${a.warn?`<div class="warn">${a.warn}</div>`:""}
    <div class="acts"><button class="btn small" data-act="toggle" data-id="${a.id}" aria-pressed="${on}">${on?"Nel piano":"Aggiungi al piano"}</button>
    <button class="btn small primary" data-act="detail" data-kind="att" data-id="${a.id}">Dettagli</button>
-   <a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Mappa</a>
-   <a class="btn small" target="_blank" rel="noopener" href="${gdir(org,a.q)}">Dall'hotel</a>${a.custom?`<button class="btn small" data-act="delcustom" data-id="${a.id}">Elimina</button>`:""}</div>
+   <a class="btn small" target="_blank" rel="noopener" href="${placeUrl(a)}">Mappa</a>${a.custom?`<button class="btn small" data-act="delcustom" data-id="${a.id}">Elimina</button>`:""}</div>
    ${on&&a.cat!=="Dormire"&&dmap?`<label class="daypick">Giorno <select class="mini" data-act="setday" data-id="${a.id}"><option value="">${dmap[a.id]?"—":"non ancora in un giorno"}</option>${dayOpts(dmap[a.id]||"")}</select></label>`:""}</article>`;
 }
 function renderGrid(){
@@ -1077,23 +1101,26 @@ function renderGrid(){
   $("#grid").innerHTML=list.length?list.map(a=>attCard(a,dmap)).join(""):`<p class="empty">Nessun luogo con questi filtri.</p>`;
 }
 function renderAtt(){ renderPropBox(); renderFavBox(); renderBudget(); renderFilters(); renderGrid(); }
+/* la scheda Attrazioni si apre sulla città in cui siete oggi (prima della partenza Tokyo, dopo il rientro tutte) */
+function defCity(){ const ti=todayIdx(); if(ti>=DAYS.length) return "all"; const D=DAYS[Math.max(0,ti)], c=DAYCFG[D.d]&&DAYCFG[D.d].city; return c&&CITY[c]?c:"tokyo"; }
 function renderPropBox(){
   const P=ATT.filter(a=>a.prop), ok=P.filter(a=>S.sel.has(a.id)).length;
   const days=P.map(a=>a.d||"").filter((d,k,arr)=>arr.indexOf(d)===k);
   const row=a=>`<div class="favrow"><button class="pill chipbtn prop" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${esc(a.name)}</button><span>${S.sel.has(a.id)?chip("ok","Validata"):chip("prop","Da validare")}</span><span>${a.why} <a href="#" data-act="detail" data-kind="att" data-id="${a.id}" onclick="return false">Scheda</a></span></div>`;
-  $("#propbox").innerHTML=`<h3 style="color:var(--prop)">Tokyo: cosa mancava</h3>
-   <p class="muted" style="margin-top:4px">Ho controllato le attrazioni di Tokyo (cibo escluso) sui quattro giorni. Il piano resta com'è; queste ${P.length} sono proposte in viola, inserite nei giorni dove stanno meglio. Tocca un nome per validarla: entra nel piano e diventa verde. Validate: <b>${ok} di ${P.length}</b>.</p>
+  const box=$("#propbox"); box.hidden=!(S.fcity==="all"||S.fcity==="tokyo"); if(box.hidden) return;
+  box.innerHTML=`<details class="box" data-box="prop"${S.box.prop?" open":""}><summary><h3 style="color:var(--prop)">Tokyo: cosa mancava</h3><span class="muted">${ok} di ${P.length} proposte validate</span></summary>
+   <p class="muted" style="margin-top:8px">Ho controllato le attrazioni di Tokyo (cibo escluso) sui quattro giorni. Il piano resta com'è; queste ${P.length} sono proposte in viola, inserite nei giorni dove stanno meglio. Tocca un nome per validarla: entra nel piano e diventa verde. Validate: <b>${ok} di ${P.length}</b>.</p>
    ${days.map(d=>{ if(!d) return `<div class="favday"><h4>Senza giorno</h4>`+P.filter(a=>!a.d).map(row).join("")+`</div>`; const dt=parseD(d); return `<div class="favday"><h4>${GGL[dt.getDay()]} ${dt.getDate()} ottobre</h4>`+P.filter(a=>a.d===d).map(row).join("")+`</div>`; }).join("")}
-   <div class="acts"><button class="btn small" data-act="propday">Mostra solo le proposte</button></div>`;
+   <div class="acts"><button class="btn small" data-act="propday">Mostra solo le proposte</button></div></details>`;
 }
 function renderFavBox(){
   const F=ATT.filter(a=>a.fav).sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:b.pri-a.pri);
   const n=v=>F.filter(a=>a.v===v).length;
   const days=F.map(a=>a.d).filter((d,k,arr)=>arr.indexOf(d)===k);
-  $("#favbox").innerHTML=`<h3><span class="heart" style="font-size:1.1rem">♥</span> I preferiti di Michela</h3>
-   <p class="muted" style="margin-top:4px">Dal suo Google Maps: 20 posti in Giappone. I quattro hotel e la stazione dei bus di Takayama erano già nel cruscotto; gli altri ${F.length} li ho messi nei giorni in cui ci passate. Il mio consiglio: <b>${n("si")} sì</b>, <b>${n("forse")} forse</b>, <b>${n("no")} da saltare</b>. Tocca un nome per aggiungerlo o toglierlo dal piano.</p>
+  $("#favbox").innerHTML=`<details class="box" data-box="fav"${S.box.fav?" open":""}><summary><h3><span class="heart" style="font-size:1.1rem">♥</span> I preferiti di Michela</h3><span class="muted">${n("si")} sì, ${n("forse")} forse, ${n("no")} da saltare</span></summary>
+   <p class="muted" style="margin-top:8px">Dal suo Google Maps: 20 posti in Giappone. I quattro hotel e la stazione dei bus di Takayama erano già nel cruscotto; gli altri ${F.length} li ho messi nei giorni in cui ci passate. Il mio consiglio: <b>${n("si")} sì</b>, <b>${n("forse")} forse</b>, <b>${n("no")} da saltare</b>. Tocca un nome per aggiungerlo o toglierlo dal piano.</p>
    ${days.map(d=>{ const dt=parseD(d); return `<div class="favday"><h4>${GGL[dt.getDay()]} ${dt.getDate()} ottobre</h4>`+F.filter(a=>a.d===d).map(a=>`<div class="favrow"><button class="pill chipbtn" data-act="toggle" data-id="${a.id}" aria-pressed="${S.sel.has(a.id)}">${esc(a.name)}</button><span>${verdictChip(a.v)}</span><span>${a.why} <a href="#" data-act="detail" data-kind="att" data-id="${a.id}" onclick="return false">Scheda</a></span></div>`).join("")+`</div>`; }).join("")}
-   <div class="acts"><button class="btn small" data-act="favday">Mostra solo i suoi preferiti</button></div>`;
+   <div class="acts"><button class="btn small" data-act="favday">Mostra solo i suoi preferiti</button></div></details>`;
 }
 function toggle(id){
   if(S.sel.has(id)){ S.sel.delete(id); unschedule(id); store.set("sched",S.sched); }
@@ -1767,14 +1794,15 @@ document.addEventListener("click",function(e){
   else if(act==="toggle"){ toggle(id); refreshModalBtn(); }
   else if(act==="detail") openModal(b.dataset.kind,id);
   else if(act==="closemodal") closeModal();
-  else if(act==="fcity"){ S.fcity=id; renderFilters(); renderGrid(); }
+  else if(act==="fcity"){ S.fcity=id; renderPropBox(); renderFilters(); renderGrid(); }
   else if(act==="addplace") openAdd(id||null);
   else if(act==="addsearch") addSearch();
   else if(act==="addpick"){ ADD.pick=ADD.res[+b.dataset.i]; $("#addres").innerHTML=addForm(ADD.pick); }
   else if(act==="addback"){ addSearch(); }
   else if(act==="addconfirm") addConfirm();
   else if(act==="dayopt") dayOptimize(id);
-  else if(act==="goday") goDay(id);
+  else if(act==="goday"||act==="openday") goDay(id);
+  else if(act==="dayall"){ S.dayAll=!S.dayAll; renderDays(); if(!S.dayAll) goDay(S.dayOpen); }
   else if(act==="logout"){ if(confirm("Esci dal cruscotto su questo dispositivo? Per rientrare servirà di nuovo la password.")){ try{ Object.keys(localStorage).filter(k=>k.indexOf("jp26")===0).forEach(k=>localStorage.removeItem(k)); }catch(x){} location.reload(); } }
   else if(act==="dayroutes"){ S.dayMsg[id]={txt:"Calcolo i tempi reali di spostamento con Google…"}; renderDays();
     dayRoutes(id).then(r=>{ const sim=simulate(id,allLists()[id]); S.dayMsg[id]={txt:routesOff?`Google Routes non risponde: ${routesOff}. Per attivarlo: Google Cloud → abilita "Routes API" e aggiungila alle API consentite della chiave.`:r.err&&!r.n?`Errore da Google Routes: ${r.err}`:`Tempi reali aggiornati${r.n?` (${r.n} percorsi)`:" (erano già calcolati)"}: ${durTxt(Math.round(sim.travelTot))} di spostamenti, rientro verso le ${fmtT(sim.fin)}.`,ok:!routesOff&&!r.err}; renderDays(); }); }
@@ -1785,9 +1813,9 @@ document.addEventListener("click",function(e){
   else if(act==="delcustom"){ S.custom=S.custom.filter(c=>c.id!==id); store.set("custom",S.custom); rebuildCustom(); S.sel.delete(id); unschedule(id); refreshAll(); }
   else if(act==="ffav"){ S.ffav=!S.ffav; renderFilters(); renderGrid(); }
   else if(act==="fprop"){ S.fprop=!S.fprop; renderFilters(); renderGrid(); }
-  else if(act==="propday"){ S.fprop=true; S.ffav=false; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
+  else if(act==="propday"){ S.fprop=true; S.ffav=false; S.fcity="all"; renderPropBox(); renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
   else if(act==="mapmode"){ S.mapmode=id; store.set("mapmode",id); renderMapMode(); }
-  else if(act==="favday"){ S.ffav=true; S.fcity="all"; renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
+  else if(act==="favday"){ S.ffav=true; S.fcity="all"; renderPropBox(); renderFilters(); renderGrid(); $("#filters").scrollIntoView({behavior:"smooth"}); }
   else if(act==="fkid"){ S.fkid=!S.fkid; renderFilters(); renderGrid(); }
   else if(act==="fpri"){ S.fpri=!S.fpri; renderFilters(); renderGrid(); }
   else if(act==="reset"){ S.sel=new Set(defSel()); store.set("sel",Array.from(S.sel)); renderHead(); renderAtt(); renderDays(); renderPanel(); }
@@ -1835,6 +1863,8 @@ if("serviceWorker" in navigator&&location.protocol!=="file:") navigator.serviceW
 
 /* ---------- avvio ---------- */
 renderHead(); renderTabs(); renderAlerts(); renderStrip(); buildMap(); renderPanel(); renderExpect(); renderBookings();
+S.dayOpen=defOpenDay(); S.fcity=defCity();
+document.addEventListener("toggle",e=>{ const b=e.target.dataset&&e.target.dataset.box; if(b) S.box[b]=e.target.open; },true);
 renderDayNav(); renderDays(); renderLegs(); renderAtt(); renderChk();
 $("#childAge").value=S.child; $("#fx").value=S.fx; renderCalc();
 renderSettings(); Sync.badge();
